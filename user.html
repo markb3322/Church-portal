@@ -3,292 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard | MC Balilihan</title>
+    <title>User Portal | MC Balilihan</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Bungee&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+        .official-stamp {
+            border: 6px double currentColor;
+            border-radius: 15px;
+            padding: 15px;
+            display: inline-block;
+            transform: rotate(-5deg);
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            font-family: 'Bungee', cursive;
+        }
+        #exportTemplate { width: 800px; position: absolute; left: -9999px; background: white; padding: 60px; }
         .custom-scroll::-webkit-scrollbar { width: 5px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .announcement-glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #10b981; border-radius: 10px; }
     </style>
 </head>
-<body class="bg-[#f8fafc] min-h-screen">
-    
-    <nav class="bg-[#2D4E53] text-white p-5 px-6 md:px-10 flex justify-between items-center shadow-lg sticky top-0 z-50">
-        <div class="flex items-center gap-3">
-            <div class="bg-emerald-500 p-2 rounded-xl shadow-lg shadow-emerald-500/20">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l4 4v10a2 2 0 01-2 2z" />
-                </svg>
-            </div>
-            <h1 class="font-black tracking-widest text-xs md:text-sm uppercase">MC Balilihan Staff Portal</h1>
+<body class="min-h-screen pb-20">
+
+    <div id="exportTemplate">
+        <div style="text-align: center; border-bottom: 4px solid #1e293b; padding-bottom: 20px; margin-bottom: 30px;">
+            <h1 style="font-size: 32px; font-weight: 900; color: #2D4E53; margin: 0;">MOBILIZATION CHURCH BALILIHAN</h1>
+            <p style="letter-spacing: 5px; font-weight: 800; color: #94a3b8; font-size: 14px; margin-top: 5px;">OFFICIAL SERVICE PROGRAM</p>
         </div>
-    </nav>
-
-    <div class="max-w-7xl mx-auto p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        <div class="lg:col-span-4">
-            <div class="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 sticky top-28 overflow-hidden">
-                <div class="bg-gradient-to-br from-[#2D4E53] to-[#1a3135] p-6 text-white">
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="font-black text-[10px] uppercase tracking-[0.2em] opacity-80">Official Update</h3>
-                        <span class="flex h-2 w-2">
-                            <span class="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-emerald-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                        </span>
-                    </div>
-                    <h2 class="text-xl font-extrabold tracking-tight">Announcement</h2>
-                </div>
-                
-                <div class="p-8 relative">
-                    <div class="absolute top-0 right-0 -mt-4 mr-6 bg-emerald-500 text-white p-3 rounded-2xl shadow-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                        </svg>
-                    </div>
-                    <div id="newsFeed" class="space-y-4">
-                        <div class="bg-slate-50/80 rounded-3xl p-6 border border-dashed border-slate-200">
-                            <p id="newsContent" class="text-sm font-bold text-slate-700 leading-relaxed italic">Checking for updates...</p>
-                        </div>
-                        <div class="flex items-center justify-between px-2">
-                            <div class="flex flex-col">
-                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Posted on</span>
-                                <span id="newsDate" class="text-xs font-bold text-[#2D4E53]">--/--/--</span>
-                            </div>
-                            <button onclick="loadNews()" class="p-2 hover:bg-slate-100 rounded-xl transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 40px;">
+            <div><p style="font-size: 12px; font-weight: 800; color: #64748b;">PROGRAM TITLE</p><h2 id="expTitle" style="font-size: 28px; font-weight: 900; color: #1e293b; margin: 0;"></h2></div>
+            <div style="text-align: right;"><p style="font-size: 12px; font-weight: 800; color: #64748b;">DATE</p><h2 id="expDate" style="font-size: 24px; font-weight: 700; color: #334155; margin: 0;"></h2></div>
         </div>
-
-        <div class="lg:col-span-8 space-y-8">
-            <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100">
-                <h3 class="font-black text-slate-800 uppercase text-[11px] tracking-[0.2em] mb-4">Verification & Records</h3>
-                <input id="verifyName" type="text" placeholder="Enter Full Name to search records..." 
-                    class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all mb-8">
-                
-                <div class="space-y-10">
-                    <div>
-                        <h4 class="text-[10px] font-black uppercase text-emerald-700 tracking-widest mb-4 flex items-center gap-2">
-                            <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span> Approved Programs
-                        </h4>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <tbody id="approvedList"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div>
-                        <h4 class="text-[10px] font-black uppercase text-red-700 tracking-widest mb-4 flex items-center gap-2">
-                            <span class="w-1.5 h-1.5 bg-red-500 rounded-full"></span> Rejected / Needs Revision
-                        </h4>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <tbody id="rejectedList"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="formSection" class="bg-white p-6 md:p-10 rounded-[2.5rem] shadow-sm border border-slate-100">
-                <h2 id="formTitle" class="text-2xl font-black text-slate-800 tracking-tight">Create New Program</h2>
-                <form id="progForm" class="space-y-6 mt-8">
-                    <div class="space-y-4">
-                        <input id="fullName" type="text" placeholder="Full Name (Submitter)" class="w-full bg-slate-50 border-none p-4 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none" required>
-                        <div class="grid grid-cols-2 gap-4">
-                            <input id="title" type="text" placeholder="Service Title" class="w-full bg-slate-50 border-none p-4 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none" required>
-                            <input id="date" type="date" class="w-full bg-slate-50 border-none p-4 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none" required>
-                        </div>
-                    </div>
-                    <div class="bg-slate-50 p-6 rounded-[2rem]">
-                        <div class="flex justify-between items-center mb-4">
-                            <span class="text-[10px] font-black uppercase text-slate-400">Segments</span>
-                            <button type="button" onclick="addRow()" class="bg-slate-900 text-white text-[9px] px-4 py-2 rounded-xl font-black transition-transform active:scale-95">+ ADD</button>
-                        </div>
-                        <div id="rowContainer" class="space-y-3"></div>
-                    </div>
-                    <button type="submit" id="submitBtn" class="w-full bg-[#2D4E53] text-white py-5 rounded-[2rem] font-black text-xs uppercase tracking-[0.2em] shadow-xl hover:bg-[#1a3135] hover:-translate-y-1 transition-all active:scale-[0.98]">SUBMIT PROGRAM</button>
-                </form>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 50px;">
+            <tbody id="expRows" style="font-size: 18px; font-weight: 600;"></tbody>
+        </table>
+        <div style="display: flex; justify-content: flex-end;">
+            <div id="stampBox" class="official-stamp">
+                <div style="font-size: 12px; border-bottom: 2px solid currentColor; margin-bottom: 5px;">MC BALILIHAN</div>
+                <div style="font-size: 45px; line-height: 1;">APPROVED</div>
+                <div id="stampMeta" style="font-size: 10px; margin-top: 5px; display: flex; justify-content: space-between; font-family: sans-serif;"></div>
             </div>
         </div>
     </div>
 
+    <nav class="bg-[#2D4E53] text-white p-5 shadow-lg flex justify-between items-center sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <div class="bg-emerald-500 p-2 rounded-xl">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l4 4v10a2 2 0 01-2 2z" /></svg>
+            </div>
+            <h1 class="font-black tracking-tighter text-xl uppercase">MC Portal</h1>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <div class="lg:col-span-8 space-y-8">
+            
+            <div class="bg-white rounded-[2rem] shadow-xl border-l-8 border-emerald-500 overflow-hidden">
+                <div class="p-6 bg-emerald-50/50 border-b border-emerald-100 flex items-center gap-3">
+                    <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span></span>
+                    <h3 class="font-black text-emerald-900 text-xs uppercase tracking-widest">Latest Announcement</h3>
+                </div>
+                <div id="annContainer" class="p-8">
+                    <p class="text-slate-400 font-bold italic animate-pulse">Checking for updates...</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-100">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                    <h2 class="text-2xl font-black text-slate-800 tracking-tight">Program History</h2>
+                    <input id="searchName" type="text" placeholder="Type your name to find records..." class="p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-emerald-500 font-bold transition-all w-full md:w-72 text-sm">
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <tbody id="historyList" class="divide-y divide-slate-50">
+                            <tr><td class="p-10 text-center text-slate-300 font-bold uppercase text-[10px] tracking-widest">Search your name above</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-4">
+            <div class="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 sticky top-28">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-800">New Program</h3>
+                </div>
+                <form id="progForm" class="space-y-4">
+                    <input id="userName" type="text" placeholder="Your Full Name" class="w-full p-4 bg-slate-50 rounded-xl font-bold outline-none border-2 border-transparent focus:border-emerald-500" required>
+                    <input id="progTitle" type="text" placeholder="Service Title" class="w-full p-4 bg-slate-50 rounded-xl font-bold outline-none border-2 border-transparent focus:border-emerald-500" required>
+                    <input id="progDate" type="date" class="w-full p-4 bg-slate-50 rounded-xl font-bold outline-none border-2 border-transparent focus:border-emerald-500" required>
+                    <div id="rowContainer" class="space-y-2 max-h-60 overflow-y-auto pr-2 custom-scroll"></div>
+                    <button type="button" onclick="addRow()" class="w-full py-2 border-2 border-dashed border-emerald-200 rounded-xl text-emerald-600 font-bold text-[10px] hover:bg-emerald-50 transition-all uppercase tracking-widest">+ Add Row</button>
+                    <button type="submit" id="submitBtn" class="w-full bg-[#2D4E53] text-white py-4 rounded-2xl font-black shadow-lg hover:bg-emerald-900 transition-all uppercase tracking-widest text-[11px]">Submit Program</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
     <script>
         const sb = supabase.createClient('https://eejovtuputrwneovhfpc.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlam92dHVwdXRyd25lb3ZoZnBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMjY5MzIsImV4cCI6MjA4NjgwMjkzMn0.JJz64gSTT9qSqOkiJvuL1PT_H_I4ZYJbchrmkoljwws');
 
-        let allLoadedProgs = [];
-
-        async function loadNews() {
-            const { data } = await sb.from('announcements').select('*').order('created_at', {ascending: false}).limit(1).single();
-            if (data) {
-                document.getElementById('newsContent').innerText = data.content;
-                document.getElementById('newsDate').innerText = new Date(data.created_at).toLocaleDateString();
+        // LOAD ANNOUNCEMENTS
+        async function loadAnn() {
+            const { data, error } = await sb.from('announcements').select('*').order('created_at', {ascending: false}).limit(1);
+            if(data && data[0]) {
+                document.getElementById('annContainer').innerHTML = `
+                    <p class="text-slate-800 font-bold text-lg leading-relaxed">${data[0].content}</p>
+                    <p class="text-[10px] text-slate-400 font-black uppercase mt-4 tracking-widest">Posted on: ${new Date(data[0].created_at).toLocaleDateString()}</p>
+                `;
+            } else {
+                document.getElementById('annContainer').innerHTML = `<p class="text-slate-400 font-bold italic">No active announcements.</p>`;
             }
         }
 
-        function addRow(actVal = '', whoVal = '') {
-            const d = document.createElement('div'); 
-            d.className = "flex gap-3 act-row animate-in fade-in slide-in-from-top-2 duration-300";
-            d.innerHTML = `
-                <input type="text" placeholder="Activity" value="${actVal}" class="act bg-white border border-slate-200 p-3 rounded-xl w-1/2 text-xs font-bold outline-none focus:ring-2 focus:ring-emerald-500/20" required> 
-                <input type="text" placeholder="In-charge" value="${whoVal}" class="who bg-white border border-slate-200 p-3 rounded-xl w-1/2 text-xs font-bold outline-none focus:ring-2 focus:ring-emerald-500/20" required>
-                <button type="button" onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-600 font-black px-1 transition-colors">×</button>
+        function addRow(act='', who='') {
+            const div = document.createElement('div');
+            div.className = "flex gap-2 act-row";
+            div.innerHTML = `
+                <input type="text" placeholder="Activity" class="act flex-1 p-3 bg-slate-50 rounded-lg text-xs font-bold border border-transparent focus:border-emerald-200 outline-none" required>
+                <input type="text" placeholder="Who" class="who w-1/3 p-3 bg-slate-50 rounded-lg text-xs font-bold border border-transparent focus:border-emerald-200 outline-none" required>
+                <button type="button" onclick="this.parentElement.remove()" class="text-red-300 hover:text-red-500 font-bold px-1">×</button>
             `;
-            document.getElementById('rowContainer').appendChild(d);
+            document.getElementById('rowContainer').appendChild(div);
         }
 
-        async function loadHistory(username) {
-            if(!username || username.length < 3) return;
-            const { data: progs } = await sb.from('programs').select('*').eq('user_id', username).order('created_at', {ascending:false});
-            allLoadedProgs = progs || [];
-            renderTables(username);
-        }
-
-        function renderTables(username) {
-            const appList = document.getElementById('approvedList');
-            const rejList = document.getElementById('rejectedList');
-            appList.innerHTML = ""; rejList.innerHTML = "";
-
-            allLoadedProgs.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.className = "border-b border-slate-50 hover:bg-slate-50/50 transition-colors";
-                const tdTitle = document.createElement('td');
-                tdTitle.className = "py-4 text-xs font-bold text-slate-700 uppercase";
-                tdTitle.textContent = item.title;
-                const tdActions = document.createElement('td');
-                tdActions.className = "py-4 text-right space-x-2";
-
-                if(item.status === 'approved') {
-                    tdActions.append(
-                        createBtn('DOC', 'bg-emerald-600 text-white', () => exportToWord(item)),
-                        createBtn('DELETE', 'bg-red-50 text-red-500', () => deleteProgram(item.id, username))
-                    );
-                } else if(item.status === 'rejected') {
-                    tdActions.append(
-                        createBtn('EDIT', 'bg-red-600 text-white', () => editRejected(item)),
-                        createBtn('DELETE', 'bg-slate-100 text-slate-400', () => deleteProgram(item.id, username))
-                    );
-                }
-                tr.append(tdTitle, tdActions);
-                (item.status === 'approved' ? appList : rejList).appendChild(tr);
-            });
-            if(!appList.children.length) appList.innerHTML = '<tr><td class="py-4 text-center text-[9px] text-slate-300">No approved records</td></tr>';
-            if(!rejList.children.length) rejList.innerHTML = '<tr><td class="py-4 text-center text-[9px] text-slate-300">No rejected records</td></tr>';
-        }
-
-        function createBtn(text, classes, onClick) {
-            const btn = document.createElement('button');
-            btn.textContent = text;
-            btn.className = `${classes} text-[8px] font-black px-3 py-2 rounded-lg transition-all active:scale-95 hover:opacity-90 shadow-sm`;
-            btn.onclick = (e) => { e.preventDefault(); onClick(); };
-            return btn;
-        }
-
-        async function deleteProgram(id, user) {
-            if(confirm("Delete this record permanently?")) {
-                const { error } = await sb.from('programs').delete().eq('id', id);
-                if(!error) loadHistory(user);
-            }
-        }
-
-        function editRejected(data) {
-            document.getElementById('formSection').scrollIntoView({ behavior: 'smooth' });
-            document.getElementById('formTitle').innerText = "Update Program";
-            document.getElementById('fullName').value = data.user_id;
-            document.getElementById('title').value = data.title;
-            document.getElementById('date').value = data.program_date;
-            document.getElementById('rowContainer').innerHTML = '';
-            if(data.content) data.content.forEach(row => addRow(row.act, row.who));
-            const sBtn = document.getElementById('submitBtn');
-            sBtn.innerText = "RESUBMIT FOR APPROVAL";
-            sBtn.classList.replace('bg-[#2D4E53]', 'bg-red-600');
-        }
-
-        /**
-         * UPDATED EXPORT FUNCTION: Includes the Documentary Stamp
-         */
-        function exportToWord(i) {
-            const rows = i.content.map(c => `
-                <tr>
-                    <td style="border:1px solid #ddd;padding:10px;font-family:Arial;"><b>${c.act.toUpperCase()}</b></td>
-                    <td style="border:1px solid #ddd;padding:10px;font-family:Arial;text-align:right;">${c.who}</td>
+        async function loadHistory(name) {
+            if(name.length < 3) return;
+            const { data } = await sb.from('programs').select('*').eq('user_id', name).order('created_at', {ascending: false});
+            const list = document.getElementById('historyList');
+            list.innerHTML = data.length ? data.map(i => `
+                <tr class="group hover:bg-slate-50 transition-all">
+                    <td class="p-6">
+                        <div class="flex items-center gap-3">
+                            <span class="w-2 h-2 rounded-full ${i.status === 'approved' ? 'bg-emerald-500' : 'bg-amber-400 animate-pulse'}"></span>
+                            <div>
+                                <h4 class="font-black text-slate-800 uppercase text-sm">${i.title}</h4>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">${i.program_date} | STATUS: ${i.status}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-6 text-right">
+                        ${i.status === 'approved' ? `
+                            <button onclick='exportImage(${JSON.stringify(i)})' class="bg-emerald-600 text-white px-5 py-2.5 rounded-xl text-[10px] font-black shadow-lg hover:bg-emerald-700 transition-all uppercase">Get Image</button>
+                        ` : '<span class="text-[10px] font-black text-slate-300 uppercase tracking-widest italic">Awaiting Review</span>'}
+                    </td>
                 </tr>
+            `).join('') : '<tr><td class="p-10 text-center text-slate-300 font-bold uppercase">No records found.</td></tr>';
+        }
+
+        async function exportImage(item) {
+            const temp = document.getElementById('exportTemplate');
+            const stampColor = item.stamp_color || "#1e40af";
+            const appDate = item.approved_at ? new Date(item.approved_at) : new Date();
+
+            document.getElementById('expTitle').innerText = item.title.toUpperCase();
+            document.getElementById('expDate').innerText = item.program_date;
+            document.getElementById('expRows').innerHTML = item.content.map(c => `
+                <tr style="border-bottom: 1px solid #e2e8f0;"><td style="padding: 15px;">${c.act.toUpperCase()}</td><td style="padding: 15px; text-align: right; color: #64748b;">${c.who}</td></tr>
             `).join('');
 
-            // Date of Approval (from database or current date)
-            const approvalDate = i.approved_at ? new Date(i.approved_at).toLocaleDateString() : new Date().toLocaleDateString();
-            const stampColor = "#059669"; // Emerald Green
+            const stamp = document.getElementById('stampBox');
+            stamp.style.color = stampColor;
+            stamp.style.borderColor = stampColor;
+            document.getElementById('stampMeta').innerHTML = `<span>VERIFIED: ${appDate.toLocaleDateString()}</span><span>${appDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>`;
 
-            const html = `
-            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-            <body style="font-family:Arial, sans-serif;padding:40px;">
-                <div style="text-align:center;margin-bottom:20px;">
-                    <h1 style="margin:0;color:#2D4E53;">MOBILIZATION CHURCH BALILIHAN</h1>
-                    <p style="margin:0;letter-spacing:2px;font-weight:bold;">OFFICIAL SERVICE PROGRAM</p>
-                    <hr style="border:1px solid black;">
-                </div>
-                
-                <p><b>TITLE:</b> ${i.title.toUpperCase()}</p>
-                <p><b>DATE:</b> ${i.program_date}</p>
-
-                <table width="100%" style="border-collapse:collapse;margin-top:20px;">
-                    <tr style="background:#eee;">
-                        <th style="border:1px solid #ddd;padding:10px;text-align:left;">ACTIVITY</th>
-                        <th style="border:1px solid #ddd;padding:10px;text-align:right;">IN-CHARGE</th>
-                    </tr>
-                    ${rows}
-                </table>
-
-                <div style="margin-top:60px; text-align:right;">
-                    <div style="display:inline-block; border:4px double ${stampColor}; padding:15px; text-align:center; color:${stampColor};">
-                        <p style="margin:0; font-size:10px; font-weight:bold;">MOBILIZATION CHURCH BALILIHAN</p>
-                        <h2 style="margin:5px 0; font-size:24px; font-weight:900;">APPROVED</h2>
-                        <p style="margin:0; font-size:12px; font-weight:bold;">DATE: ${approvalDate}</p>
-                    </div>
-                </div>
-            </body>
-            </html>`;
-
-            const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `OFFICIAL_${i.title}_Program.doc`;
-            link.click();
+            html2canvas(temp, { scale: 3 }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `APPROVED_${item.title}.png`;
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+            });
         }
 
-        document.getElementById('verifyName').addEventListener('input', (e) => loadHistory(e.target.value));
-
+        document.getElementById('searchName').addEventListener('input', (e) => loadHistory(e.target.value));
+        
         document.getElementById('progForm').onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
-            btn.disabled = true;
-            btn.innerText = "SUBMITTING...";
-
-            const content = Array.from(document.querySelectorAll('.act-row')).map(d => ({
-                act: d.querySelector('.act').value, 
-                who: d.querySelector('.who').value
+            btn.innerText = "SENDING..."; btn.disabled = true;
+            
+            const content = Array.from(document.querySelectorAll('.act-row')).map(r => ({
+                act: r.querySelector('.act').value, who: r.querySelector('.who').value
             }));
-
-            const { error } = await sb.from('programs').insert({ 
-                user_id: document.getElementById('fullName').value, 
-                title: document.getElementById('title').value, 
-                program_date: document.getElementById('date').value, 
-                content: content, 
+            
+            const { error } = await sb.from('programs').insert({
+                user_id: document.getElementById('userName').value,
+                title: document.getElementById('progTitle').value,
+                program_date: document.getElementById('progDate').value,
+                content: content,
                 status: 'pending'
             });
 
-            if (!error) { alert("Submitted successfully!"); location.reload(); } 
-            else { alert(error.message); btn.disabled = false; btn.innerText = "SUBMIT PROGRAM"; }
+            if(!error) { alert("Sent successfully!"); location.reload(); }
+            else { alert("Error: " + error.message); btn.innerText = "SUBMIT PROGRAM"; btn.disabled = false; }
         }
 
         addRow();
-        loadNews();
+        loadAnn(); // Fetch announcement on load
     </script>
 </body>
 </html>
