@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard | MC Balilihan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-50 min-h-screen">
+    <nav class="bg-[#1a3a3a] text-white p-4 flex justify-between px-10 items-center">
+        <h2 class="font-bold text-sm tracking-widest uppercase">Church Admin Panel</h2>
+        <div class="flex gap-4 items-center">
+            <button onclick="addUser()" class="bg-blue-500 text-[10px] px-3 py-1 rounded">ADD STAFF</button>
+            <button onclick="location.href='index.html'" class="text-[10px] bg-gray-700 px-3 py-1 rounded">LOGOUT</button>
+        </div>
+    </nav>
+
+    <div class="p-8 grid grid-cols-12 gap-6">
+        <div class="col-span-12 lg:col-span-4 space-y-6">
+            <div class="bg-white rounded-xl shadow-sm border h-[60vh] overflow-y-auto">
+                <h3 class="p-4 font-bold border-b text-gray-600 text-xs">PENDING APPROVALS</h3>
+                <div id="pList" class="divide-y"></div>
+            </div>
+            
+            <div class="bg-white p-4 rounded-xl border shadow-sm">
+                <h3 class="font-bold text-xs text-gray-500 mb-2 uppercase">Post Church News</h3>
+                <textarea id="annText" class="w-full border p-2 text-sm rounded-lg h-20" placeholder="Type announcement..."></textarea>
+                <button onclick="postAnn()" class="w-full bg-black text-white py-2 text-xs rounded-lg mt-2">PUBLISH TO DASHBOARD</button>
+            </div>
+        </div>
+
+        <div id="detailView" class="col-span-12 lg:col-span-8 bg-white rounded-xl shadow-lg border p-10 min-h-[500px] flex items-center justify-center text-gray-300 italic">
+            Select a submission from the sidebar to review.
+        </div>
+    </div>
+
+    <script>
+        const sb = supabase.createClient('https://eejovtuputrwneovhfpc.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlam92dHVwdXRyd25lb3ZoZnBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMjY5MzIsImV4cCI6MjA4NjgwMjkzMn0.JJz64gSTT9qSqOkiJvuL1PT_H_I4ZYJbchrmkoljwws');
+        
+        async function load() {
+            const { data } = await sb.from('programs').select('*').eq('status', 'pending');
+            document.getElementById('pList').innerHTML = data.length ? data.map(i => `
+                <div onclick='show("${i.id}")' class="p-4 cursor-pointer hover:bg-blue-50 transition border-l-4 border-transparent hover:border-blue-500">
+                    <p class="font-bold text-sm text-gray-800">${i.title}</p>
+                    <p class="text-[10px] text-gray-400">${i.program_date}</p>
+                </div>
+            `).join('') : '<p class="p-4 text-xs italic text-gray-400">No pending files.</p>';
+        }
+
+        async function show(id) {
+            const { data: i } = await sb.from('programs').select('*').eq('id', id).single();
+            document.getElementById('detailView').innerHTML = `
+                <div class="w-full animate-in fade-in duration-300">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-4">${i.title}</h2>
+                    <div class="space-y-3 mb-10">
+                        ${i.content.map(c => `<div class="flex border-b border-dashed py-1 text-lg"><span class="w-1/2 font-bold">${c.act}</span><span class="text-gray-600">${c.who}</span></div>`).join('')}
+                    </div>
+                    <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-100 italic text-sm text-gray-700 mb-8">
+                        <b>User Note:</b> ${i.notes || 'None'}
+                    </div>
+                    <div class="flex gap-4">
+                        <button onclick="approve('${i.id}')" class="bg-green-600 text-white px-10 py-3 rounded-xl font-bold hover:bg-green-700">APPROVE</button>
+                        <button onclick="updateStatus('${i.id}', 'rejected')" class="bg-red-500 text-white px-10 py-3 rounded-xl font-bold hover:bg-red-600">REJECT</button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('detailView').classList.remove('flex', 'items-center', 'justify-center', 'text-gray-300');
+        }
+
+        async function approve(id) {
+            const { error } = await sb.from('programs').update({ status: 'approved', updated_at: new Date() }).eq('id', id);
+            if (!error) location.reload();
+        }
+
+        async function updateStatus(id, status) {
+            await sb.from('programs').update({ status }).eq('id', id);
+            location.reload();
+        }
+
+        async function postAnn() {
+            await sb.from('announcements').insert({ content: document.getElementById('annText').value });
+            alert("Announcement posted successfully!");
+            document.getElementById('annText').value = "";
+        }
+
+        async function addUser() {
+            const email = prompt("Enter Staff Email:");
+            const pass = prompt("Enter Strong Password:");
+            if(email && pass) await sb.auth.signUp({ email, password: pass });
+            alert("Account created. They can now login.");
+        }
+        load();
+    </script>
+</body>
+</html>

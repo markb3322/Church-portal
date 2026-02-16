@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Dashboard | MC Balilihan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        .stamp { border: 4px double #d91b1b; color: #d91b1b; padding: 5px; transform: rotate(-10deg); font-family: monospace; font-weight: 900; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div id="annBar" class="bg-yellow-400 text-black text-center text-xs py-2 font-bold hidden border-b border-yellow-600"></div>
+    <nav class="bg-[#2D4E53] text-white p-4 flex justify-between px-10 items-center shadow-md">
+        <h1 class="font-bold tracking-widest text-sm">MC BALILIHAN USER DASHBOARD</h1>
+        <button onclick="sb.auth.signOut().then(()=>location.href='index.html')" class="bg-red-500 hover:bg-red-700 px-3 py-1 rounded text-xs transition">LOGOUT</button>
+    </nav>
+
+    <div class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-7 bg-white p-8 rounded-xl shadow-sm border border-gray-200">
+            <h2 class="text-xl font-bold text-gray-700 mb-6 border-b pb-2">Create New Church Program</h2>
+            <form id="progForm" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <input id="title" type="text" placeholder="Service Title" class="border p-2 rounded-lg" required>
+                    <input id="date" type="date" class="border p-2 rounded-lg" required>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-xl border">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-xs font-bold uppercase text-gray-500">Program Segments</span>
+                        <button type="button" onclick="addRow()" class="bg-blue-600 text-white text-[10px] px-2 py-1 rounded">+ ADD ROW</button>
+                    </div>
+                    <div id="rowContainer" class="space-y-2"></div>
+                </div>
+                <textarea id="notes" placeholder="Notes for Admin..." class="w-full border p-2 rounded-lg h-24"></textarea>
+                <button type="submit" class="w-full bg-[#2D4E53] text-white py-3 rounded-xl font-bold hover:shadow-lg transition">SUBMIT TO ADMIN</button>
+            </form>
+        </div>
+
+        <div class="lg:col-span-5 bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <h3 class="font-bold text-gray-700 mb-4 uppercase text-xs tracking-wider">My Submissions</h3>
+            <div id="historyList" class="space-y-3"></div>
+        </div>
+    </div>
+
+    <script>
+        const sb = supabase.createClient('https://eejovtuputrwneovhfpc.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlam92dHVwdXRyd25lb3ZoZnBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMjY5MzIsImV4cCI6MjA4NjgwMjkzMn0.JJz64gSTT9qSqOkiJvuL1PT_H_I4ZYJbchrmkoljwws');
+        
+        function addRow() {
+            const d = document.createElement('div'); d.className = "flex gap-2";
+            d.innerHTML = `<input type="text" placeholder="Activity" class="act border p-2 rounded w-1/2 text-sm"> <input type="text" placeholder="Assigned Person" class="who border p-2 rounded w-1/2 text-sm">`;
+            document.getElementById('rowContainer').appendChild(d);
+        }
+
+        async function init() {
+            const { data: { user } } = await sb.auth.getUser();
+            const { data: progs } = await sb.from('programs').select('*').eq('user_id', user.id).order('created_at', {ascending:false});
+            const { data: ann } = await sb.from('announcements').select('*').order('created_at', {ascending:false}).limit(1);
+            
+            if(ann.length) { document.getElementById('annBar').innerText = "📢 ANNOUNCEMENT: " + ann[0].content; document.getElementById('annBar').classList.remove('hidden'); }
+            
+            document.getElementById('historyList').innerHTML = progs.map(i => `
+                <div class="p-4 border rounded-xl flex justify-between items-center ${i.status === 'approved' ? 'bg-green-50 border-green-200' : 'bg-gray-50'}">
+                    <div>
+                        <b class="text-sm block">${i.title}</b>
+                        <span class="text-[10px] text-gray-500">${i.program_date} | ${i.status.toUpperCase()}</span>
+                    </div>
+                    ${i.status === 'approved' ? `<button onclick='dlDoc(${JSON.stringify(i)})' class="bg-green-600 text-white text-[10px] px-3 py-1.5 rounded-lg">DOWNLOAD WORD</button>` : ''}
+                </div>
+            `).join('');
+        }
+
+        async function dlDoc(i) {
+            const { Document, Packer, Paragraph, TextRun, AlignmentType, BorderStyle } = docx;
+            const appDate = new Date(i.updated_at).toLocaleDateString();
+            const doc = new Document({ sections: [{ children: [
+                new Paragraph({ text: i.title.toUpperCase(), alignment: AlignmentType.CENTER, heading: docx.HeadingLevel.HEADING_1 }),
+                ...i.content.map(c => new Paragraph({ children: [new TextRun({text: c.act, bold:true}), new TextRun({text: " - "+c.who})], spacing: {before: 200} })),
+                new Paragraph({ text: "", spacing: {before: 1000} }),
+                new Paragraph({ alignment: AlignmentType.RIGHT, border: {top:{color:"D91B1B", value:BorderStyle.DOUBLE, size:3}, bottom:{color:"D91B1B", value:BorderStyle.DOUBLE, size:3}, left:{color:"D91B1B", value:BorderStyle.DOUBLE, size:3}, right:{color:"D91B1B", value:BorderStyle.DOUBLE, size:3}},
+                    children: [
+                        new TextRun({text: "MOBILIZATION CHURCH BALILIHAN", color:"D91B1B", size:14, bold:true, break:1}),
+                        new TextRun({text: "APPROVED", color:"D91B1B", size:40, bold:true, break:1}),
+                        new TextRun({text: "Date: " + appDate, color:"D91B1B", size:16, bold:true, break:1})
+                    ]
+                })
+            ]}]});
+            Packer.toBlob(doc).then(b => { 
+                const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `${i.title}.docx`; a.click(); 
+            });
+        }
+
+        document.getElementById('progForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const { data: { user } } = await sb.auth.getUser();
+            const content = Array.from(document.querySelectorAll('#rowContainer div')).map(d => ({act: d.querySelector('.act').value, who: d.querySelector('.who').value}));
+            await sb.from('programs').insert({ user_id: user.id, title: document.getElementById('title').value, program_date: document.getElementById('date').value, content, notes: document.getElementById('notes').value });
+            location.reload();
+        }
+        addRow(); init();
+    </script>
+</body>
+</html>
