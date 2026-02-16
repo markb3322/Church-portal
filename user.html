@@ -2,102 +2,219 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard | MC Balilihan</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        .stamp { border: 4px double #d91b1b; color: #d91b1b; padding: 5px; transform: rotate(-10deg); font-family: monospace; font-weight: 900; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .custom-scroll::-webkit-scrollbar { width: 5px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
-    <div id="annBar" class="bg-yellow-400 text-black text-center text-xs py-2 font-bold hidden border-b border-yellow-600"></div>
-    <nav class="bg-[#2D4E53] text-white p-4 flex justify-between px-10 items-center shadow-md">
-        <h1 class="font-bold tracking-widest text-sm">MC BALILIHAN USER DASHBOARD</h1>
-        <button onclick="sb.auth.signOut().then(()=>location.href='index.html')" class="bg-red-500 hover:bg-red-700 px-3 py-1 rounded text-xs transition">LOGOUT</button>
+<body class="bg-[#f8fafc] min-h-screen">
+    
+    <nav class="bg-[#2D4E53] text-white p-5 px-6 md:px-10 flex justify-between items-center shadow-lg sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <div class="bg-emerald-500 p-2 rounded-xl">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l4 4v10a2 2 0 01-2 2z" />
+                </svg>
+            </div>
+            <h1 class="font-black tracking-widest text-xs md:text-sm uppercase">MC Balilihan Staff Portal</h1>
+        </div>
     </nav>
 
-    <div class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div class="lg:col-span-7 bg-white p-8 rounded-xl shadow-sm border border-gray-200">
-            <h2 class="text-xl font-bold text-gray-700 mb-6 border-b pb-2">Create New Church Program</h2>
-            <form id="progForm" class="space-y-4">
-                <div class="grid grid-cols-2 gap-4">
-                    <input id="title" type="text" placeholder="Service Title" class="border p-2 rounded-lg" required>
-                    <input id="date" type="date" class="border p-2 rounded-lg" required>
+    <div class="max-w-7xl mx-auto p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <div class="lg:col-span-4 space-y-6">
+            <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 sticky top-28">
+                <h3 class="font-black text-slate-800 text-[11px] uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                    <span class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span> Latest News
+                </h3>
+                <div id="newsFeed" class="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scroll">
+                    <p class="text-[10px] text-slate-300 font-bold uppercase">Loading news...</p>
                 </div>
-                <div class="bg-slate-50 p-4 rounded-xl border">
-                    <div class="flex justify-between items-center mb-4">
-                        <span class="text-xs font-bold uppercase text-gray-500">Program Segments</span>
-                        <button type="button" onclick="addRow()" class="bg-blue-600 text-white text-[10px] px-2 py-1 rounded">+ ADD ROW</button>
-                    </div>
-                    <div id="rowContainer" class="space-y-2"></div>
-                </div>
-                <textarea id="notes" placeholder="Notes for Admin..." class="w-full border p-2 rounded-lg h-24"></textarea>
-                <button type="submit" class="w-full bg-[#2D4E53] text-white py-3 rounded-xl font-bold hover:shadow-lg transition">SUBMIT TO ADMIN</button>
-            </form>
+            </div>
         </div>
 
-        <div class="lg:col-span-5 bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <h3 class="font-bold text-gray-700 mb-4 uppercase text-xs tracking-wider">My Submissions</h3>
-            <div id="historyList" class="space-y-3"></div>
+        <div class="lg:col-span-8 space-y-8">
+            <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100">
+                <h3 class="font-black text-slate-800 uppercase text-[11px] tracking-[0.2em] mb-4">Verification & History</h3>
+                <input id="verifyName" type="text" placeholder="Enter Full Name to see history" 
+                    class="w-full bg-slate-50 border-none p-4 rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none mb-6" 
+                    oninput="loadHistory(this.value)">
+                
+                <div id="historyList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <p class="text-[10px] text-slate-300 font-black uppercase text-center py-4 col-span-full">History will appear here</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 md:p-10 rounded-[2.5rem] shadow-sm border border-slate-100">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-black text-slate-800 tracking-tight">Create New Program</h2>
+                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">Submit a new schedule for approval</p>
+                </div>
+
+                <form id="progForm" class="space-y-6">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Full Name (Program Submitter)</label>
+                            <input id="fullName" type="text" placeholder="e.g. Mark Brian Angco" class="w-full bg-slate-50 border-none p-4 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none" required>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Service Title</label>
+                                <input id="title" type="text" placeholder="e.g. Youth Night" class="w-full bg-slate-50 border-none p-4 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none" required>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Program Date</label>
+                                <input id="date" type="date" class="w-full bg-slate-50 border-none p-4 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50/50 p-6 rounded-[2rem] border border-slate-100">
+                        <div class="flex justify-between items-center mb-6">
+                            <span class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Program Segments</span>
+                            <button type="button" onclick="addRow()" class="bg-slate-900 text-white text-[9px] px-4 py-2 rounded-xl font-black hover:bg-emerald-600 transition-all">+ ADD ROW</button>
+                        </div>
+                        <div id="rowContainer" class="space-y-3"></div>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="w-full bg-[#2D4E53] text-white py-5 rounded-[2rem] font-black text-xs uppercase tracking-[0.2em] shadow-xl hover:bg-emerald-600 transition-all duration-300">
+                        SUBMIT TO ADMIN
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 
     <script>
         const sb = supabase.createClient('https://eejovtuputrwneovhfpc.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlam92dHVwdXRyd25lb3ZoZnBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMjY5MzIsImV4cCI6MjA4NjgwMjkzMn0.JJz64gSTT9qSqOkiJvuL1PT_H_I4ZYJbchrmkoljwws');
-        
+
+        async function loadNews() {
+            const { data } = await sb.from('announcements').select('*').order('created_at', {ascending: false});
+            const feed = document.getElementById('newsFeed');
+            if (data && data.length) {
+                feed.innerHTML = data.map(n => `
+                    <div class="p-4 bg-slate-50 rounded-2xl border-l-4 border-emerald-500 shadow-sm">
+                        <p class="text-xs font-bold text-slate-700 leading-relaxed">${n.content}</p>
+                        <p class="text-[9px] text-slate-400 font-black mt-2 uppercase">${new Date(n.created_at).toLocaleDateString()}</p>
+                    </div>
+                `).join('');
+            }
+        }
+
         function addRow() {
-            const d = document.createElement('div'); d.className = "flex gap-2";
-            d.innerHTML = `<input type="text" placeholder="Activity" class="act border p-2 rounded w-1/2 text-sm"> <input type="text" placeholder="Assigned Person" class="who border p-2 rounded w-1/2 text-sm">`;
+            const d = document.createElement('div'); 
+            d.className = "flex gap-3 act-row";
+            d.innerHTML = `
+                <input type="text" placeholder="Activity" class="act bg-white border border-slate-200 p-3 rounded-xl w-1/2 text-xs font-bold outline-none focus:ring-2 focus:ring-emerald-500/20" required> 
+                <input type="text" placeholder="In-charge" class="who bg-white border border-slate-200 p-3 rounded-xl w-1/2 text-xs font-bold outline-none focus:ring-2 focus:ring-emerald-500/20" required>
+                <button type="button" onclick="this.parentElement.remove()" class="text-red-400 font-black px-1">×</button>
+            `;
             document.getElementById('rowContainer').appendChild(d);
         }
 
-        async function init() {
-            const { data: { user } } = await sb.auth.getUser();
-            const { data: progs } = await sb.from('programs').select('*').eq('user_id', user.id).order('created_at', {ascending:false});
-            const { data: ann } = await sb.from('announcements').select('*').order('created_at', {ascending:false}).limit(1);
-            
-            if(ann.length) { document.getElementById('annBar').innerText = "📢 ANNOUNCEMENT: " + ann[0].content; document.getElementById('annBar').classList.remove('hidden'); }
-            
-            document.getElementById('historyList').innerHTML = progs.map(i => `
-                <div class="p-4 border rounded-xl flex justify-between items-center ${i.status === 'approved' ? 'bg-green-50 border-green-200' : 'bg-gray-50'}">
-                    <div>
-                        <b class="text-sm block">${i.title}</b>
-                        <span class="text-[10px] text-gray-500">${i.program_date} | ${i.status.toUpperCase()}</span>
+        async function loadHistory(username) {
+            if(!username || username.length < 3) return;
+            const { data: progs } = await sb.from('programs').select('*').eq('user_id', username).order('created_at', {ascending:false});
+            const list = document.getElementById('historyList');
+            if (progs && progs.length) {
+                list.innerHTML = progs.map(i => `
+                    <div class="p-5 border rounded-[1.5rem] bg-white shadow-sm transition-all">
+                        <div class="flex justify-between items-start mb-2">
+                            <b class="text-xs uppercase text-slate-800">${i.title}</b>
+                            <span class="text-[8px] font-black uppercase px-2 py-1 rounded-lg ${i.status === 'approved' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${i.status}</span>
+                        </div>
+                        <p class="text-[9px] text-slate-400 font-bold uppercase mb-4">${i.program_date}</p>
+                        ${i.status === 'approved' ? `<button onclick='exportToWord(${JSON.stringify(i)})' class="w-full py-2 bg-slate-900 text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all">Export to MS Word</button>` : ''}
                     </div>
-                    ${i.status === 'approved' ? `<button onclick='dlDoc(${JSON.stringify(i)})' class="bg-green-600 text-white text-[10px] px-3 py-1.5 rounded-lg">DOWNLOAD WORD</button>` : ''}
-                </div>
-            `).join('');
+                `).join('');
+            }
         }
 
-        async function dlDoc(i) {
-            const { Document, Packer, Paragraph, TextRun, AlignmentType, BorderStyle } = docx;
-            const appDate = new Date(i.updated_at).toLocaleDateString();
-            const doc = new Document({ sections: [{ children: [
-                new Paragraph({ text: i.title.toUpperCase(), alignment: AlignmentType.CENTER, heading: docx.HeadingLevel.HEADING_1 }),
-                ...i.content.map(c => new Paragraph({ children: [new TextRun({text: c.act, bold:true}), new TextRun({text: " - "+c.who})], spacing: {before: 200} })),
-                new Paragraph({ text: "", spacing: {before: 1000} }),
-                new Paragraph({ alignment: AlignmentType.RIGHT, border: {top:{color:"D91B1B", value:BorderStyle.DOUBLE, size:3}, bottom:{color:"D91B1B", value:BorderStyle.DOUBLE, size:3}, left:{color:"D91B1B", value:BorderStyle.DOUBLE, size:3}, right:{color:"D91B1B", value:BorderStyle.DOUBLE, size:3}},
-                    children: [
-                        new TextRun({text: "MOBILIZATION CHURCH BALILIHAN", color:"D91B1B", size:14, bold:true, break:1}),
-                        new TextRun({text: "APPROVED", color:"D91B1B", size:40, bold:true, break:1}),
-                        new TextRun({text: "Date: " + appDate, color:"D91B1B", size:16, bold:true, break:1})
-                    ]
-                })
-            ]}]});
-            Packer.toBlob(doc).then(b => { 
-                const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `${i.title}.docx`; a.click(); 
-            });
+        function exportToWord(i) {
+            const tableRows = i.content.map(c => `
+                <tr>
+                    <td style="border: 1px solid black; padding: 8px;"><b>${c.act.toUpperCase()}</b></td>
+                    <td style="border: 1px solid black; padding: 8px; text-align: right;">${c.who}</td>
+                </tr>
+            `).join('');
+
+            const htmlContent = `
+                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                <head><meta charset='utf-8'></head>
+                <body style="font-family: Arial, sans-serif; padding: 40px;">
+                    <div style="text-align: center;">
+                        <h1 style="margin: 0; font-size: 20pt;">MOBILIZATION CHURCH BALILIHAN</h1>
+                        <p style="margin: 0; font-size: 10pt; letter-spacing: 2px;">OFFICIAL SERVICE PROGRAM</p>
+                        <hr style="border: 1px solid black;">
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <p><b>SERVICE TITLE:</b> ${i.title.toUpperCase()}</p>
+                        <p><b>DATE:</b> ${i.program_date}</p>
+                    </div>
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                        <thead>
+                            <tr style="background-color: #f2f2f2;">
+                                <th style="border: 1px solid black; padding: 10px; text-align: left;">ACTIVITY</th>
+                                <th style="border: 1px solid black; padding: 10px; text-align: right;">IN-CHARGE</th>
+                            </tr>
+                        </thead>
+                        <tbody>${tableRows}</tbody>
+                    </table>
+                    <div style="margin-top: 50px; text-align: right;">
+                        <div style="display: inline-block; border: 3px solid black; padding: 15px; text-align: center;">
+                            <p style="margin: 0; font-weight: bold; font-size: 12pt;">MOBILIZATION CHURCH BALILIHAN APPROVED</p>
+                            <p style="margin: 0; font-size: 10pt;">DATE: ${new Date().toLocaleDateString()}</p>
+                            <p style="margin: 0; font-size: 8pt; text-transform: uppercase;">Official Electronic Copy</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `;
+
+            const blob = new Blob(['\ufeff', htmlContent], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${i.title}_Program.doc`;
+            link.click();
         }
 
         document.getElementById('progForm').onsubmit = async (e) => {
             e.preventDefault();
-            const { data: { user } } = await sb.auth.getUser();
-            const content = Array.from(document.querySelectorAll('#rowContainer div')).map(d => ({act: d.querySelector('.act').value, who: d.querySelector('.who').value}));
-            await sb.from('programs').insert({ user_id: user.id, title: document.getElementById('title').value, program_date: document.getElementById('date').value, content, notes: document.getElementById('notes').value });
-            location.reload();
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.innerText = "SUBMITTING...";
+
+            const content = Array.from(document.querySelectorAll('.act-row')).map(d => ({
+                act: d.querySelector('.act').value, 
+                who: d.querySelector('.who').value
+            }));
+
+            const { error } = await sb.from('programs').insert({ 
+                user_id: document.getElementById('fullName').value, 
+                title: document.getElementById('title').value, 
+                program_date: document.getElementById('date').value, 
+                content: content, 
+                status: 'pending'
+            });
+
+            if (!error) {
+                alert("Program submitted!");
+                location.reload();
+            } else {
+                alert(error.message);
+                btn.disabled = false;
+            }
         }
-        addRow(); init();
+
+        addRow();
+        loadNews();
     </script>
 </body>
 </html>
