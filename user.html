@@ -48,23 +48,17 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                         </svg>
                     </div>
-
                     <div id="newsFeed" class="space-y-4">
                         <div class="bg-slate-50/80 rounded-3xl p-6 border border-dashed border-slate-200">
-                            <p id="newsContent" class="text-sm font-bold text-slate-700 leading-relaxed italic">
-                                Checking for latest updates from the administration...
-                            </p>
+                            <p id="newsContent" class="text-sm font-bold text-slate-700 leading-relaxed italic">Checking for updates...</p>
                         </div>
-                        
                         <div class="flex items-center justify-between px-2">
                             <div class="flex flex-col">
                                 <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Posted on</span>
                                 <span id="newsDate" class="text-xs font-bold text-[#2D4E53]">--/--/--</span>
                             </div>
                             <button onclick="loadNews()" class="p-2 hover:bg-slate-100 rounded-xl transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                             </button>
                         </div>
                     </div>
@@ -89,7 +83,6 @@
                             </table>
                         </div>
                     </div>
-
                     <div>
                         <h4 class="text-[10px] font-black uppercase text-red-700 tracking-widest mb-4 flex items-center gap-2">
                             <span class="w-1.5 h-1.5 bg-red-500 rounded-full"></span> Rejected / Needs Revision
@@ -173,7 +166,7 @@
 
                 if(item.status === 'approved') {
                     tdActions.append(
-                        createBtn('DOC', 'bg-slate-900 text-white', () => exportToWord(item)),
+                        createBtn('DOC', 'bg-emerald-600 text-white', () => exportToWord(item)),
                         createBtn('DELETE', 'bg-red-50 text-red-500', () => deleteProgram(item.id, username))
                     );
                 } else if(item.status === 'rejected') {
@@ -185,9 +178,8 @@
                 tr.append(tdTitle, tdActions);
                 (item.status === 'approved' ? appList : rejList).appendChild(tr);
             });
-
-            if(!appList.children.length) appList.innerHTML = '<tr><td class="py-4 text-center text-[9px] text-slate-300">No records</td></tr>';
-            if(!rejList.children.length) rejList.innerHTML = '<tr><td class="py-4 text-center text-[9px] text-slate-300">No records</td></tr>';
+            if(!appList.children.length) appList.innerHTML = '<tr><td class="py-4 text-center text-[9px] text-slate-300">No approved records</td></tr>';
+            if(!rejList.children.length) rejList.innerHTML = '<tr><td class="py-4 text-center text-[9px] text-slate-300">No rejected records</td></tr>';
         }
 
         function createBtn(text, classes, onClick) {
@@ -218,13 +210,55 @@
             sBtn.classList.replace('bg-[#2D4E53]', 'bg-red-600');
         }
 
+        /**
+         * UPDATED EXPORT FUNCTION: Includes the Documentary Stamp
+         */
         function exportToWord(i) {
-            const rows = i.content.map(c => `<tr><td style="border:1px solid black;padding:8px">${c.act.toUpperCase()}</td><td style="border:1px solid black;padding:8px;text-align:right">${c.who}</td></tr>`).join('');
-            const html = `<html><body style="font-family:Arial;padding:40px"><h2 align="center">MC BALILIHAN SERVICE PROGRAM</h2><p><b>TITLE:</b> ${i.title.toUpperCase()}</p><p><b>DATE:</b> ${i.program_date}</p><table width="100%" style="border-collapse:collapse">${rows}</table></body></html>`;
+            const rows = i.content.map(c => `
+                <tr>
+                    <td style="border:1px solid #ddd;padding:10px;font-family:Arial;"><b>${c.act.toUpperCase()}</b></td>
+                    <td style="border:1px solid #ddd;padding:10px;font-family:Arial;text-align:right;">${c.who}</td>
+                </tr>
+            `).join('');
+
+            // Date of Approval (from database or current date)
+            const approvalDate = i.approved_at ? new Date(i.approved_at).toLocaleDateString() : new Date().toLocaleDateString();
+            const stampColor = "#059669"; // Emerald Green
+
+            const html = `
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+            <body style="font-family:Arial, sans-serif;padding:40px;">
+                <div style="text-align:center;margin-bottom:20px;">
+                    <h1 style="margin:0;color:#2D4E53;">MOBILIZATION CHURCH BALILIHAN</h1>
+                    <p style="margin:0;letter-spacing:2px;font-weight:bold;">OFFICIAL SERVICE PROGRAM</p>
+                    <hr style="border:1px solid black;">
+                </div>
+                
+                <p><b>TITLE:</b> ${i.title.toUpperCase()}</p>
+                <p><b>DATE:</b> ${i.program_date}</p>
+
+                <table width="100%" style="border-collapse:collapse;margin-top:20px;">
+                    <tr style="background:#eee;">
+                        <th style="border:1px solid #ddd;padding:10px;text-align:left;">ACTIVITY</th>
+                        <th style="border:1px solid #ddd;padding:10px;text-align:right;">IN-CHARGE</th>
+                    </tr>
+                    ${rows}
+                </table>
+
+                <div style="margin-top:60px; text-align:right;">
+                    <div style="display:inline-block; border:4px double ${stampColor}; padding:15px; text-align:center; color:${stampColor};">
+                        <p style="margin:0; font-size:10px; font-weight:bold;">MOBILIZATION CHURCH BALILIHAN</p>
+                        <h2 style="margin:5px 0; font-size:24px; font-weight:900;">APPROVED</h2>
+                        <p style="margin:0; font-size:12px; font-weight:bold;">DATE: ${approvalDate}</p>
+                    </div>
+                </div>
+            </body>
+            </html>`;
+
             const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `${i.title}.doc`;
+            link.download = `OFFICIAL_${i.title}_Program.doc`;
             link.click();
         }
 
