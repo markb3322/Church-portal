@@ -22,7 +22,6 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade { animation: fadeIn 0.4s ease-out forwards; }
 
-        /* Announcement Date Box - Optimized Small Size */
         .ann-date-box {
             background: linear-gradient(135deg, #2D4E53, #437178);
             color: white;
@@ -57,7 +56,7 @@
             <tbody id="expRows" style="font-size: 18px; font-weight: 600;"></tbody>
         </table>
         <div style="display: flex; justify-content: flex-end;">
-            <div class="official-stamp" style="color: #059669;">
+            <div id="finalStamp" class="official-stamp" style="color: #059669;">
                 <div style="font-size: 12px; border-bottom: 2px solid currentColor; margin-bottom: 5px;">MOBILIZATION CHURCH BALILIHAN</div>
                 <div style="font-size: 45px; line-height: 1;">APPROVED</div>
                 <div id="stampMeta" style="font-size: 10px; margin-top: 5px; display: flex; justify-content: space-between; font-family: sans-serif;"></div>
@@ -143,27 +142,20 @@
     <script>
         const sb = supabase.createClient('https://eejovtuputrwneovhfpc.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlam92dHVwdXRyd25lb3ZoZnBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMjY5MzIsImV4cCI6MjA4NjgwMjkzMn0.JJz64gSTT9qSqOkiJvuL1PT_H_I4ZYJbchrmkoljwws');
 
-        // Logic for Announcements
         async function loadAnnouncement() {
             const container = document.getElementById('annContainer');
             try {
                 const { data, error } = await sb.from('announcements').select('*').order('created_at', {ascending: false}).limit(1);
-                if (error) throw error;
-
-                if(data && data.length > 0) {
+                if (data && data.length > 0) {
                     const ann = data[0];
-                    const dateObj = new Date(ann.created_at);
-                    const day = dateObj.getDate();
-                    const month = dateObj.toLocaleString('default', { month: 'short' }).toUpperCase();
-                    const time = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
+                    const d = new Date(ann.created_at);
                     container.innerHTML = `
                         <div class="bg-white p-4 md:p-5 rounded-[2.5rem] shadow-sm border border-slate-100 flex flex-col md:flex-row gap-5 hover:shadow-md transition-shadow">
                             <div class="ann-date-box">
-                                <span class="text-[8px] font-black opacity-70 uppercase tracking-widest">${month}</span>
-                                <span class="text-2xl font-black leading-none my-1">${day}</span>
+                                <span class="text-[8px] font-black opacity-70 uppercase tracking-widest">${d.toLocaleString('default',{month:'short'}).toUpperCase()}</span>
+                                <span class="text-2xl font-black leading-none my-1">${d.getDate()}</span>
                                 <div class="h-[1px] w-6 bg-white/20 my-1"></div>
-                                <span class="text-[8px] font-bold opacity-80">${time}</span>
+                                <span class="text-[8px] font-bold opacity-80">${d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</span>
                             </div>
                             <div class="flex-1 flex flex-col justify-center py-1">
                                 <div class="flex items-center gap-2 mb-1">
@@ -173,31 +165,17 @@
                                 <p class="text-slate-800 font-bold text-base md:text-lg leading-relaxed italic">"${ann.content}"</p>
                             </div>
                         </div>`;
-                } else {
-                    container.innerHTML = `
-                        <div class="bg-slate-50 p-6 rounded-[2.5rem] border border-dashed border-slate-200 text-center">
-                            <p class="text-slate-400 font-bold uppercase text-[10px] tracking-widest">No active announcements</p>
-                        </div>`;
                 }
-            } catch (err) {
-                console.error(err);
-                container.innerHTML = ''; 
-            }
+            } catch (err) { console.error(err); }
         }
 
-        // Logic for Rows
         function addRow(act = '', who = '') {
             const div = document.createElement('div');
             div.className = "flex flex-col md:flex-row gap-4 act-row animate-fade p-4 bg-slate-50/50 rounded-3xl border border-slate-100";
             div.innerHTML = `
-                <div class="flex-1">
-                    <input type="text" value="${act}" placeholder="Activity" class="act w-full p-5 bg-white rounded-2xl font-bold border-2 border-slate-100 focus:border-emerald-500 outline-none transition-all" required>
-                </div>
-                <div class="md:w-2/5">
-                    <input type="text" value="${who}" placeholder="Person In-charge" class="who w-full p-5 bg-white rounded-2xl font-bold border-2 border-slate-100 focus:border-emerald-500 outline-none transition-all" required>
-                </div>
-                <button type="button" onclick="this.parentElement.remove()" class="text-red-400 font-bold px-2 text-xl">×</button>
-            `;
+                <div class="flex-1"><input type="text" value="${act}" placeholder="Activity" class="act w-full p-5 bg-white rounded-2xl font-bold border-2 border-slate-100 focus:border-emerald-500 outline-none transition-all" required></div>
+                <div class="md:w-2/5"><input type="text" value="${who}" placeholder="Person In-charge" class="who w-full p-5 bg-white rounded-2xl font-bold border-2 border-slate-100 focus:border-emerald-500 outline-none transition-all" required></div>
+                <button type="button" onclick="this.parentElement.remove()" class="text-red-400 font-bold px-2 text-xl">×</button>`;
             document.getElementById('rowContainer').appendChild(div);
         }
 
@@ -205,28 +183,22 @@
             if(!name || name.length < 3) return;
             const { data } = await sb.from('programs').select('*').ilike('user_id', `%${name}%`).order('created_at', {ascending: false});
             const list = document.getElementById('historyList');
-            
             if(data && data.length > 0) {
                 list.innerHTML = data.map(i => {
                     const itemData = JSON.stringify(i).replace(/'/g, "&apos;");
-                    const canEdit = i.status === 'pending' || i.status === 'rejected';
-                    const statusColor = i.status === 'approved' ? 'text-emerald-500' : (i.status === 'rejected' ? 'text-red-500' : 'text-amber-500');
-
+                    const isApproved = i.status === 'approved';
+                    const statusColor = isApproved ? 'text-emerald-500' : (i.status === 'rejected' ? 'text-red-500' : 'text-amber-500');
                     return `
                     <tr class="group">
                         <td class="py-6 px-4">
                             <h4 class="font-black text-slate-800 uppercase text-sm">${i.title}</h4>
-                            <p class="text-[9px] text-slate-400 font-black uppercase mt-1">
-                                ${i.program_date} — <span class="${statusColor}">${i.status}</span>
-                            </p>
+                            <p class="text-[9px] text-slate-400 font-black uppercase mt-1">${i.program_date} — <span class="${statusColor}">${i.status}</span></p>
                         </td>
                         <td class="py-6 px-4 text-right space-x-4">
-                            ${canEdit ? `
-                                <button onclick='startEdit(${itemData})' class="text-blue-500 font-black text-[10px] uppercase hover:underline">Edit</button>
-                                <button onclick="deleteRecord('${i.id}')" class="text-red-400 font-black text-[10px] uppercase hover:underline">Delete</button>
-                            ` : `
-                                <button onclick='exportImage(${itemData})' class="bg-[#2D4E53] text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase hover:shadow-lg transition-all">Download PNG</button>
-                            `}
+                            ${isApproved ? 
+                                `<button onclick='exportImage(${itemData})' class="bg-[#2D4E53] text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase hover:shadow-lg transition-all">Download PNG</button>` : 
+                                `<button onclick='startEdit(${itemData})' class="text-blue-500 font-black text-[10px] uppercase hover:underline">Edit</button>
+                                 <button onclick="deleteRecord('${i.id}')" class="text-red-400 font-black text-[10px] uppercase hover:underline">Delete</button>`}
                         </td>
                     </tr>`;
                 }).join('');
@@ -235,26 +207,24 @@
             }
         }
 
-        window.startEdit = function(item) {
-            document.getElementById('editId').value = item.id;
-            document.getElementById('userName').value = item.user_id;
-            document.getElementById('progTitle').value = item.title;
-            document.getElementById('progDate').value = item.program_date;
-            const container = document.getElementById('rowContainer');
-            container.innerHTML = '';
-            item.content.forEach(c => addRow(c.act, c.who));
-            
-            document.getElementById('formTitle').innerText = item.status === 'rejected' ? "Fix Rejected Program" : "Edit Your Request";
-            document.getElementById('submitBtn').innerText = "Update Program";
-            document.getElementById('cancelBtn').classList.remove('hidden');
-            document.getElementById('formAnchor').scrollIntoView({ behavior: 'smooth' });
-        }
-
         window.deleteRecord = async function(id) {
             if(confirm("Confirm deletion?")) {
                 await sb.from('programs').delete().eq('id', id);
                 loadHistory(document.getElementById('searchName').value);
             }
+        }
+
+        window.startEdit = function(item) {
+            document.getElementById('editId').value = item.id;
+            document.getElementById('userName').value = item.user_id;
+            document.getElementById('progTitle').value = item.title;
+            document.getElementById('progDate').value = item.program_date;
+            document.getElementById('rowContainer').innerHTML = '';
+            item.content.forEach(c => addRow(c.act, c.who));
+            document.getElementById('formTitle').innerText = item.status === 'rejected' ? "Fix Rejected Program" : "Edit Your Request";
+            document.getElementById('submitBtn').innerText = "Update Program";
+            document.getElementById('cancelBtn').classList.remove('hidden');
+            document.getElementById('formAnchor').scrollIntoView({ behavior: 'smooth' });
         }
 
         function resetForm() {
@@ -272,11 +242,9 @@
             const btn = document.getElementById('submitBtn');
             const editId = document.getElementById('editId').value;
             btn.disabled = true; btn.innerText = "Processing...";
-            
             const content = Array.from(document.querySelectorAll('.act-row')).map(r => ({
                 act: r.querySelector('.act').value, who: r.querySelector('.who').value
             }));
-            
             const payload = {
                 user_id: document.getElementById('userName').value,
                 title: document.getElementById('progTitle').value,
@@ -284,47 +252,38 @@
                 content: content,
                 status: 'pending'
             };
-
             const { error } = editId ? await sb.from('programs').update(payload).eq('id', editId) : await sb.from('programs').insert(payload);
-
-            if(!error) {
-                alert("Success!");
-                location.reload();
-            } else {
-                alert("Error: " + error.message);
-                btn.disabled = false;
-                btn.innerText = "Try Again";
-            }
+            if(!error) { alert("Success!"); location.reload(); } else { alert("Error: " + error.message); btn.disabled = false; btn.innerText = "Try Again"; }
         }
 
         window.exportImage = async function(item) {
             const temp = document.getElementById('exportTemplate');
+            const stamp = document.getElementById('finalStamp');
             document.getElementById('expTitle').innerText = item.title.toUpperCase();
             document.getElementById('expDate').innerText = item.program_date;
             document.getElementById('expRows').innerHTML = item.content.map(c => `
                 <tr style="border-bottom: 1px solid #eee;">
                     <td style="padding: 15px; text-transform: uppercase; color: #1e293b;">${c.act}</td>
                     <td style="padding: 15px; text-align: right; color: #64748b;">${c.who}</td>
-                </tr>
-            `).join('');
+                </tr>`).join('');
             
-            const stampDate = item.updated_at ? new Date(item.updated_at) : new Date();
+            // Database Color Sync
+            stamp.style.color = item.stamp_color || '#059669';
+            const stampDate = item.approved_at ? new Date(item.approved_at) : new Date();
             document.getElementById('stampMeta').innerHTML = `<span>APPROVED: ${stampDate.toLocaleDateString()}</span><span>MCB-OFFICIAL</span>`;
             
             const logo = temp.querySelector('img');
-            if (logo.complete) capture(); else logo.onload = capture;
-
-            function capture() {
+            const capture = () => {
                 html2canvas(temp, { scale: 2, useCORS: true, backgroundColor: "#ffffff" }).then(canvas => {
                     const link = document.createElement('a');
                     link.download = `Program_${item.title}.png`;
                     link.href = canvas.toDataURL("image/png");
                     link.click();
                 });
-            }
+            };
+            if (logo.complete) capture(); else logo.onload = capture;
         }
 
-        // Initialize Everything
         document.addEventListener('DOMContentLoaded', () => {
             loadAnnouncement();
             addRow();
