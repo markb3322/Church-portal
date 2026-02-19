@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Portal | MCB Balilihan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; }
+
+        /* Floating Nav Animation */
+        .floating-nav {
+            transition: all 0.3s ease;
+        }
+
+        .calendar-day {
+            min-height: 110px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: 1px solid #f1f5f9;
+        }
+
+        .calendar-day:hover { background-color: #f8fafc; transform: translateY(-2px); z-index: 10; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+
+        .today { background-color: #eff6ff !important; border: 2px solid #3b82f6 !important; }
+
+        #eventDrawer { transition: transform 0.3s ease-in-out; transform: translateX(100%); }
+        #eventDrawer.open { transform: translateX(0); }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="min-h-screen pb-10">
+
+    <div class="fixed top-0 left-0 right-0 z-[100] px-4 py-3 md:px-8 md:py-4 pointer-events-none">
+        <nav class="max-w-7xl mx-auto h-16 bg-white/80 backdrop-blur-md border border-white/20 shadow-lg shadow-slate-200/50 rounded-2xl px-6 flex items-center justify-between pointer-events-auto floating-nav">
+            <div class="flex items-center gap-3">
+                <img src="mcb.png" alt="MCB Logo" class="h-9 w-9 object-contain">
+                <div class="flex flex-col leading-none">
+                    <span class="text-lg font-800 tracking-tighter uppercase italic text-slate-800">Report <span class="text-emerald-600">Portal</span></span>
+                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Mobilization Church Balilihan</span>
+                </div>
+            </div>
+            
+            <div class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-emerald-50 rounded-full border border-emerald-100">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">System Active</span>
+            </div>
+        </nav>
+    </div>
+
+    <main class="max-w-7xl mx-auto p-4 md:p-8 pt-24 md:pt-28 w-full">
+        
+        <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200 mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <h2 class="text-3xl font-black text-slate-800 tracking-tight uppercase leading-tight italic">Activity <span class="text-emerald-600">Dashboard</span></h2>
+                <p class="text-slate-500 text-sm font-medium">Monitoring systematic program submissions and status.</p>
+            </div>
+            
+            <div class="flex items-center bg-slate-100 p-1.5 rounded-2xl border border-slate-200 shadow-inner">
+                <button onclick="changeMonth(-1)" class="p-2.5 hover:bg-white hover:shadow-sm rounded-xl transition-all text-slate-600 active:scale-90">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <div id="currentMonthYear" class="px-6 font-black text-slate-800 min-w-[160px] text-center uppercase tracking-tighter text-sm">
+                    Loading...
+                </div>
+                <button onclick="changeMonth(1)" class="p-2.5 hover:bg-white hover:shadow-sm rounded-xl transition-all text-slate-600 active:scale-90">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
+                <div class="w-10 h-10 bg-blue-100 text-blue-600 flex items-center justify-center rounded-2xl mb-4 text-sm"><i class="fa-solid fa-layer-group"></i></div>
+                <p class="text-[10px] font-black text-slate-400 uppercase leading-none mb-1 tracking-widest">Total Reports</p>
+                <h3 id="statTotal" class="text-3xl font-black text-slate-800 leading-none">0</h3>
+            </div>
+            <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
+                <div class="w-10 h-10 bg-emerald-100 text-emerald-600 flex items-center justify-center rounded-2xl mb-4 text-sm"><i class="fa-solid fa-circle-check"></i></div>
+                <p class="text-[10px] font-black text-slate-400 uppercase leading-none mb-1 tracking-widest">Approved</p>
+                <h3 id="statApproved" class="text-3xl font-black text-emerald-600 leading-none">0</h3>
+            </div>
+            <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
+                <div class="w-10 h-10 bg-rose-100 text-rose-600 flex items-center justify-center rounded-2xl mb-4 text-sm"><i class="fa-solid fa-circle-xmark"></i></div>
+                <p class="text-[10px] font-black text-slate-400 uppercase leading-none mb-1 tracking-widest">Rejected</p>
+                <h3 id="statRejected" class="text-3xl font-black text-rose-600 leading-none">0</h3>
+            </div>
+            <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
+                <div class="w-10 h-10 bg-amber-100 text-amber-600 flex items-center justify-center rounded-2xl mb-4 text-sm"><i class="fa-solid fa-clock"></i></div>
+                <p class="text-[10px] font-black text-slate-400 uppercase leading-none mb-1 tracking-widest">Pending</p>
+                <h3 id="statPending" class="text-3xl font-black text-amber-600 leading-none">0</h3>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden">
+            <div class="grid grid-cols-7 bg-slate-50 border-b border-slate-200 py-5 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+            </div>
+            <div id="calendarBody" class="grid grid-cols-7 bg-white">
+                </div>
+        </div>
+    </main>
+
+    <div id="eventDrawer" class="fixed top-0 right-0 h-full w-full md:w-96 bg-white shadow-2xl z-[150] p-0 flex flex-col border-l border-slate-200">
+        <div class="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+            <div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Activities for</p>
+                <h3 class="text-2xl font-black text-slate-800 uppercase italic leading-none" id="selectedDateText">---</h3>
+            </div>
+            <button onclick="closeDrawer()" class="w-12 h-12 flex items-center justify-center bg-white border border-slate-200 rounded-full text-slate-400 hover:text-slate-800 shadow-sm transition-all text-2xl font-light">&times;</button>
+        </div>
+        <div id="drawerContent" class="flex-grow p-6 space-y-4 overflow-y-auto bg-slate-50/30">
+        </div>
+        <div class="p-6 border-t border-slate-100 bg-white">
+            <p class="text-[10px] font-black text-slate-300 text-center uppercase tracking-[0.3em]">MCB System v2.0</p>
+        </div>
+    </div>
+
+    <script>
+        const SB_URL = 'https://eejovtuputrwneovhfpc.supabase.co';
+        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlam92dHVwdXRyd25lb3ZoZnBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMjY5MzIsImV4cCI6MjA4NjgwMjkzMn0.JJz64gSTT9qSqOkiJvuL1PT_H_I4ZYJbchrmkoljwws';
+        const sb = supabase.createClient(SB_URL, SB_KEY);
+        
+        let currentDate = new Date();
+        let allPrograms = [];
+
+        async function loadData() {
+            const { data } = await sb.from('programs').select('*');
+            allPrograms = data || [];
+            updateStats();
+            renderCalendar();
+        }
+
+        function updateStats() {
+            document.getElementById('statTotal').innerText = allPrograms.length;
+            document.getElementById('statApproved').innerText = allPrograms.filter(i => i.status === 'approved').length;
+            document.getElementById('statRejected').innerText = allPrograms.filter(i => i.status === 'rejected').length;
+            document.getElementById('statPending').innerText = allPrograms.filter(i => i.status === 'pending').length;
+        }
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const today = new Date();
+            document.getElementById('currentMonthYear').innerText = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(currentDate);
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const calendarBody = document.getElementById('calendarBody');
+            calendarBody.innerHTML = '';
+
+            for (let i = 0; i < firstDay; i++) {
+                calendarBody.innerHTML += `<div class="calendar-day bg-slate-50/30 opacity-40"></div>`;
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayEvents = allPrograms.filter(p => p.program_date === dateStr);
+                const isToday = today.toDateString() === new Date(year, month, day).toDateString();
+                
+                calendarBody.innerHTML += `
+                    <div class="calendar-day ${isToday ? 'today' : ''} p-2 md:p-3 border-r border-b border-slate-100 flex flex-col" onclick="openDrawer('${dateStr}')">
+                        <span class="text-sm font-black ${isToday ? 'text-blue-600' : 'text-slate-300'} mb-2">${day}</span>
+                        <div class="space-y-1">
+                            ${dayEvents.slice(0, 3).map(e => `
+                                <div class="h-1.5 w-full rounded-full ${e.status === 'approved' ? 'bg-emerald-500' : (e.status === 'rejected' ? 'bg-rose-500' : 'bg-amber-500')}"></div>
+                            `).join('')}
+                            ${dayEvents.length > 3 ? `<div class="text-[8px] font-black text-slate-400 uppercase">+${dayEvents.length - 3} more</div>` : ''}
+                        </div>
+                    </div>`;
+            }
+        }
+
+        function openDrawer(dateStr) {
+            const dayEvents = allPrograms.filter(p => p.program_date === dateStr);
+            document.getElementById('selectedDateText').innerText = new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            const content = document.getElementById('drawerContent');
+            if(dayEvents.length === 0) {
+                content.innerHTML = `<div class="flex flex-col items-center justify-center py-20 text-slate-300">
+                    <i class="fa-solid fa-calendar-xmark text-4xl mb-3 opacity-20"></i>
+                    <p class="font-bold uppercase text-[10px] tracking-[0.2em]">No activities found</p>
+                </div>`;
+            } else {
+                content.innerHTML = dayEvents.map(e => `
+                    <div class="bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100 hover:border-emerald-200 transition-all group active:scale-[0.98]">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="w-2 h-2 rounded-full ${e.status === 'approved' ? 'bg-emerald-500' : 'bg-amber-500'} animate-pulse"></span>
+                            <span class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">${e.status}</span>
+                        </div>
+                        <h4 class="font-black text-slate-800 leading-tight group-hover:text-emerald-700 transition-colors uppercase italic text-sm">${e.title}</h4>
+                        <div class="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between">
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest italic">ID: ${e.user_id.slice(0,8)}</p>
+                            <i class="fa-solid fa-chevron-right text-[10px] text-slate-300 group-hover:text-emerald-500"></i>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            document.getElementById('eventDrawer').classList.add('open');
+        }
+
+        function closeDrawer() { document.getElementById('eventDrawer').classList.remove('open'); }
+        function changeMonth(offset) { currentDate.setMonth(currentDate.getMonth() + offset); renderCalendar(); }
+
+        document.addEventListener('DOMContentLoaded', loadData);
+    </script>
+</body>
+</html>
