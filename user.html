@@ -22,11 +22,11 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade { animation: fadeIn 0.4s ease-out forwards; }
 
-        /* Announcement Date Box - Optimized Sizes */
+        /* Announcement Date Box - Optimized Small Size */
         .ann-date-box {
             background: linear-gradient(135deg, #2D4E53, #437178);
             color: white;
-            min-width: 85px; /* Pinaliit nang konti */
+            min-width: 85px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -35,7 +35,7 @@
             padding: 12px;
         }
 
-        .nav-logo { width: 45px; height: 45px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+        .nav-logo { width: 50px; height: 50px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
     </style>
 </head>
 <body class="pb-20 text-slate-800">
@@ -69,9 +69,12 @@
         <div class="max-w-6xl mx-auto glass-effect rounded-[2rem] px-8 py-4 flex justify-between items-center shadow-lg border border-white">
             <div class="flex items-center gap-4">
                 <img src="mcb.png" class="nav-logo" alt="Church Logo">
-                <h1 class="font-black text-slate-800 text-xl uppercase tracking-tighter">MC Portal</h1>
+                <div>
+                    <h1 class="font-black text-slate-800 text-xl md:text-2xl uppercase tracking-tighter leading-none">MC Program Portal</h1>
+                    <p class="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">Mobilization Church Balilihan</p>
+                </div>
             </div>
-            <div id="liveTime" class="text-[10px] font-black text-slate-400 uppercase tracking-widest hidden md:block"></div>
+            <div id="liveTime" class="text-[10px] font-black text-slate-400 uppercase tracking-widest hidden lg:block"></div>
         </div>
     </nav>
 
@@ -140,6 +143,49 @@
     <script>
         const sb = supabase.createClient('https://eejovtuputrwneovhfpc.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlam92dHVwdXRyd25lb3ZoZnBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMjY5MzIsImV4cCI6MjA4NjgwMjkzMn0.JJz64gSTT9qSqOkiJvuL1PT_H_I4ZYJbchrmkoljwws');
 
+        // Logic for Announcements
+        async function loadAnnouncement() {
+            const container = document.getElementById('annContainer');
+            try {
+                const { data, error } = await sb.from('announcements').select('*').order('created_at', {ascending: false}).limit(1);
+                if (error) throw error;
+
+                if(data && data.length > 0) {
+                    const ann = data[0];
+                    const dateObj = new Date(ann.created_at);
+                    const day = dateObj.getDate();
+                    const month = dateObj.toLocaleString('default', { month: 'short' }).toUpperCase();
+                    const time = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                    container.innerHTML = `
+                        <div class="bg-white p-4 md:p-5 rounded-[2.5rem] shadow-sm border border-slate-100 flex flex-col md:flex-row gap-5 hover:shadow-md transition-shadow">
+                            <div class="ann-date-box">
+                                <span class="text-[8px] font-black opacity-70 uppercase tracking-widest">${month}</span>
+                                <span class="text-2xl font-black leading-none my-1">${day}</span>
+                                <div class="h-[1px] w-6 bg-white/20 my-1"></div>
+                                <span class="text-[8px] font-bold opacity-80">${time}</span>
+                            </div>
+                            <div class="flex-1 flex flex-col justify-center py-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="bg-emerald-50 text-emerald-600 text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter">Latest Announcement</span>
+                                    <div class="h-[1px] flex-1 bg-slate-50"></div>
+                                </div>
+                                <p class="text-slate-800 font-bold text-base md:text-lg leading-relaxed italic">"${ann.content}"</p>
+                            </div>
+                        </div>`;
+                } else {
+                    container.innerHTML = `
+                        <div class="bg-slate-50 p-6 rounded-[2.5rem] border border-dashed border-slate-200 text-center">
+                            <p class="text-slate-400 font-bold uppercase text-[10px] tracking-widest">No active announcements</p>
+                        </div>`;
+                }
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = ''; 
+            }
+        }
+
+        // Logic for Rows
         function addRow(act = '', who = '') {
             const div = document.createElement('div');
             div.className = "flex flex-col md:flex-row gap-4 act-row animate-fade p-4 bg-slate-50/50 rounded-3xl border border-slate-100";
@@ -278,44 +324,16 @@
             }
         }
 
-        async function loadAnnouncement() {
-            const { data } = await sb.from('announcements').select('*').order('created_at', {ascending: false}).limit(1);
-            if(data?.[0]) {
-                const ann = data[0];
-                const dateObj = new Date(ann.created_at);
-                const day = dateObj.getDate();
-                const month = dateObj.toLocaleString('default', { month: 'short' }).toUpperCase();
-                const time = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-                document.getElementById('annContainer').innerHTML = `
-                    <div class="bg-white p-4 md:p-5 rounded-[2.5rem] shadow-sm border border-slate-100 flex flex-col md:flex-row gap-5 hover:shadow-md transition-shadow">
-                        <div class="ann-date-box">
-                            <span class="text-[8px] font-black opacity-70 uppercase tracking-widest">${month}</span>
-                            <span class="text-2xl font-black leading-none my-1">${day}</span>
-                            <div class="h-[1px] w-6 bg-white/20 my-1"></div>
-                            <span class="text-[8px] font-bold opacity-80">${time}</span>
-                        </div>
-                        <div class="flex-1 flex flex-col justify-center py-1">
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="bg-emerald-50 text-emerald-600 text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter">Latest Announcement</span>
-                                <div class="h-[1px] flex-1 bg-slate-50"></div>
-                            </div>
-                            <p class="text-slate-800 font-bold text-base md:text-lg leading-relaxed italic">"${ann.content}"</p>
-                        </div>
-                    </div>`;
-            } else {
-                document.getElementById('annContainer').innerHTML = `
-                    <div class="bg-slate-50 p-8 rounded-[2.5rem] border border-dashed border-slate-200 text-center">
-                        <p class="text-slate-400 font-bold uppercase text-[10px] tracking-widest">No active announcements</p>
-                    </div>`;
-            }
-        }
-
-        document.getElementById('searchName').addEventListener('input', (e) => loadHistory(e.target.value));
-        setInterval(() => { document.getElementById('liveTime').innerText = new Date().toLocaleString(); }, 1000);
-        
-        addRow();
-        loadAnnouncement();
+        // Initialize Everything
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAnnouncement();
+            addRow();
+            document.getElementById('searchName').addEventListener('input', (e) => loadHistory(e.target.value));
+            setInterval(() => { 
+                const lt = document.getElementById('liveTime');
+                if(lt) lt.innerText = new Date().toLocaleString(); 
+            }, 1000);
+        });
     </script>
 </body>
 </html>
