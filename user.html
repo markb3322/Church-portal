@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Portal | MC Balilihan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Bungee&display=swap');
+        
+        :root { --mc-green: #2D4E53; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; min-height: 100vh; }
+        .glass-effect { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.4); }
+        .official-stamp { border: 6px double currentColor; border-radius: 15px; padding: 15px; display: inline-block; transform: rotate(-5deg); text-align: center; background: white; font-family: 'Bungee', cursive; }
+        
+        /* Hidden Template Styling */
+        #exportTemplate { width: 800px; position: absolute; left: -9999px; background: white; padding: 40px 60px; }
+        .template-header { display: flex; align-items: center; justify-content: center; gap: 20px; border-bottom: 4px solid #1e293b; padding-bottom: 20px; margin-bottom: 30px; }
+        .logo-img { width: 100px; height: 100px; object-fit: contain; }
+        .header-text { text-align: left; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade { animation: fadeIn 0.4s ease-out forwards; }
+
+        /* Announcement Card Specific */
+        .ann-date-box {
+            background: linear-gradient(135deg, #2D4E53, #437178);
+            color: white;
+            min-width: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 1.5rem;
+        }
+
+        /* Navbar Logo Styling */
+        .nav-logo { width: 40px; height: 40px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+    </style>
+</head>
+<body class="pb-20 text-slate-800">
+
+    <div id="exportTemplate">
+        <div class="template-header">
+            <img src="mcb.png" class="logo-img" alt="MC Logo">
+            <div class="header-text">
+                <h1 style="font-size: 28px; font-weight: 900; color: #2D4E53; margin: 0; text-transform: uppercase;">Mobilization Church Balilihan</h1>
+                <p style="font-size: 14px; font-weight: 700; color: #64748b; margin: 0; letter-spacing: 1px;">Sal-ing, Balilihan, Bohol</p>
+                <p style="letter-spacing: 4px; font-weight: 800; color: #94a3b8; font-size: 12px; margin-top: 5px; text-transform: uppercase;">Official Service Program</p>
+            </div>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 40px;">
+            <div><p style="font-size: 12px; font-weight: 800; color: #64748b; text-transform: uppercase;">Program Title</p><h2 id="expTitle" style="font-size: 24px; font-weight: 900; color: #1e293b; margin: 0;"></h2></div>
+            <div style="text-align: right;"><p style="font-size: 12px; font-weight: 800; color: #64748b; text-transform: uppercase;">Date</p><h2 id="expDate" style="font-size: 20px; font-weight: 700; color: #334155; margin: 0;"></h2></div>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 50px;">
+            <tbody id="expRows" style="font-size: 18px; font-weight: 600;"></tbody>
+        </table>
+        <div style="display: flex; justify-content: flex-end;">
+            <div class="official-stamp">
+                <div style="font-size: 12px; border-bottom: 2px solid currentColor; margin-bottom: 5px;">MC BALILIHAN</div>
+                <div style="font-size: 45px; line-height: 1;">APPROVED</div>
+                <div id="stampMeta" style="font-size: 10px; margin-top: 5px; display: flex; justify-content: space-between; font-family: sans-serif;"></div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="sticky top-0 z-50 px-4 py-4">
+        <div class="max-w-6xl mx-auto glass-effect rounded-[2rem] px-8 py-4 flex justify-between items-center shadow-lg border border-white">
+            <div class="flex items-center gap-4">
+                <img src="mcb.png" class="nav-logo" alt="Church Logo">
+                <h1 class="font-black text-slate-800 text-xl uppercase tracking-tighter">MC Portal</h1>
+            </div>
+            <div id="liveTime" class="text-[10px] font-black text-slate-400 uppercase tracking-widest hidden md:block"></div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 mt-6 space-y-8">
+        
+        <div id="annContainer" class="animate-fade">
+             <div class="bg-white p-4 rounded-[2.5rem] shadow-sm border border-slate-100 flex gap-6">
+                <div class="w-24 h-24 bg-slate-100 rounded-3xl animate-pulse"></div>
+                <div class="flex-1 space-y-3 py-2">
+                    <div class="h-4 bg-slate-100 w-1/4 rounded animate-pulse"></div>
+                    <div class="h-8 bg-slate-100 w-3/4 rounded animate-pulse"></div>
+                </div>
+             </div>
+        </div>
+
+        <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 animate-fade">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+                <div>
+                    <h2 class="text-2xl font-black text-slate-800 tracking-tight">Program History</h2>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Search your name to manage requests</p>
+                </div>
+                <div class="relative w-full md:w-80">
+                    <input id="searchName" type="text" placeholder="Type your name..." class="w-full p-4 pl-12 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-emerald-500 focus:bg-white font-bold transition-all text-sm">
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <tbody id="historyList" class="divide-y divide-slate-50">
+                        <tr><td class="p-10 text-center text-slate-300 font-bold uppercase text-[10px]">Type 3 letters to search</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="formAnchor" class="max-w-4xl mx-auto">
+            <div class="bg-white p-10 md:p-16 rounded-[3rem] shadow-xl border border-white animate-fade">
+                <div class="text-center mb-12">
+                    <h3 id="formTitle" class="text-3xl font-black text-slate-800 tracking-tight">Request New Program</h3>
+                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-2">Fill up the sequence below</p>
+                </div>
+
+                <form id="progForm" class="space-y-8">
+                    <input type="hidden" id="editId"> 
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">Requestor Name</label>
+                            <input id="userName" type="text" class="w-full p-5 bg-slate-50 rounded-2xl font-bold outline-none border-2 border-slate-100 focus:border-emerald-500 transition-all text-lg" required>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">Event Date</label>
+                            <input id="progDate" type="date" class="w-full p-5 bg-slate-50 rounded-2xl font-bold outline-none border-2 border-slate-100 focus:border-emerald-500 transition-all text-lg" required>
+                        </div>
+                        <div class="md:col-span-2 space-y-2">
+                            <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">Program Title</label>
+                            <input id="progTitle" type="text" class="w-full p-5 bg-slate-50 rounded-2xl font-bold outline-none border-2 border-slate-100 focus:border-emerald-500 transition-all text-xl" required>
+                        </div>
+                    </div>
+
+                    <div class="pt-8 border-t border-slate-100">
+                        <h4 class="text-xs font-black text-slate-800 uppercase tracking-widest mb-6">Program Sequence</h4>
+                        <div id="rowContainer" class="space-y-6 mb-6"></div>
+                        <button type="button" onclick="addRow()" class="w-full py-5 border-2 border-dashed border-slate-200 rounded-3xl text-slate-400 font-black text-xs hover:border-emerald-400 hover:text-emerald-500 transition-all uppercase tracking-widest">+ Add Activity Row</button>
+                    </div>
+
+                    <div class="flex flex-col gap-4">
+                        <button type="submit" id="submitBtn" class="w-full bg-[#2D4E53] text-white py-6 rounded-[2rem] font-black shadow-lg hover:opacity-90 transition-all uppercase tracking-widest text-sm">Submit Program</button>
+                        <button type="button" id="cancelBtn" onclick="resetForm()" class="hidden w-full bg-slate-100 text-slate-500 py-4 rounded-[2rem] font-bold text-xs uppercase">Cancel Edit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const sb = supabase.createClient('https://eejovtuputrwneovhfpc.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlam92dHVwdXRyd25lb3ZoZnBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMjY5MzIsImV4cCI6MjA4NjgwMjkzMn0.JJz64gSTT9qSqOkiJvuL1PT_H_I4ZYJbchrmkoljwws');
+
+        function addRow(act = '', who = '') {
+            const div = document.createElement('div');
+            div.className = "flex flex-col md:flex-row gap-4 act-row animate-fade p-4 bg-slate-50/50 rounded-3xl border border-slate-100";
+            div.innerHTML = `
+                <div class="flex-1">
+                    <input type="text" value="${act}" placeholder="Activity" class="act w-full p-5 bg-white rounded-2xl font-bold border-2 border-slate-100 focus:border-emerald-500 outline-none transition-all" required>
+                </div>
+                <div class="md:w-2/5">
+                    <input type="text" value="${who}" placeholder="Person" class="who w-full p-5 bg-white rounded-2xl font-bold border-2 border-slate-100 focus:border-emerald-500 outline-none transition-all" required>
+                </div>
+                <button type="button" onclick="this.parentElement.remove()" class="text-red-400 font-bold px-2">×</button>
+            `;
+            document.getElementById('rowContainer').appendChild(div);
+        }
+
+        async function loadHistory(name) {
+            if(!name || name.length < 3) return;
+            const { data } = await sb.from('programs').select('*').ilike('user_id', `%${name}%`).order('created_at', {ascending: false});
+            const list = document.getElementById('historyList');
+            
+            if(data && data.length > 0) {
+                list.innerHTML = data.map(i => {
+                    const itemData = JSON.stringify(i).replace(/'/g, "&apos;");
+                    return `
+                    <tr class="group">
+                        <td class="py-6 px-4">
+                            <h4 class="font-black text-slate-800 uppercase text-sm">${i.title}</h4>
+                            <p class="text-[9px] text-slate-400 font-black uppercase mt-1">${i.program_date} — <span class="${i.status === 'approved' ? 'text-emerald-500' : 'text-amber-500'}">${i.status}</span></p>
+                        </td>
+                        <td class="py-6 px-4 text-right space-x-4">
+                            ${i.status === 'pending' ? `
+                                <button onclick='startEdit(${itemData})' class="text-blue-500 font-black text-[10px] uppercase">Edit</button>
+                                <button onclick="deleteRecord('${i.id}')" class="text-red-400 font-black text-[10px] uppercase">Delete</button>
+                            ` : `
+                                <button onclick='exportImage(${itemData})' class="bg-[#2D4E53] text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase">Download PNG</button>
+                            `}
+                        </td>
+                    </tr>`;
+                }).join('');
+            }
+        }
+
+        window.startEdit = function(item) {
+            document.getElementById('editId').value = item.id;
+            document.getElementById('userName').value = item.user_id;
+            document.getElementById('progTitle').value = item.title;
+            document.getElementById('progDate').value = item.program_date;
+            const container = document.getElementById('rowContainer');
+            container.innerHTML = '';
+            item.content.forEach(c => addRow(c.act, c.who));
+            document.getElementById('formTitle').innerText = "Edit Your Request";
+            document.getElementById('submitBtn').innerText = "Update Program";
+            document.getElementById('cancelBtn').classList.remove('hidden');
+            document.getElementById('formAnchor').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        window.deleteRecord = async function(id) {
+            if(confirm("Confirm Delete?")) {
+                await sb.from('programs').delete().eq('id', id);
+                loadHistory(document.getElementById('searchName').value);
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('progForm').reset();
+            document.getElementById('editId').value = '';
+            document.getElementById('rowContainer').innerHTML = '';
+            addRow();
+            document.getElementById('formTitle').innerText = "Request New Program";
+            document.getElementById('submitBtn').innerText = "Submit Program";
+            document.getElementById('cancelBtn').classList.add('hidden');
+        }
+
+        document.getElementById('progForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const editId = document.getElementById('editId').value;
+            btn.disabled = true; btn.innerText = "Processing...";
+            
+            const content = Array.from(document.querySelectorAll('.act-row')).map(r => ({
+                act: r.querySelector('.act').value, who: r.querySelector('.who').value
+            }));
+            
+            const payload = {
+                user_id: document.getElementById('userName').value,
+                title: document.getElementById('progTitle').value,
+                program_date: document.getElementById('progDate').value,
+                content: content,
+                status: 'pending'
+            };
+
+            const { error } = editId ? await sb.from('programs').update(payload).eq('id', editId) : await sb.from('programs').insert(payload);
+
+            if(!error) {
+                alert("Success!");
+                location.reload();
+            } else {
+                alert("Error: " + error.message);
+                btn.disabled = false;
+            }
+        }
+
+        window.exportImage = async function(item) {
+            const temp = document.getElementById('exportTemplate');
+            document.getElementById('expTitle').innerText = item.title.toUpperCase();
+            document.getElementById('expDate').innerText = item.program_date;
+            document.getElementById('expRows').innerHTML = item.content.map(c => `
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 15px; text-transform: uppercase;">${c.act}</td>
+                    <td style="padding: 15px; text-align: right; color: #64748b;">${c.who}</td>
+                </tr>
+            `).join('');
+            
+            const stampDate = item.updated_at ? new Date(item.updated_at) : new Date();
+            document.getElementById('stampMeta').innerHTML = `<span>APPROVED: ${stampDate.toLocaleDateString()}</span><span>MCB-OFFICIAL</span>`;
+            
+            const logo = temp.querySelector('img');
+            if (logo.complete) capture(); else logo.onload = capture;
+
+            function capture() {
+                html2canvas(temp, { scale: 2, useCORS: true, backgroundColor: "#ffffff" }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = `Program_${item.title}.png`;
+                    link.href = canvas.toDataURL("image/png");
+                    link.click();
+                });
+            }
+        }
+
+        async function loadAnnouncement() {
+            const { data, error } = await sb.from('announcements').select('*').order('created_at', {ascending: false}).limit(1);
+            
+            if(data?.[0]) {
+                const ann = data[0];
+                const dateObj = new Date(ann.created_at);
+                const day = dateObj.getDate();
+                const month = dateObj.toLocaleString('default', { month: 'short' }).toUpperCase();
+                const time = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                document.getElementById('annContainer').innerHTML = `
+                    <div class="bg-white p-4 md:p-6 rounded-[2.5rem] shadow-sm border border-slate-100 flex flex-col md:flex-row gap-6 hover:shadow-md transition-shadow">
+                        <div class="ann-date-box p-4 md:p-6">
+                            <span class="text-[10px] font-black opacity-60 uppercase tracking-widest">${month}</span>
+                            <span class="text-3xl font-black leading-none">${day}</span>
+                            <div class="h-[1px] w-8 bg-white/30 my-2"></div>
+                            <span class="text-[10px] font-bold">${time}</span>
+                        </div>
+                        <div class="flex-1 flex flex-col justify-center py-2">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="bg-emerald-100 text-emerald-600 text-[9px] font-black px-2 py-1 rounded-full uppercase tracking-tighter">Latest Announcement</span>
+                                <div class="h-[1px] flex-1 bg-slate-50"></div>
+                            </div>
+                            <p class="text-slate-800 font-bold text-lg md:text-xl leading-relaxed">"${ann.content}"</p>
+                        </div>
+                    </div>`;
+            } else {
+                document.getElementById('annContainer').innerHTML = `
+                    <div class="bg-slate-50 p-8 rounded-[2.5rem] border border-dashed border-slate-200 text-center">
+                        <p class="text-slate-400 font-bold uppercase text-[10px] tracking-widest">No active announcements</p>
+                    </div>`;
+            }
+        }
+
+        document.getElementById('searchName').addEventListener('input', (e) => loadHistory(e.target.value));
+        setInterval(() => { document.getElementById('liveTime').innerText = new Date().toLocaleString(); }, 1000);
+        
+        addRow();
+        loadAnnouncement();
+    </script>
+</body>
+</html>
