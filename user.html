@@ -17,7 +17,7 @@
         
         #exportTemplate { width: 800px; position: absolute; left: -9999px; background: white; padding: 40px 60px; }
         .template-header { display: flex; align-items: center; justify-content: center; gap: 20px; border-bottom: 4px solid #1e293b; padding-bottom: 20px; margin-bottom: 30px; }
-        .logo-img { width: 100px; height: 100px; object-fit: contain; }
+        .logo-img { width: 100px; height: 100px; object-fit: contain; border-radius: 50%; }
         
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade { animation: fadeIn 0.4s ease-out forwards; }
@@ -33,7 +33,7 @@
             border-radius: 1.5rem;
         }
 
-        .nav-logo { width: 40px; height: 40px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+        .nav-logo { width: 45px; height: 45px; object-fit: contain; border-radius: 50%; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
     </style>
 </head>
 <body class="pb-20 text-slate-800">
@@ -66,7 +66,7 @@
     <nav class="sticky top-0 z-50 px-4 py-4">
         <div class="max-w-6xl mx-auto glass-effect rounded-[2rem] px-8 py-4 flex justify-between items-center shadow-lg border border-white">
             <div class="flex items-center gap-4">
-                <img src="mcb.png" class="nav-logo" alt="Church Logo">
+                <img src="https://raw.githubusercontent.com/Galat-Inosante/images/main/5111.png" class="nav-logo" alt="Church Logo">
                 <h1 class="font-black text-slate-800 text-xl uppercase tracking-tighter">MC Portal</h1>
             </div>
             <div id="liveTime" class="text-[10px] font-black text-slate-400 uppercase tracking-widest hidden md:block"></div>
@@ -169,8 +169,6 @@
             if(data && data.length > 0) {
                 list.innerHTML = data.map(i => {
                     const itemData = JSON.stringify(i).replace(/'/g, "&apos;");
-                    
-                    // Logic to show Edit/Delete buttons if status is PENDING or REJECTED
                     const canEdit = i.status === 'pending' || i.status === 'rejected';
                     const statusColor = i.status === 'approved' ? 'text-emerald-500' : (i.status === 'rejected' ? 'text-red-500' : 'text-amber-500');
 
@@ -244,7 +242,7 @@
                 title: document.getElementById('progTitle').value,
                 program_date: document.getElementById('progDate').value,
                 content: content,
-                status: 'pending' // Automatically resets to pending when updated
+                status: 'pending'
             };
 
             const { error } = editId ? await sb.from('programs').update(payload).eq('id', editId) : await sb.from('programs').insert(payload);
