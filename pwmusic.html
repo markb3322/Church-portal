@@ -9,83 +9,68 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Bungee&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Bungee&family=Special+Elite&display=swap');
         
         :root { --mc-green: #2D4E53; --mc-gold: #D4AF37; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; min-height: 100vh; color: #1e293b; }
 
         .music-card { background: white; border-radius: 2rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); border: 1px solid white; transition: all 0.3s ease; overflow: hidden; }
         
+        .board-card { position: relative; transition: transform 0.2s; }
+        .board-card:hover { transform: translateY(-2px); }
+        .quote-icon { position: absolute; top: -10px; right: 20px; font-size: 2rem; opacity: 0.1; }
+
         .calendar-day { aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 12px; font-weight: 700; transition: 0.2s; border: 1px solid #f1f5f9; font-size: 0.8rem; }
         .calendar-day:hover { background: var(--mc-green); color: white; transform: scale(1.1); }
-        .day-active { background: var(--mc-green) !important; color: white !important; box-shadow: 0 5px 15px rgba(45,78,83,0.3); }
-        .day-today { border: 2px solid var(--mc-gold); }
+        .calendar-day.today { border: 2px solid var(--mc-gold); color: var(--mc-green); }
+        .calendar-day.selected { background: var(--mc-green); color: white; }
 
-        /* Added crossOrigin for html2canvas to handle local images */
-        #printableLineup { width: 500px; padding: 60px; background: white; position: absolute; left: -9999px; top: 0; }
-        .stamp-approved { border: 5px double #10b981; color: #10b981; font-family: 'Bungee', cursive; transform: rotate(-12deg); padding: 10px 25px; display: inline-block; border-radius: 15px; }
-
-        .custom-scroll::-webkit-scrollbar { height: 4px; }
-        .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        #printableLineup { width: 600px; padding: 50px; background: white; position: absolute; left: -9999px; top: 0; }
+        .official-header { border-bottom: 3px solid #2D4E53; padding-bottom: 20px; margin-bottom: 30px; }
         
-        .active-stat { background: #2D4E53; color: white; box-shadow: 0 4px 10px rgba(45,78,83,0.2); }
-        .stat-btn:not(.active-stat) { color: #64748b; }
-        
-        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .stamp-box { border: 4px solid #10b981; color: #10b981; padding: 15px; display: inline-block; border-radius: 8px; transform: rotate(-5deg); font-family: 'Special Elite', cursive; text-align: center; min-width: 250px; }
+        .stamp-title { font-size: 10px; font-weight: 900; border-bottom: 1px solid #10b981; margin-bottom: 5px; padding-bottom: 2px; }
+        .stamp-approved { font-family: 'Bungee', cursive; font-size: 32px; line-height: 1; margin: 5px 0; }
+        .stamp-details { font-size: 11px; font-weight: bold; margin-top: 5px; }
 
-        .song-input-group { animation: slideIn 0.3s ease-out; }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .filter-btn.active { background-color: var(--mc-green); color: white; border-color: var(--mc-green); }
     </style>
 </head>
 <body class="pb-12">
 
     <div id="printableLineup">
-        <div class="flex justify-center mb-4">
-            <img src="mcb.png" alt="MCB Logo" class="h-16 w-16 object-contain">
+        <div class="official-header text-center">
+            <img src="mcb.png" class="w-20 h-20 mx-auto mb-2" alt="Logo">
+            <h1 class="text-2xl font-black text-[#2D4E53]">MOBILIZATION CHURCH BALILIHAN</h1>
+            <p class="text-xs font-bold text-slate-500">Sal-ing, Balilihan, Bohol</p>
+            <p class="text-sm font-black text-emerald-600 mt-2 tracking-widest uppercase">Praise and Worship Line Up</p>
         </div>
-        <div class="text-center mb-10">
-            <h1 class="text-2xl font-black text-[#2D4E53] uppercase tracking-tighter">Music Service Lineup</h1>
-            <p class="text-[10px] font-bold text-slate-400 tracking-[0.4em] uppercase">Mobilization Church Balilihan</p>
-        </div>
-        <div class="bg-slate-50 rounded-[2rem] p-8 mb-8 border border-slate-100">
-            <div class="flex justify-between items-end border-b border-slate-200 pb-4 mb-6">
-                <div>
-                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Worship Leader</p>
-                    <h2 id="imgLeader" class="text-xl font-black text-slate-800 uppercase italic">---</h2>
-                </div>
-                <div class="text-right">
-                    <p id="imgDate" class="text-sm font-bold text-emerald-600">---</p>
-                </div>
+        <div class="mb-10 space-y-6">
+            <div class="flex justify-between items-center border-b pb-2">
+                <div><span class="text-[10px] font-black text-slate-400 uppercase">Worship Leader</span><h2 id="imgLeader" class="text-xl font-bold text-slate-800">---</h2></div>
+                <div class="text-right"><span class="text-[10px] font-black text-slate-400 uppercase">Service Date</span><h2 id="imgDate" class="text-lg font-bold text-[#2D4E53]">---</h2></div>
             </div>
-            <div class="space-y-8">
-                <div>
-                    <h4 class="text-[10px] font-black text-emerald-600 uppercase mb-3">Praise Songs</h4>
-                    <p id="imgPraise" class="font-bold text-slate-700 text-lg leading-relaxed pl-4">---</p>
-                </div>
-                <div>
-                    <h4 class="text-[10px] font-black text-blue-600 uppercase mb-3">Worship Songs</h4>
-                    <p id="imgWorship" class="font-bold text-slate-700 text-lg leading-relaxed pl-4">---</p>
-                </div>
+            <div class="space-y-6">
+                <div class="bg-slate-50 p-6 rounded-2xl"><h4 class="text-xs font-black text-emerald-600 uppercase mb-2">🔥 Praise (Fast)</h4><p id="imgPraise" class="font-bold text-slate-700 text-lg leading-relaxed">---</p></div>
+                <div class="bg-slate-50 p-6 rounded-2xl"><h4 class="text-xs font-black text-blue-600 uppercase mb-2">🙏 Worship (Slow)</h4><p id="imgWorship" class="font-bold text-slate-700 text-lg leading-relaxed">---</p></div>
             </div>
         </div>
-        <div class="flex justify-center mt-12">
-            <div class="stamp-approved text-3xl">APPROVED</div>
+        <div class="flex justify-end mt-12 pr-4">
+            <div class="stamp-box">
+                <div class="stamp-title">MOBILIZATION CHURCH BALILIHAN</div>
+                <div class="stamp-approved">APPROVED</div>
+                <div class="stamp-details">DATE: <span id="stampDate">---</span><br>TIME: <span id="stampTime">---</span></div>
+            </div>
         </div>
     </div>
 
     <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
-        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+        <div class="max-w-6xl mx-auto px-6 py-3 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="h-11 w-11 bg-white rounded-xl shadow-md p-1 border border-slate-100 flex items-center justify-center overflow-hidden">
-                    <img src="mcb.png" alt="Logo" class="h-full w-full object-contain">
-                </div>
+                <img src="mcb.png" class="w-10 h-10 object-contain" alt="MCB Logo">
                 <div>
-                    <h1 class="font-extrabold text-slate-800 uppercase tracking-tight text-sm md:text-base">Music Team Portal</h1>
-                    <p class="text-[9px] font-bold text-emerald-600 uppercase tracking-widest">Mobilization Church Balilihan</p>
+                    <h1 class="font-extrabold text-slate-800 uppercase text-sm md:text-base leading-none">Music Team Portal</h1>
+                    <p class="text-[9px] font-bold text-emerald-600 uppercase mt-1">Mobilization Church Balilihan</p>
                 </div>
             </div>
         </div>
@@ -93,85 +78,96 @@
 
     <main class="max-w-6xl mx-auto px-4 mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div class="lg:col-span-4 space-y-6">
-            <section class="music-card p-6 border-t-4 border-[#D4AF37]">
+            
+            <section class="music-card p-6 border-t-4 border-[#D4AF37] board-card">
+                <i class="fa-solid fa-quote-right quote-icon text-[#D4AF37]"></i>
                 <div class="flex items-center gap-2 mb-4">
-                    <i class="fa-solid fa-quote-left text-[#D4AF37] text-xl"></i>
-                    <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-widest">📖 Pastor's Board</h3>
+                    <span class="bg-amber-100 text-[#D4AF37] p-2 rounded-lg text-xs"><i class="fa-solid fa-person-rays"></i></span>
+                    <h3 class="text-[10px] font-black uppercase text-slate-500 tracking-widest">Pastor's Board</h3>
                 </div>
-                <div class="p-5 bg-amber-50/50 rounded-3xl border border-amber-100">
-                    <p id="pastorText" class="text-sm font-bold text-slate-700 italic leading-relaxed">"Loading Pastor's message..."</p>
-                    <p id="pastorDate" class="mt-3 text-[8px] font-black text-amber-600 uppercase tracking-widest text-right">---</p>
+                <div class="bg-gradient-to-br from-amber-50 to-white p-5 rounded-2xl border border-amber-100">
+                    <p id="pastorText" class="text-sm font-bold text-slate-700 leading-relaxed italic">"Loading message..."</p>
+                    <div class="mt-4 flex items-center justify-between border-t border-amber-100 pt-3">
+                        <span class="text-[9px] font-black text-amber-600 bg-amber-100 px-2 py-0.5 rounded">OFFICIAL</span>
+                        <span id="pastorTimeAgo" class="text-[9px] font-bold text-slate-400">---</span>
+                    </div>
                 </div>
             </section>
 
-            <section class="music-card p-6 border-t-4 border-[#2D4E53]">
+            <section class="music-card p-6 border-t-4 border-[#2D4E53] board-card">
+                <i class="fa-solid fa-bullhorn quote-icon text-[#2D4E53]"></i>
                 <div class="flex items-center gap-2 mb-4">
-                    <i class="fa-solid fa-bullhorn text-[#2D4E53] text-xl"></i>
-                    <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-widest">📣 Music Desk</h3>
+                    <span class="bg-slate-100 text-[#2D4E53] p-2 rounded-lg text-xs"><i class="fa-solid fa-circle-info"></i></span>
+                    <h3 class="text-[10px] font-black uppercase text-slate-500 tracking-widest">Music Desk</h3>
                 </div>
-                <div class="p-5 bg-slate-50 rounded-3xl border border-slate-100">
-                    <p id="announcementText" class="text-xs font-bold text-slate-600 leading-relaxed italic">Loading announcements...</p>
-                    <div class="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between">
-                        <span class="text-[8px] font-black text-emerald-600 uppercase bg-emerald-50 px-2 py-1 rounded-md">Team Only</span>
-                        <p id="annDate" class="text-[8px] font-bold text-slate-400 uppercase">---</p>
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                    <p id="announcementText" class="text-xs font-bold text-slate-600 leading-relaxed">Loading desk updates...</p>
+                    <div class="mt-4 flex items-center justify-end gap-2 text-slate-400">
+                        <i class="fa-regular fa-clock text-[9px]"></i>
+                        <span id="annTimeAgo" class="text-[9px] font-bold">---</span>
                     </div>
                 </div>
             </section>
 
             <section class="music-card p-6">
-                <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-6" id="monthYear">📅 Calendar</h3>
-                <div id="calendarGrid" class="grid grid-cols-7 gap-1.5"></div>
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-widest" id="monthYear">📅 Month</h3>
+                    <div class="flex gap-2">
+                        <button onclick="changeMonth(-1)" class="p-2 hover:bg-slate-100 rounded-full text-slate-400"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                        <button onclick="changeMonth(1)" class="p-2 hover:bg-slate-100 rounded-full text-slate-400"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                    </div>
+                </div>
+                <div id="calendarGrid" class="grid grid-cols-7 gap-1.5 text-center">
+                    <div class="text-[8px] font-black text-slate-300">S</div><div class="text-[8px] font-black text-slate-300">M</div><div class="text-[8px] font-black text-slate-300">T</div><div class="text-[8px] font-black text-slate-300">W</div><div class="text-[8px] font-black text-slate-300">T</div><div class="text-[8px] font-black text-slate-300">F</div><div class="text-[8px] font-black text-slate-300">S</div>
+                </div>
             </section>
         </div>
 
         <div class="lg:col-span-8 space-y-6">
-            <section id="formSection" class="music-card p-8 md:p-10">
-                <h2 class="text-xl font-black text-slate-800 tracking-tight mb-8">✨ Create New Setlist</h2>
+            <section class="music-card p-8">
+                <h2 class="text-xl font-black text-slate-800 mb-8">✨ Create New Line Up</h2>
                 <form id="setlistForm" class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="space-y-2">
-                            <label class="text-[9px] font-black text-slate-400 uppercase ml-2">👤 Worship Leader</label>
-                            <input type="text" id="leader" class="w-full p-4 bg-slate-50 rounded-2xl border-none font-bold outline-none focus:ring-2 ring-[#2D4E53]/20" required>
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-[9px] font-black text-slate-400 uppercase ml-2">📅 Service Date</label>
-                            <input type="date" id="sDate" class="w-full p-4 bg-slate-50 rounded-2xl border-none font-bold outline-none focus:ring-2 ring-[#2D4E53]/20" required>
-                        </div>
+                        <input type="text" id="leader" placeholder="Worship Leader Name" class="w-full p-4 bg-slate-50 rounded-2xl font-bold outline-none border focus:border-[#2D4E53]" required>
+                        <input type="date" id="sDate" class="w-full p-4 bg-slate-50 rounded-2xl font-bold outline-none border focus:border-[#2D4E53]" required>
                     </div>
-                    
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="p-5 bg-emerald-50/50 rounded-[2rem]">
-                            <h4 class="text-[10px] font-black text-emerald-600 mb-4 uppercase">🔥 Praise (Fast)</h4>
+                            <h4 class="text-[10px] font-black text-emerald-600 mb-4 uppercase">🔥 Praise</h4>
                             <div id="praiseContainer" class="space-y-3">
-                                <input type="text" class="praise-in w-full p-3.5 bg-white rounded-xl text-sm font-bold" placeholder="Song Title 1">
+                                <input type="text" class="praise-in w-full p-3 bg-white rounded-xl text-sm font-bold border" placeholder="Song 1">
                             </div>
-                            <button type="button" onclick="addIn('praiseContainer')" class="mt-4 text-[10px] font-bold text-emerald-500 hover:underline">➕ Add Song</button>
+                            <button type="button" onclick="addIn('praiseContainer')" class="mt-4 text-[10px] font-bold text-emerald-500">➕ Add Song</button>
                         </div>
-
                         <div class="p-5 bg-blue-50/50 rounded-[2rem]">
-                            <h4 class="text-[10px] font-black text-blue-600 mb-4 uppercase">🙏 Worship (Slow)</h4>
+                            <h4 class="text-[10px] font-black text-blue-600 mb-4 uppercase">🙏 Worship</h4>
                             <div id="worshipContainer" class="space-y-3">
-                                <input type="text" class="worship-in w-full p-3.5 bg-white rounded-xl text-sm font-bold" placeholder="Song Title 1">
+                                <input type="text" class="worship-in w-full p-3 bg-white rounded-xl text-sm font-bold border" placeholder="Song 1">
                             </div>
-                            <button type="button" onclick="addIn('worshipContainer')" class="mt-4 text-[10px] font-bold text-blue-500 hover:underline">➕ Add Song</button>
+                            <button type="button" onclick="addIn('worshipContainer')" class="mt-4 text-[10px] font-bold text-blue-500">➕ Add Song</button>
                         </div>
                     </div>
-
-                    <button type="submit" id="subBtn" class="w-full bg-[#2D4E53] text-white py-5 rounded-3xl font-black uppercase tracking-[0.2em] text-xs shadow-xl">
-                        🚀 Submit Lineup
-                    </button>
+                    <button type="submit" id="subBtn" class="w-full bg-[#2D4E53] text-white py-5 rounded-3xl font-black uppercase text-xs shadow-xl hover:bg-[#1e3538] transition-all">🚀 Submit Lineup</button>
                 </form>
             </section>
 
-            <section class="music-card p-6 md:p-8">
-                <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8">📊 Tracking</h3>
-                <div class="overflow-x-auto custom-scroll">
-                    <table class="w-full text-left table-fixed min-w-[450px]">
+            <section class="music-card p-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">📊 Tracking</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="filterTable('all')" class="filter-btn active text-[9px] font-black px-3 py-1.5 rounded-full border border-slate-200 uppercase transition-all">All</button>
+                        <button onclick="filterTable('approved')" class="filter-btn text-[9px] font-black px-3 py-1.5 rounded-full border border-slate-200 text-emerald-600 uppercase transition-all">Approved</button>
+                        <button onclick="filterTable('pending')" class="filter-btn text-[9px] font-black px-3 py-1.5 rounded-full border border-slate-200 text-amber-500 uppercase transition-all">Pending</button>
+                        <button onclick="filterTable('rejected')" class="filter-btn text-[9px] font-black px-3 py-1.5 rounded-full border border-slate-200 text-rose-500 uppercase transition-all">Rejected</button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
                         <thead>
                             <tr class="border-b border-slate-100">
-                                <th class="pb-4 w-2/5 text-[9px] font-black text-slate-300 uppercase">Leader</th>
-                                <th class="pb-4 w-1/4 text-[9px] font-black text-slate-300 uppercase">Date</th>
-                                <th class="pb-4 w-1/3 text-[9px] font-black text-slate-300 uppercase text-right">Status</th>
+                                <th class="pb-4 text-[9px] font-black text-slate-300 uppercase">Leader</th>
+                                <th class="pb-4 text-[9px] font-black text-slate-300 uppercase">Date</th>
+                                <th class="pb-4 text-right text-[9px] font-black text-slate-300 uppercase">Action</th>
                             </tr>
                         </thead>
                         <tbody id="historyBody" class="divide-y divide-slate-50"></tbody>
@@ -183,107 +179,134 @@
 
     <script>
         const sb = supabase.createClient('https://eejovtuputrwneovhfpc.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlam92dHVwdXRyd25lb3ZoZnBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMjY5MzIsImV4cCI6MjA4NjgwMjkzMn0.JJz64gSTT9qSqOkiJvuL1PT_H_I4ZYJbchrmkoljwws');
+        
+        let currentYear = new Date().getFullYear();
+        let currentMonth = new Date().getMonth();
+        let fullHistory = [];
 
-        let allData = [];
-
-        function addIn(id) {
-            const container = document.getElementById(id);
-            const wrapper = document.createElement('div');
-            wrapper.className = "flex gap-2 song-input-group mt-3";
-            const inputClass = id.includes('praise') ? 'praise-in' : 'worship-in';
-            wrapper.innerHTML = `<input type="text" class="${inputClass} w-full p-3.5 bg-white rounded-xl text-sm font-bold border" placeholder="Next song..."><button type="button" onclick="this.parentElement.remove()" class="text-rose-500 p-2"><i class="fa-solid fa-trash-can"></i></button>`;
-            container.appendChild(wrapper);
+        function timeAgo(date) {
+            const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+            let interval = seconds / 31536000;
+            if (interval > 1) return Math.floor(interval) + " years ago";
+            interval = seconds / 2592000;
+            if (interval > 1) return Math.floor(interval) + " months ago";
+            interval = seconds / 86400;
+            if (interval > 1) return Math.floor(interval) + " days ago";
+            interval = seconds / 3600;
+            if (interval > 1) return Math.floor(interval) + " hrs ago";
+            interval = seconds / 60;
+            if (interval > 1) return Math.floor(interval) + " mins ago";
+            return "just now";
         }
 
         async function loadData() {
-            try {
-                const { data: pastorAnn } = await sb.from('music_announcements').select('*').eq('type', 'pastor').order('created_at', {ascending: false}).limit(1);
-                if(pastorAnn?.[0]) {
-                    document.getElementById('pastorText').innerText = `"${pastorAnn[0].content}"`;
-                    document.getElementById('pastorDate').innerText = new Date(pastorAnn[0].created_at).toLocaleDateString();
-                }
+            const { data: pAnn } = await sb.from('music_announcements').select('*').eq('type', 'pastor').order('created_at', {ascending: false}).limit(1);
+            if(pAnn?.[0]) {
+                document.getElementById('pastorText').innerText = `"${pAnn[0].content}"`;
+                document.getElementById('pastorTimeAgo').innerText = timeAgo(pAnn[0].created_at);
+            }
+            const { data: mAnn } = await sb.from('music_announcements').select('*').eq('type', 'music').order('created_at', {ascending: false}).limit(1);
+            if(mAnn?.[0]) {
+                document.getElementById('announcementText').innerText = mAnn[0].content;
+                document.getElementById('annTimeAgo').innerText = timeAgo(mAnn[0].created_at);
+            }
+            const { data: hist } = await sb.from('programs').select('*').eq('title', 'Music').order('created_at',{ascending:false});
+            fullHistory = hist || [];
+            renderTable(fullHistory);
+        }
 
-                const { data: musicAnn } = await sb.from('music_announcements').select('*').eq('type', 'music').order('created_at', {ascending: false}).limit(1);
-                if(musicAnn?.[0]) {
-                    document.getElementById('announcementText').innerText = musicAnn[0].content;
-                    document.getElementById('annDate').innerText = new Date(musicAnn[0].created_at).toLocaleDateString();
-                }
-
-                const { data: hist } = await sb.from('programs').select('*').eq('title', 'Music').order('created_at',{ascending:false});
-                allData = hist || [];
-                renderTable(allData);
-            } catch (e) { console.error("Error:", e); }
+        function addIn(id) {
+            const container = document.getElementById(id);
+            const input = document.createElement('input');
+            input.className = id.includes('praise') ? 'praise-in w-full p-3 bg-white rounded-xl text-sm font-bold border mt-2' : 'worship-in w-full p-3 bg-white rounded-xl text-sm font-bold border mt-2';
+            input.placeholder = "Next song...";
+            container.appendChild(input);
         }
 
         function renderTable(data) {
             const body = document.getElementById('historyBody');
-            body.innerHTML = data.map(item => {
+            body.innerHTML = data.length ? data.map(item => {
                 const isApproved = item.status === 'approved';
-                const sCls = isApproved ? 'bg-emerald-100 text-emerald-600' : (item.status === 'rejected' ? 'bg-rose-100 text-rose-600' : 'bg-amber-100 text-amber-600');
+                const statusColor = item.status === 'rejected' ? 'text-rose-500' : (item.status === 'pending' ? 'text-amber-500' : 'text-emerald-500');
                 return `
-                    <tr class="hover:bg-slate-50">
+                    <tr class="hover:bg-slate-50 transition-colors">
                         <td class="py-4 text-[10px] font-black uppercase">${item.user_id}</td>
                         <td class="py-4 text-[9px] text-slate-400 font-black">${item.program_date}</td>
                         <td class="py-4 text-right">
-                            ${isApproved ? `<button onclick="downloadSetlistAsImage('${item.id}')" class="bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-[8px] font-black">SAVE IMAGE</button>` : `<span class="px-3 py-1.5 rounded-full text-[8px] font-black uppercase ${sCls}">${item.status}</span>`}
+                            ${isApproved ? `<button onclick='downloadImage(${JSON.stringify(item)})' class="bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-[8px] font-black shadow-md hover:shadow-lg">SAVE IMAGE</button>` : `<span class="text-[8px] font-black uppercase ${statusColor}">${item.status}</span>`}
                         </td>
                     </tr>`;
-            }).join('');
+            }).join('') : `<tr><td colspan="3" class="py-10 text-center text-slate-300 text-[10px] font-black uppercase">No records found</td></tr>`;
+        }
+
+        function filterTable(status) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            if(status === 'all') renderTable(fullHistory);
+            else renderTable(fullHistory.filter(item => item.status === status));
+        }
+
+        async function downloadImage(item) {
+            const praises = item.content.find(c => c.act === "PRAISE")?.who || "---";
+            const worships = item.content.find(c => c.act === "WORSHIP")?.who || "---";
+            document.getElementById('imgLeader').innerText = item.user_id;
+            document.getElementById('imgDate').innerText = item.program_date;
+            document.getElementById('imgPraise').innerText = praises;
+            document.getElementById('imgWorship').innerText = worships;
+            const now = new Date();
+            document.getElementById('stampDate').innerText = now.toLocaleDateString();
+            document.getElementById('stampTime').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const element = document.getElementById('printableLineup');
+            html2canvas(element, { scale: 2 }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `MCB-Lineup-${item.program_date}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            });
         }
 
         document.getElementById('setlistForm').onsubmit = async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('subBtn'); btn.disabled = true; btn.innerText = "SENDING...";
-            
+            const btn = document.getElementById('subBtn'); btn.disabled = true;
             const praises = Array.from(document.querySelectorAll('.praise-in')).map(i=>i.value).filter(v=>v);
             const worships = Array.from(document.querySelectorAll('.worship-in')).map(i=>i.value).filter(v=>v);
-
             const { error } = await sb.from('programs').insert([{
                 user_id: document.getElementById('leader').value,
                 program_date: document.getElementById('sDate').value,
-                title: "Music", 
+                title: "Music",
                 status: "pending",
                 content: [{ act: "PRAISE", who: praises.join(' • ') }, { act: "WORSHIP", who: worships.join(' • ') }]
             }]);
-
-            if(!error) { alert("🎉 Submitted!"); location.reload(); }
-            else { alert("❌ Error: " + error.message); btn.disabled = false; btn.innerText = "🚀 Submit Lineup"; }
+            if(!error) location.reload(); else { alert(error.message); btn.disabled = false; }
         };
 
-        async function downloadSetlistAsImage(id) {
-            const { data: item } = await sb.from('programs').select('*').eq('id', id).single();
-            if(!item) return;
-            document.getElementById('imgLeader').innerText = item.user_id;
-            document.getElementById('imgDate').innerText = item.program_date;
-            document.getElementById('imgPraise').innerText = item.content[0].who;
-            document.getElementById('imgWorship').innerText = item.content[1].who;
-            
-            // Allow time for images to load if necessary
-            setTimeout(() => {
-                html2canvas(document.getElementById('printableLineup'), { 
-                    scale: 3,
-                    useCORS: true,
-                    allowTaint: true
-                }).then(canvas => {
-                    const link = document.createElement('a');
-                    link.download = `MCB-Setlist-${item.program_date}.png`;
-                    link.href = canvas.toDataURL();
-                    link.click();
-                });
-            }, 500);
+        function changeMonth(step) {
+            currentMonth += step;
+            if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+            if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+            buildCal();
         }
 
         function buildCal() {
             const grid = document.getElementById('calendarGrid');
-            const now = new Date();
-            document.getElementById('monthYear').innerText = now.toLocaleString('default', { month: 'long', year: 'numeric' });
+            const monthText = document.getElementById('monthYear');
+            const headers = Array.from(grid.children).slice(0, 7);
             grid.innerHTML = '';
-            for(let i=1; i<=31; i++) {
+            headers.forEach(h => grid.appendChild(h));
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const today = new Date();
+            monthText.innerText = new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long', year: 'numeric' });
+            for(let i=0; i<firstDay; i++) grid.appendChild(document.createElement('div'));
+            for(let i=1; i<=daysInMonth; i++) {
                 const d = document.createElement('div');
-                d.className = "calendar-day"; d.innerText = i;
+                d.className = "calendar-day";
+                if(i === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear()) d.classList.add('today');
+                d.innerText = i;
                 d.onclick = () => {
-                    const month = String(now.getMonth() + 1).padStart(2, '0');
-                    document.getElementById('sDate').value = `${now.getFullYear()}-${month}-${String(i).padStart(2,'0')}`;
+                    document.querySelectorAll('.calendar-day').forEach(el => el.classList.remove('selected'));
+                    d.classList.add('selected');
+                    document.getElementById('sDate').value = `${currentYear}-${String(currentMonth + 1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
                 };
                 grid.appendChild(d);
             }
