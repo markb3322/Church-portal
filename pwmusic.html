@@ -45,17 +45,19 @@
             <p class="text-xs font-bold text-slate-500">Sal-ing, Balilihan, Bohol</p>
             <p class="text-sm font-black text-emerald-600 mt-2 tracking-widest uppercase">Praise and Worship Line Up</p>
         </div>
-        <div class="mb-10 space-y-6">
+        <div class="mb-10 space-y-4">
             <div class="flex justify-between items-center border-b pb-2">
                 <div><span class="text-[10px] font-black text-slate-400 uppercase">Worship Leader</span><h2 id="imgLeader" class="text-xl font-bold text-slate-800">---</h2></div>
                 <div class="text-right"><span class="text-[10px] font-black text-slate-400 uppercase">Service Date</span><h2 id="imgDate" class="text-lg font-bold text-[#2D4E53]">---</h2></div>
             </div>
-            <div class="space-y-6">
-                <div class="bg-slate-50 p-6 rounded-2xl"><h4 class="text-xs font-black text-emerald-600 uppercase mb-2">🔥 Praise (Fast)</h4><p id="imgPraise" class="font-bold text-slate-700 text-lg leading-relaxed">---</p></div>
-                <div class="bg-slate-50 p-6 rounded-2xl"><h4 class="text-xs font-black text-blue-600 uppercase mb-2">🙏 Worship (Slow)</h4><p id="imgWorship" class="font-bold text-slate-700 text-lg leading-relaxed">---</p></div>
+            <div class="grid grid-cols-1 gap-4">
+                <div class="bg-slate-50 p-4 rounded-xl border-l-4 border-slate-300"><h4 class="text-[10px] font-black text-slate-500 uppercase mb-1">🎵 Opening Song</h4><p id="imgOpening" class="font-bold text-slate-700 text-md">---</p></div>
+                <div class="bg-slate-50 p-4 rounded-xl border-l-4 border-emerald-500"><h4 class="text-[10px] font-black text-emerald-600 uppercase mb-1">🔥 Praise (Fast)</h4><p id="imgPraise" class="font-bold text-slate-700 text-md">---</p></div>
+                <div class="bg-slate-50 p-4 rounded-xl border-l-4 border-blue-500"><h4 class="text-[10px] font-black text-blue-600 uppercase mb-1">🙏 Worship (Slow)</h4><p id="imgWorship" class="font-bold text-slate-700 text-md">---</p></div>
+                <div class="bg-slate-50 p-4 rounded-xl border-l-4 border-slate-300"><h4 class="text-[10px] font-black text-slate-500 uppercase mb-1">🎹 Closing Song</h4><p id="imgClosing" class="font-bold text-slate-700 text-md">---</p></div>
             </div>
         </div>
-        <div class="flex justify-end mt-12 pr-4">
+        <div class="flex justify-end mt-8 pr-4">
             <div class="stamp-box">
                 <div class="stamp-title">MOBILIZATION CHURCH BALILIHAN</div>
                 <div class="stamp-approved">APPROVED</div>
@@ -78,7 +80,6 @@
 
     <main class="max-w-6xl mx-auto px-4 mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div class="lg:col-span-4 space-y-6">
-            
             <section class="music-card p-6 border-t-4 border-[#D4AF37] board-card">
                 <i class="fa-solid fa-quote-right quote-icon text-[#D4AF37]"></i>
                 <div class="flex items-center gap-2 mb-4">
@@ -131,6 +132,14 @@
                         <input type="text" id="leader" placeholder="Worship Leader Name" class="w-full p-4 bg-slate-50 rounded-2xl font-bold outline-none border focus:border-[#2D4E53]" required>
                         <input type="date" id="sDate" class="w-full p-4 bg-slate-50 rounded-2xl font-bold outline-none border focus:border-[#2D4E53]" required>
                     </div>
+
+                    <div class="p-5 bg-slate-50 rounded-[2rem] border border-dashed border-slate-300">
+                        <h4 class="text-[10px] font-black text-slate-500 mb-4 uppercase">🎵 Opening Song</h4>
+                        <div id="openingContainer" class="space-y-3">
+                            <input type="text" class="opening-in w-full p-3 bg-white rounded-xl text-sm font-bold border" placeholder="Enter Opening Song">
+                        </div>
+                    </div>
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="p-5 bg-emerald-50/50 rounded-[2rem]">
                             <h4 class="text-[10px] font-black text-emerald-600 mb-4 uppercase">🔥 Praise</h4>
@@ -147,6 +156,14 @@
                             <button type="button" onclick="addIn('worshipContainer')" class="mt-4 text-[10px] font-bold text-blue-500">➕ Add Song</button>
                         </div>
                     </div>
+
+                    <div class="p-5 bg-slate-50 rounded-[2rem] border border-dashed border-slate-300">
+                        <h4 class="text-[10px] font-black text-slate-500 mb-4 uppercase">🎹 Closing Song</h4>
+                        <div id="closingContainer" class="space-y-3">
+                            <input type="text" class="closing-in w-full p-3 bg-white rounded-xl text-sm font-bold border" placeholder="Enter Closing Song">
+                        </div>
+                    </div>
+
                     <button type="submit" id="subBtn" class="w-full bg-[#2D4E53] text-white py-5 rounded-3xl font-black uppercase text-xs shadow-xl hover:bg-[#1e3538] transition-all">🚀 Submit Lineup</button>
                 </form>
             </section>
@@ -218,7 +235,8 @@
         function addIn(id) {
             const container = document.getElementById(id);
             const input = document.createElement('input');
-            input.className = id.includes('praise') ? 'praise-in w-full p-3 bg-white rounded-xl text-sm font-bold border mt-2' : 'worship-in w-full p-3 bg-white rounded-xl text-sm font-bold border mt-2';
+            const typeClass = id.includes('praise') ? 'praise-in' : 'worship-in';
+            input.className = `${typeClass} w-full p-3 bg-white rounded-xl text-sm font-bold border mt-2`;
             input.placeholder = "Next song...";
             container.appendChild(input);
         }
@@ -247,15 +265,23 @@
         }
 
         async function downloadImage(item) {
+            // Update to handle Opening and Closing Song
+            const opening = item.content.find(c => c.act === "OPENING")?.who || "---";
             const praises = item.content.find(c => c.act === "PRAISE")?.who || "---";
             const worships = item.content.find(c => c.act === "WORSHIP")?.who || "---";
+            const closing = item.content.find(c => c.act === "CLOSING")?.who || "---";
+
             document.getElementById('imgLeader').innerText = item.user_id;
             document.getElementById('imgDate').innerText = item.program_date;
+            document.getElementById('imgOpening').innerText = opening;
             document.getElementById('imgPraise').innerText = praises;
             document.getElementById('imgWorship').innerText = worships;
+            document.getElementById('imgClosing').innerText = closing;
+
             const now = new Date();
             document.getElementById('stampDate').innerText = now.toLocaleDateString();
             document.getElementById('stampTime').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
             const element = document.getElementById('printableLineup');
             html2canvas(element, { scale: 2 }).then(canvas => {
                 const link = document.createElement('a');
@@ -268,14 +294,23 @@
         document.getElementById('setlistForm').onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('subBtn'); btn.disabled = true;
+            
+            const openings = Array.from(document.querySelectorAll('.opening-in')).map(i=>i.value).filter(v=>v);
             const praises = Array.from(document.querySelectorAll('.praise-in')).map(i=>i.value).filter(v=>v);
             const worships = Array.from(document.querySelectorAll('.worship-in')).map(i=>i.value).filter(v=>v);
+            const closings = Array.from(document.querySelectorAll('.closing-in')).map(i=>i.value).filter(v=>v);
+
             const { error } = await sb.from('programs').insert([{
                 user_id: document.getElementById('leader').value,
                 program_date: document.getElementById('sDate').value,
                 title: "Music",
                 status: "pending",
-                content: [{ act: "PRAISE", who: praises.join(' • ') }, { act: "WORSHIP", who: worships.join(' • ') }]
+                content: [
+                    { act: "OPENING", who: openings.join(' • ') },
+                    { act: "PRAISE", who: praises.join(' • ') }, 
+                    { act: "WORSHIP", who: worships.join(' • ') },
+                    { act: "CLOSING", who: closings.join(' • ') }
+                ]
             }]);
             if(!error) location.reload(); else { alert(error.message); btn.disabled = false; }
         };
