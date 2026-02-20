@@ -3,59 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Portal | Mobilization Church Balilihan</title>
+    <title>User Portal | MCB Balilihan</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Bungee&family=Special+Elite&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Special+Elite&display=swap');
         
-        :root { --mc-green: #2D4E53; --mc-gold: #D4AF37; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; min-height: 100vh; color: #1e293b; }
+        :root { --mc-green: #2D4E53; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; color: #1e293b; }
         
         .glass-nav { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.5); }
-        .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05); }
-        
-        /* OFFICIAL RUBBER STAMP STYLE */
+        .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
+
+        /* Announcement Date Styling */
+        .ann-date-box { 
+            background: linear-gradient(135deg, #2D4E53, #437178); 
+            color: white; 
+            min-width: 85px; 
+            border-radius: 1.5rem; 
+            box-shadow: 0 8px 15px -3px rgba(45, 78, 83, 0.3);
+        }
+
         .official-stamp {
             font-family: 'Special Elite', cursive;
             border: 4px double currentColor;
-            padding: 15px 25px;
+            padding: 10px 20px;
             display: inline-block;
             transform: rotate(-3deg);
             text-transform: uppercase;
-            line-height: 1.2;
             text-align: center;
-            background: rgba(255,255,255,0.1);
-            border-radius: 8px;
-            min-width: 220px;
+            border-radius: 4px;
         }
         .stamp-approved { color: #059669; }
         .stamp-rejected { color: #dc2626; }
         .stamp-pending { color: #d97706; }
-        .stamp-revision { color: #2563eb; }
-
-        .rejection-sticky {
-            background: #fff9c4;
-            border-left: 5px solid #fbc02d;
-            box-shadow: 5px 5px 15px rgba(0,0,0,0.08);
-            position: relative;
-        }
 
         #exportTemplate { width: 800px; position: absolute; left: -9999px; background: white; padding: 60px; }
         
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-slide { animation: slideUp 0.5s ease-out forwards; }
-        .btn-primary { background: var(--mc-green); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .btn-primary { background: var(--mc-green); color: white; transition: 0.3s; }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+        
+        .custom-scroll::-webkit-scrollbar { width: 5px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
 <body class="pb-20">
 
     <nav class="sticky top-0 z-50 glass-nav mb-8">
-        <div class="max-w-6xl mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
             <div class="flex items-center gap-3 md:gap-4">
-                <div class="bg-white p-2 rounded-xl md:rounded-2xl shadow-sm border border-slate-100">
+                <div class="bg-white p-2 rounded-xl shadow-sm border border-slate-100">
                     <img src="mcb.png" class="w-8 h-8 md:w-10 md:h-10 object-contain" alt="Logo">
                 </div>
                 <div>
@@ -63,122 +62,115 @@
                     <p class="text-[8px] md:text-[10px] font-bold text-emerald-600 uppercase tracking-widest mt-1">Mobilization Church Balilihan</p>
                 </div>
             </div>
-            <div id="liveTime" class="text-[10px] md:text-[11px] font-bold text-slate-500 bg-slate-100 px-3 md:px-4 py-2 rounded-full hidden sm:block"></div>
+            <div id="liveTime" class="text-[10px] md:text-[11px] font-bold text-slate-500 bg-slate-100 px-4 py-2 rounded-full hidden sm:block"></div>
         </div>
     </nav>
 
-    <main class="max-w-5xl mx-auto px-4 space-y-8 md:space-y-10">
-        <div id="annContainer" class="animate-slide"></div>
+    <main class="max-w-6xl mx-auto px-4 space-y-8">
+        
+        <div id="annContainer"></div>
 
-        <section class="bg-white rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-10 card-shadow border-t-8 border-emerald-500 animate-slide">
+        <div class="bg-white rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-10 card-shadow border-t-8 border-emerald-500 transition-all hover:shadow-xl">
             <div class="mb-8">
-                <h2 class="text-xl md:text-2xl font-black text-slate-800 tracking-tight">Approve By Admin Request Program</h2>
-                <p class="text-[10px] md:text-xs font-semibold text-emerald-600 mt-1 uppercase tracking-wider">Verified and Official Church Programs</p>
+                <h2 class="text-xl md:text-2xl font-black text-slate-800 tracking-tight flex items-center gap-2">
+                    Verified Church Programs <i class="fa-solid fa-circle-check text-emerald-500"></i>
+                </h2>
+                <p class="text-[10px] md:text-xs font-semibold text-emerald-600 mt-1 uppercase tracking-wider">Approved and Official Schedules</p>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full min-w-[600px] border-collapse">
+                <table class="w-full text-left">
                     <thead>
-                        <tr class="text-left border-b-2 border-slate-50">
-                            <th class="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest px-2">Date</th>
-                            <th class="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest px-2">Title</th>
-                            <th class="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest px-2">Requestor</th>
-                            <th class="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right px-2">Download</th>
+                        <tr class="text-[10px] font-black uppercase text-slate-400 border-b-2 border-slate-50">
+                            <th class="pb-4 px-2">Date</th>
+                            <th class="pb-4 px-2">Program Title</th>
+                            <th class="pb-4 px-2">Requestor</th>
+                            <th class="pb-4 px-2 text-right">Action</th>
                         </tr>
                     </thead>
                     <tbody id="approvedList" class="divide-y divide-slate-50">
-                        <tr><td colspan="4" class="py-10 text-center text-slate-400 font-bold animate-pulse">Loading approved list...</td></tr>
+                        <tr><td colspan="4" class="py-10 text-center text-slate-300 font-bold italic">Loading programs...</td></tr>
                     </tbody>
                 </table>
             </div>
-        </section>
+        </div>
 
-        <section class="bg-white rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-10 card-shadow border border-white animate-slide">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-                <div>
-                    <h2 class="text-xl md:text-2xl font-black text-slate-800 tracking-tight">Request Status</h2>
-                    <p class="text-[10px] md:text-xs font-semibold text-slate-400 mt-1 uppercase tracking-wider">Search your name below</p>
-                </div>
-                <div class="relative group">
-                    <input id="searchName" type="text" placeholder="Type your name..." class="w-full md:w-80 p-4 pl-12 bg-slate-50 border-2 border-slate-100 rounded-xl md:rounded-2xl outline-none focus:border-[#2D4E53] font-bold text-sm">
-                    <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
-                </div>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full min-w-[500px] md:min-w-full">
-                    <tbody id="historyList" class="divide-y divide-slate-100"></tbody>
-                </table>
-            </div>
-        </section>
-
-        <section id="formAnchor" class="max-w-4xl mx-auto animate-slide">
-            <div class="bg-white p-6 md:p-16 rounded-[1.5rem] md:rounded-[3rem] shadow-2xl border border-white relative">
-                <div class="text-center mb-8 md:mb-12">
-                    <h3 id="formTitle" class="text-2xl md:text-4xl font-black text-slate-800 tracking-tight">Submit Program</h3>
-                </div>
-                
-                <form id="progForm" class="space-y-6 md:space-y-8">
-                    <input type="hidden" id="editId"> 
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+            <div class="md:col-span-7">
+                <div id="formAnchor" class="bg-white p-6 md:p-12 rounded-[1.5rem] md:rounded-[3rem] shadow-xl border border-white">
+                    <h2 id="formTitle" class="text-2xl md:text-3xl font-black text-slate-800 mb-8 uppercase italic">Submit <span class="text-emerald-600">New Program</span></h2>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-                        <div class="space-y-2">
-                            <label class="text-[10px] font-black text-slate-400 uppercase ml-2">Requestor Name</label>
-                            <input id="userName" type="text" class="w-full p-4 md:p-5 bg-slate-50 rounded-xl md:rounded-2xl font-bold outline-none border-2 border-slate-100 focus:border-[#2D4E53]" placeholder="e.g. Juan Dela Cruz" required>
+                    <form id="progForm" class="space-y-6">
+                        <input type="hidden" id="editId">
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-black text-slate-400 uppercase ml-2">Requestor Name</label>
+                                <input id="userName" type="text" class="w-full p-4 bg-slate-50 rounded-2xl font-bold outline-none border-2 border-slate-50 focus:border-[#2D4E53]" placeholder="e.g. Juan Dela Cruz" required>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-black text-slate-400 uppercase ml-2">Service Date</label>
+                                <input id="progDate" type="date" class="w-full p-4 bg-slate-50 rounded-2xl font-bold outline-none border-2 border-slate-50 focus:border-[#2D4E53]" required>
+                            </div>
                         </div>
+                        
                         <div class="space-y-2">
-                            <label class="text-[10px] font-black text-slate-400 uppercase ml-2">Service Date</label>
-                            <input id="progDate" type="date" class="w-full p-4 md:p-5 bg-slate-50 rounded-xl md:rounded-2xl font-bold outline-none border-2 border-slate-100 focus:border-[#2D4E53]" required>
-                        </div>
-                        <div class="md:col-span-2 space-y-2">
                             <label class="text-[10px] font-black text-slate-400 uppercase ml-2">Program Title</label>
-                            <input id="progTitle" type="text" class="w-full p-4 md:p-5 bg-slate-50 rounded-xl md:rounded-2xl font-bold outline-none border-2 border-slate-100 focus:border-[#2D4E53]" placeholder="e.g. Sunday Worship Service" required>
+                            <input id="progTitle" type="text" class="w-full p-4 bg-slate-50 rounded-2xl font-bold outline-none border-2 border-slate-50 focus:border-[#2D4E53]" placeholder="e.g. Sunday Worship Service" required>
                         </div>
-                    </div>
 
-                    <div class="space-y-4 pt-4 border-t border-slate-50">
-                        <p class="text-[10px] font-black text-slate-400 uppercase ml-2">Program Sequence</p>
-                        <div id="rowContainer" class="space-y-4"></div>
-                    </div>
+                        <div id="rowContainer" class="space-y-4 pt-4 border-t border-slate-50"></div>
 
-                    <div class="flex flex-col gap-4">
-                        <button type="button" onclick="addRow()" class="w-full py-4 border-2 border-dashed border-slate-200 rounded-xl md:rounded-2xl text-slate-400 font-black hover:bg-slate-50 transition-all text-sm uppercase tracking-widest">
-                            <i class="fa-solid fa-plus mr-2"></i> Add Row
-                        </button>
-                        
-                        <button type="submit" id="submitBtn" class="btn-primary w-full text-white py-5 md:py-6 rounded-2xl md:rounded-[2rem] font-black uppercase tracking-widest text-sm shadow-xl">
-                            SUBMIT PROGRAM
-                        </button>
-                        
-                        <button type="button" id="cancelBtn" onclick="resetForm()" class="hidden w-full bg-slate-100 text-slate-500 py-4 rounded-xl md:rounded-[2rem] font-bold text-sm uppercase">
-                            CANCEL EDIT
-                        </button>
-                    </div>
-                </form>
+                        <div class="pt-6 space-y-4">
+                            <button type="button" onclick="addRow()" class="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 font-black hover:bg-slate-50 transition-all text-[10px] uppercase tracking-widest">
+                                <i class="fa-solid fa-plus mr-2"></i> Add Activity Line
+                            </button>
+                            <button type="submit" id="submitBtn" class="btn-primary w-full py-5 rounded-[2rem] font-black uppercase tracking-widest text-xs shadow-lg">
+                                PUBLISH PROGRAM
+                            </button>
+                            <button type="button" id="cancelBtn" onclick="resetForm()" class="hidden w-full bg-slate-100 text-slate-400 py-4 rounded-[2rem] font-black text-[10px] uppercase tracking-widest">
+                                CANCEL EDIT
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </section>
+
+            <div class="md:col-span-5">
+                <div class="bg-white p-6 md:p-10 rounded-[1.5rem] md:rounded-[2.5rem] card-shadow border border-white h-full">
+                    <div class="mb-6">
+                        <h2 class="text-xl font-black text-slate-800 tracking-tight">Status <span class="text-emerald-600">Registry</span></h2>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Search your name for history</p>
+                    </div>
+                    <div class="relative mb-8">
+                        <input id="searchName" type="text" placeholder="Type name to search..." class="w-full p-4 pl-12 bg-slate-50 border-2 border-slate-50 rounded-2xl font-bold text-sm outline-none focus:border-[#2D4E53]">
+                        <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                    </div>
+                    <div id="historyList" class="space-y-4 overflow-y-auto max-h-[600px] custom-scroll pr-2">
+                        <p class="text-center text-[10px] font-black text-slate-300 uppercase py-20 tracking-widest italic">Type to view submissions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
     <div id="exportTemplate">
-        <div style="display: flex; align-items: center; justify-content: center; gap: 30px; border-bottom: 5px solid #2D4E53; padding-bottom: 30px; margin-bottom: 40px;">
-            <img src="mcb.png" style="width:120px; height:120px;" alt="Logo">
-            <div style="text-align: left;">
-                <h1 style="font-size: 32px; font-weight: 900; color: #2D4E53; margin: 0; text-transform: uppercase;">Mobilization Church Balilihan</h1>
-                <div style="display: inline-block; background: #2D4E53; color: white; padding: 4px 15px; font-size: 12px; font-weight: 900; border-radius: 5px; margin-top: 10px;">OFFICIAL SERVICE PROGRAM</div>
-            </div>
+        <div style="text-align:center; margin-bottom: 40px; border-bottom: 5px solid #2D4E53; padding-bottom: 30px;">
+            <img src="mcb.png" style="width:120px; height:120px; margin-bottom: 10px;" alt="Logo">
+            <h1 style="font-size: 32px; font-weight: 900; color: #2D4E53; margin: 0; text-transform: uppercase;">Mobilization Church Balilihan</h1>
+            <p style="font-size: 14px; font-weight: 800; color: #64748b; letter-spacing: 3px; text-transform: uppercase; margin-top: 10px;">Official Service Program</p>
         </div>
-        <h2 id="expTitle" style="font-size: 28px; font-weight: 900; color: #1e293b; margin: 0;"></h2>
-        <h2 id="expDate" style="font-size: 24px; font-weight: 700; color: #2D4E53;"></h2>
-        <table style="width: 100%; border-collapse: collapse; margin-top: 30px;">
-            <tbody id="expRows" style="font-size: 20px;"></tbody>
+        <div style="margin-bottom: 40px;">
+            <h2 id="expTitle" style="font-size: 36px; font-weight: 900; color: #1e293b; margin: 0;"></h2>
+            <p id="expDate" style="font-size: 20px; font-weight: 700; color: #2D4E53; margin: 10px 0 0 0;"></p>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 60px;">
+            <tbody id="expRows" style="font-size: 22px;"></tbody>
         </table>
-        
-        <div style="display: flex; justify-content: flex-end; margin-top: 60px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+            <div style="font-size: 14px; color: #94a3b8; font-weight: 800; text-transform: uppercase;">Prepared by: <span id="expUser" style="color:#2D4E53"></span></div>
             <div id="finalStamp" class="official-stamp">
-                <div style="font-size: 14px; font-weight: 900; letter-spacing: 2px; margin-bottom: 5px;">Mobilization Church Balilihan</div>
-                <div id="stampText" style="font-size: 38px; font-weight: 900; border-top: 2px solid currentColor; border-bottom: 2px solid currentColor; padding: 5px 0; margin: 5px 0;">STATUS</div>
-                <div style="text-align: left; font-size: 11px; font-weight: bold; margin-top: 8px; font-family: 'Courier New', monospace;">
-                    DATE: <span id="stampDateFill">__________</span><br>
-                    TIME: <span id="stampTimeFill">__________</span>
-                </div>
+                <div style="font-size: 12px; font-weight: 900; border-bottom: 2px solid currentColor; margin-bottom: 5px; padding-bottom: 2px;">M.C.B. VERIFIED</div>
+                <div id="stampText" style="font-size: 32px; font-weight: 900;">STATUS</div>
             </div>
         </div>
     </div>
@@ -186,114 +178,80 @@
     <script>
         const sb = supabase.createClient('https://eejovtuputrwneovhfpc.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlam92dHVwdXRyd25lb3ZoZnBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMjY5MzIsImV4cCI6MjA4NjgwMjkzMn0.JJz64gSTT9qSqOkiJvuL1PT_H_I4ZYJbchrmkoljwws');
 
-        function getTimeAgo(date) {
-            const seconds = Math.floor((new Date() - date) / 1000);
+        // Logic for "Time Ago"
+        function timeAgo(date) {
+            const seconds = Math.floor((new Date() - new Date(date)) / 1000);
             let interval = Math.floor(seconds / 31536000);
-            if (interval >= 1) return interval + "y ago";
+            if (interval > 1) return interval + " years ago";
             interval = Math.floor(seconds / 2592000);
-            if (interval >= 1) return interval + "mo ago";
+            if (interval > 1) return interval + " months ago";
             interval = Math.floor(seconds / 86400);
-            if (interval >= 1) return interval + "d ago";
+            if (interval > 1) return interval + " days ago";
             interval = Math.floor(seconds / 3600);
-            if (interval >= 1) return interval + "h ago";
+            if (interval > 1) return interval + " hours ago";
             interval = Math.floor(seconds / 60);
-            if (interval >= 1) return interval + "m ago";
-            return "Just now";
-        }
-
-        async function loadAnnouncement() {
-            const container = document.getElementById('annContainer');
-            const { data } = await sb.from('announcements').select('*').order('created_at', {ascending: false}).limit(1);
-            if (data?.[0]) {
-                const ann = data[0];
-                const d = new Date(ann.created_at);
-                const timeString = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                const timeAgo = getTimeAgo(d);
-
-                container.innerHTML = `
-                    <div class="bg-[#2D4E53] p-1 rounded-3xl md:rounded-[2.5rem] shadow-xl overflow-hidden mb-6">
-                        <div class="bg-white/10 backdrop-blur-md p-4 md:p-6 rounded-3xl md:rounded-[2.3rem] flex flex-col md:flex-row gap-4 md:gap-6 items-center">
-                            <div class="bg-white p-3 md:p-4 rounded-xl md:rounded-2xl flex flex-row md:flex-col items-center justify-center min-w-[100px] gap-2 md:gap-0">
-                                <span class="text-[10px] font-black text-slate-400 uppercase">${d.toLocaleString('default',{month:'short'})}</span>
-                                <span class="text-xl md:text-3xl font-black text-slate-800 leading-none my-1">${d.getDate()}</span>
-                                <span class="text-[10px] font-bold text-[#2D4E53] hidden md:block">${d.getFullYear()}</span>
-                            </div>
-                            <div class="flex-1 text-center md:text-left">
-                                <div class="flex flex-col md:flex-row md:items-center justify-between mb-2">
-                                    <span class="text-emerald-400 text-[10px] font-black uppercase tracking-[0.2em]">Pastor's Announcement</span>
-                                    <span class="text-white/50 text-[9px] font-bold uppercase tracking-widest mt-1 md:mt-0">
-                                        <i class="fa-regular fa-clock mr-1"></i> Posted at ${timeString} • ${timeAgo}
-                                    </span>
-                                </div>
-                                <p class="text-white font-bold text-base md:text-xl italic leading-tight">"${ann.content}"</p>
-                            </div>
-                        </div>
-                    </div>`;
-            }
-        }
-
-        // Load Approved Table
-        async function loadApprovedPrograms() {
-            const list = document.getElementById('approvedList');
-            const { data } = await sb.from('programs').select('*').eq('status', 'approved').order('program_date', {ascending: false});
-            
-            if(data?.length > 0) {
-                list.innerHTML = data.map(item => {
-                    const itemData = JSON.stringify(item).replace(/'/g, "&apos;");
-                    return `
-                        <tr class="hover:bg-slate-50 transition-colors">
-                            <td class="py-4 px-2 font-bold text-slate-600 text-sm">${item.program_date}</td>
-                            <td class="py-4 px-2">
-                                <span class="font-black text-slate-800 text-sm md:text-base">${item.title}</span>
-                            </td>
-                            <td class="py-4 px-2 text-slate-500 font-bold text-xs uppercase">${item.user_id}</td>
-                            <td class="py-4 px-2 text-right">
-                                <button onclick='exportImage(${itemData})' class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all">
-                                    <i class="fa-solid fa-download mr-1"></i> PNG
-                                </button>
-                            </td>
-                        </tr>`;
-                }).join('');
-            } else {
-                list.innerHTML = `<tr><td colspan="4" class="py-10 text-center text-slate-400 font-bold italic">No approved programs yet.</td></tr>`;
-            }
+            if (interval > 1) return interval + " minutes ago";
+            return "just now";
         }
 
         function addRow(act = '', who = '') {
             const div = document.createElement('div');
-            div.className = "flex flex-col sm:flex-row gap-3 act-row p-4 bg-slate-50 rounded-2xl relative border border-slate-100 group";
+            div.className = "flex flex-col sm:flex-row gap-3 act-row p-4 bg-slate-50 rounded-2xl border border-white group relative";
             div.innerHTML = `
                 <div class="flex-1">
-                    <input type="text" value="${act}" placeholder="Activity (e.g. Worship)" class="act w-full p-3 md:p-4 rounded-xl border-2 border-white focus:border-[#2D4E53] outline-none font-bold text-sm" required>
+                    <input type="text" value="${act}" placeholder="Activity" class="act w-full p-4 bg-white rounded-xl outline-none font-bold text-sm border border-slate-100 focus:border-[#2D4E53]" required>
                 </div>
-                <div class="w-full sm:w-1/3">
-                    <input type="text" value="${who}" placeholder="Who (e.g. Team A)" class="who w-full p-3 md:p-4 rounded-xl border-2 border-white focus:border-[#2D4E53] outline-none font-bold text-sm" required>
+                <div class="sm:w-1/3">
+                    <input type="text" value="${who}" placeholder="Person" class="who w-full p-4 bg-white rounded-xl outline-none font-bold text-sm border border-slate-100 focus:border-[#2D4E53]" required>
                 </div>
-                <button type="button" onclick="this.parentElement.remove()" class="absolute -top-2 -right-2 sm:relative sm:top-0 sm:right-0 bg-rose-500 sm:bg-transparent text-white sm:text-rose-400 h-8 w-8 sm:h-auto sm:w-auto rounded-full flex items-center justify-center hover:scale-110 transition-all shadow-sm sm:shadow-none">
-                    <i class="fa-solid fa-trash-can text-xs sm:text-base"></i>
-                </button>`;
+                <button type="button" onclick="this.closest('.act-row').remove()" class="text-slate-300 hover:text-red-500 p-2"><i class="fa-solid fa-circle-xmark"></i></button>`;
             document.getElementById('rowContainer').appendChild(div);
         }
 
-        async function loadHistory(name) {
-            if(!name || name.length < 2) return;
-            const { data } = await sb.from('programs').select('*').ilike('user_id', `%${name}%`).order('created_at', {ascending: false});
-            const list = document.getElementById('historyList');
-            if(data?.length > 0) {
+        async function loadAnnouncement() {
+            try {
+                const { data } = await sb.from('music_announcements').select('*').order('created_at', {ascending: false}).limit(1);
+                if (data?.[0]) {
+                    const ann = data[0];
+                    const d = new Date(ann.created_at);
+                    const timeStr = timeAgo(ann.created_at);
+                    
+                    document.getElementById('annContainer').innerHTML = `
+                        <div class="bg-white p-6 md:p-8 rounded-[2rem] card-shadow border-l-[12px] border-[#2D4E53] flex flex-col md:flex-row gap-6 items-center transition-all hover:scale-[1.01] mb-8">
+                            <div class="ann-date-box p-5 shrink-0 flex flex-col items-center justify-center">
+                                <span class="text-[10px] font-black opacity-80 uppercase">${d.toLocaleString('default',{month:'short'})}</span>
+                                <span class="text-3xl font-black leading-none my-1">${d.getDate()}</span>
+                                <span class="text-[9px] font-bold opacity-70">${d.getFullYear()}</span>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex flex-wrap items-center gap-2 mb-2">
+                                    <span class="bg-emerald-100 text-emerald-700 text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-widest">
+                                        <i class="fa-solid fa-bullhorn mr-1"></i> Pastor's Message
+                                    </span>
+                                    <span class="text-[10px] font-bold text-slate-400 italic">Posted ${timeStr}</span>
+                                </div>
+                                <p class="text-slate-800 font-extrabold italic text-lg md:text-xl leading-snug">"${ann.content}"</p>
+                            </div>
+                        </div>`;
+                }
+            } catch (e) {}
+        }
+
+        async function loadApproved() {
+            const { data } = await sb.from('programs').select('*').eq('status', 'approved').order('program_date', {ascending: false});
+            const list = document.getElementById('approvedList');
+            if (data?.length) {
                 list.innerHTML = data.map(i => {
-                    const itemData = JSON.stringify(i).replace(/'/g, "&apos;");
-                    return `<tr class="py-4 border-b">
-                                <td class="py-4 md:py-6 pr-4">
-                                    <h4 class="font-black text-slate-800 text-sm md:text-base">${i.title} <span class="text-[8px] md:text-[10px] font-black uppercase ml-2 px-2 py-1 rounded bg-slate-100">${i.status}</span></h4>
-                                    <p class="text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">${i.program_date}</p>
-                                    ${i.rejection_reason ? `<div class="rejection-sticky p-3 mt-2 rounded-xl text-[11px] font-bold italic border-l-4 border-amber-400">"${i.rejection_reason}"</div>` : ''}
-                                </td>
-                                <td class="text-right whitespace-nowrap">
-                                    <button onclick='exportImage(${itemData})' class="bg-slate-900 text-white px-3 md:px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest mr-1 md:mr-2">PNG</button>
-                                    ${i.status !== 'approved' ? `<button onclick='startEdit(${itemData})' class="bg-blue-600 text-white px-3 md:px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest">Edit</button>` : ''}
-                                </td>
-                            </tr>`;
+                    const json = JSON.stringify(i).replace(/'/g, "&apos;");
+                    return `<tr class="hover:bg-slate-50 transition-all">
+                        <td class="p-4 font-bold text-xs text-slate-500 uppercase">${i.program_date}</td>
+                        <td class="p-4 font-black text-slate-800 text-sm uppercase">${i.title}</td>
+                        <td class="p-4 font-bold text-xs text-emerald-600 uppercase italic">${i.user_id}</td>
+                        <td class="p-4 text-right"><button onclick='exportImage(${json})' class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase">Download PNG</button></td>
+                    </tr>`;
                 }).join('');
+            } else {
+                list.innerHTML = `<tr><td colspan="4" class="py-10 text-center text-slate-300 font-bold uppercase text-xs tracking-widest">No active programs</td></tr>`;
             }
         }
 
@@ -301,44 +259,22 @@
             const temp = document.getElementById('exportTemplate');
             const stamp = document.getElementById('finalStamp');
             const stampText = document.getElementById('stampText');
-            const stampDateFill = document.getElementById('stampDateFill');
-            const stampTimeFill = document.getElementById('stampTimeFill');
-            
             stamp.className = "official-stamp";
+            if (item.status === 'approved') { stamp.classList.add('stamp-approved'); stampText.innerText = "APPROVED"; }
+            else if (item.status === 'rejected') { stamp.classList.add('stamp-rejected'); stampText.innerText = "REJECTED"; }
+            else { stamp.classList.add('stamp-pending'); stampText.innerText = "PENDING"; }
             
-            if (item.status === 'approved') { 
-                stamp.classList.add('stamp-approved'); 
-                stampText.innerText = "APPROVED"; 
-                const appDate = new Date(item.approved_at || item.created_at);
-                stampDateFill.innerText = appDate.toLocaleDateString();
-                stampTimeFill.innerText = appDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            }
-            else if (item.status === 'rejected') { stamp.classList.add('stamp-rejected'); stampText.innerText = "REJECTED"; stampDateFill.innerText = "__________"; stampTimeFill.innerText = "__________"; }
-            else if (item.status === 'pending') { stamp.classList.add('stamp-pending'); stampText.innerText = "PENDING"; stampDateFill.innerText = "__________"; stampTimeFill.innerText = "__________"; }
-            else { stamp.classList.add('stamp-revision'); stampText.innerText = "REVISION"; stampDateFill.innerText = "__________"; stampTimeFill.innerText = "__________"; }
-
-            document.getElementById('expTitle').innerText = item.title.toUpperCase();
+            document.getElementById('expTitle').innerText = item.title;
             document.getElementById('expDate').innerText = item.program_date;
-            document.getElementById('expRows').innerHTML = item.content.map(c => `<tr><td style="padding:15px; border-bottom:1px solid #eee; font-weight:bold;">${c.act}</td><td style="text-align:right; color:#666;">${c.who}</td></tr>`).join('');
+            document.getElementById('expUser').innerText = item.user_id;
+            document.getElementById('expRows').innerHTML = item.content.map(c => `<tr style="border-bottom: 2px solid #f1f5f9;"><td style="padding: 20px 0; font-weight: 900; color:#2D4E53;">${c.act}</td><td style="padding: 20px 0; text-align: right; color:#64748b;">${c.who}</td></tr>`).join('');
             
-            html2canvas(temp, { scale: 3, useCORS: true }).then(canvas => {
+            html2canvas(temp, { scale: 3 }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = `MCB_${item.status.toUpperCase()}_${item.program_date}.png`;
-                link.href = canvas.toDataURL("image/png");
+                link.download = `MCB_${item.program_date}_${item.title}.png`;
+                link.href = canvas.toDataURL();
                 link.click();
             });
-        }
-
-        window.startEdit = function(item) {
-            document.getElementById('editId').value = item.id;
-            document.getElementById('userName').value = item.user_id;
-            document.getElementById('progTitle').value = item.title;
-            document.getElementById('progDate').value = item.program_date;
-            document.getElementById('rowContainer').innerHTML = '';
-            item.content.forEach(c => addRow(c.act, c.who));
-            document.getElementById('cancelBtn').classList.remove('hidden');
-            document.getElementById('formTitle').innerText = "Update Program";
-            document.getElementById('formAnchor').scrollIntoView({ behavior: 'smooth' });
         }
 
         document.getElementById('progForm').onsubmit = async (e) => {
@@ -346,41 +282,95 @@
             const btn = document.getElementById('submitBtn');
             const editId = document.getElementById('editId').value;
             btn.disabled = true; btn.innerText = "Processing...";
+            
             const content = Array.from(document.querySelectorAll('.act-row')).map(r => ({
-                act: r.querySelector('.act').value, who: r.querySelector('.who').value
+                act: r.querySelector('.act').value,
+                who: r.querySelector('.who').value
             }));
+
             const payload = {
                 user_id: document.getElementById('userName').value,
                 title: document.getElementById('progTitle').value,
                 program_date: document.getElementById('progDate').value,
                 content: content,
-                status: 'pending',
-                rejection_reason: null
+                status: 'pending'
             };
+
             const { error } = editId ? await sb.from('programs').update(payload).eq('id', editId) : await sb.from('programs').insert([payload]);
-            if(!error) { alert("Success! Check status above."); location.reload(); } 
-            else { alert("Error: " + error.message); btn.disabled = false; }
+
+            if(!error) {
+                alert(editId ? "Update Successful!" : "Submission Successful!");
+                location.reload();
+            } else {
+                alert("Error: " + error.message);
+                btn.disabled = false;
+                btn.innerText = "PUBLISH PROGRAM";
+            }
+        }
+
+        async function loadHistory(name) {
+            if(!name || name.length < 2) return;
+            const { data } = await sb.from('programs').select('*').ilike('user_id', `%${name}%`).order('created_at', {ascending: false});
+            const list = document.getElementById('historyList');
+            if (data?.length) {
+                list.innerHTML = data.map(i => {
+                    const json = JSON.stringify(i).replace(/'/g, "&apos;");
+                    let color = i.status === 'approved' ? 'text-emerald-500 border-emerald-500' : (i.status === 'rejected' ? 'text-red-500 border-red-500' : 'text-amber-500 border-amber-500');
+                    return `<div class="bg-white p-5 rounded-2xl border-2 border-slate-50 shadow-sm transition-all hover:border-emerald-200">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-[8px] font-black px-2 py-0.5 border-2 rounded ${color}">${i.status.toUpperCase()}</span>
+                            <div class="flex gap-3">
+                                <button onclick='exportImage(${json})' class="text-slate-300 hover:text-emerald-600 transition-colors"><i class="fa-solid fa-download"></i></button>
+                                ${i.status !== 'approved' ? `
+                                    <button onclick='startEdit(${json})' class="text-slate-300 hover:text-blue-500"><i class="fa-solid fa-pen-to-square"></i></button>
+                                    <button onclick='deleteProg(${i.id})' class="text-slate-300 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
+                                ` : ''}
+                            </div>
+                        </div>
+                        <div class="font-black text-xs uppercase text-slate-700">${i.title}</div>
+                        <div class="text-[9px] text-slate-400 font-bold uppercase mt-1">📅 ${i.program_date}</div>
+                    </div>`;
+                }).join('');
+            } else {
+                list.innerHTML = `<p class="text-center text-slate-300 py-10 font-bold text-xs uppercase tracking-widest">No records found</p>`;
+            }
+        }
+
+        window.deleteProg = async (id) => {
+            if(confirm("Confirm deletion of this submission?")) {
+                const { error } = await sb.from('programs').delete().eq('id', id);
+                if(!error) location.reload();
+            }
+        }
+
+        window.startEdit = (item) => {
+            document.getElementById('editId').value = item.id;
+            document.getElementById('userName').value = item.user_id;
+            document.getElementById('progTitle').value = item.title;
+            document.getElementById('progDate').value = item.program_date;
+            document.getElementById('rowContainer').innerHTML = '';
+            item.content.forEach(c => addRow(c.act, c.who));
+            
+            document.getElementById('submitBtn').innerText = "UPDATE PROGRAM";
+            document.getElementById('formTitle').innerHTML = "Update <span class='text-emerald-600'>Program</span>";
+            document.getElementById('cancelBtn').classList.remove('hidden');
+            document.getElementById('formAnchor').scrollIntoView({ behavior: 'smooth' });
         }
 
         function resetForm() {
-            document.getElementById('progForm').reset();
-            document.getElementById('editId').value = '';
-            document.getElementById('rowContainer').innerHTML = '';
-            document.getElementById('formTitle').innerText = "Submit Program";
-            addRow();
-            document.getElementById('cancelBtn').classList.add('hidden');
+            location.reload();
         }
+
+        setInterval(() => {
+            const d = new Date();
+            document.getElementById('liveTime').innerText = d.toLocaleString('en-US', { hour12: true, dateStyle: 'medium', timeStyle: 'short' });
+        }, 1000);
 
         document.addEventListener('DOMContentLoaded', () => {
             loadAnnouncement();
-            loadApprovedPrograms();
+            loadApproved();
             addRow();
             document.getElementById('searchName').addEventListener('input', (e) => loadHistory(e.target.value));
-            setInterval(() => { 
-                const d = new Date();
-                const liveEl = document.getElementById('liveTime');
-                if(liveEl) liveEl.innerText = d.toLocaleString('en-US', { hour12: true, dateStyle: 'medium', timeStyle: 'short' }); 
-            }, 1000);
         });
     </script>
 </body>
