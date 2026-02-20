@@ -22,6 +22,7 @@
             border: 1px solid #f1f5f9;
             border-radius: 1.5rem;
             margin: 2px;
+            cursor: pointer;
         }
         .calendar-day:hover { transform: scale(1.02); z-index: 10; box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.05); border-color: var(--mc-emerald); }
         .today { background: linear-gradient(135deg, #f0fdf4, #dcfce7) !important; border: 2px solid #22c55e !important; }
@@ -211,19 +212,30 @@
             } catch (err) { console.error("Database Error:", err.message); }
         }
 
+        // --- FIXED STATS LOGIC ---
         function updateStats() {
             const total = allPrograms.length;
             const approved = allPrograms.filter(i => i.status === 'approved').length;
             const pending = allPrograms.filter(i => i.status === 'pending').length;
             const rejected = allPrograms.filter(i => i.status === 'rejected').length;
-            const music = allPrograms.filter(i => i.category === 'music').length;
+            
+            // Mas pinalakas na filter: it's either check column 'title' or 'category'
+            // Base sa common practice, ang music lineup ay may title na 'Music'
+            const musicCount = allPrograms.filter(i => 
+                (i.title && i.title.toLowerCase().includes('music')) || 
+                (i.category && i.category.toLowerCase() === 'music')
+            ).length;
+
+            const generalCount = total - musicCount;
             
             document.getElementById('statTotal').innerText = total;
             document.getElementById('statApproved').innerText = approved;
             document.getElementById('statPending').innerText = pending;
             document.getElementById('statRejected').innerText = rejected;
-            document.getElementById('statMusic').innerText = music;
-            document.getElementById('statGeneral').innerText = total - music;
+            
+            // Updating the breakdown card
+            document.getElementById('statMusic').innerText = musicCount;
+            document.getElementById('statGeneral').innerText = generalCount;
         }
 
         function renderCalendar() {
@@ -239,7 +251,7 @@
             const daysInMonth = new Date(year, month + 1, 0).getDate();
 
             for (let i = 0; i < firstDay; i++) {
-                calendarBody.innerHTML += `<div class="calendar-day opacity-0"></div>`;
+                calendarBody.innerHTML += `<div class="calendar-day opacity-0 pointer-events-none"></div>`;
             }
 
             for (let day = 1; day <= daysInMonth; day++) {
@@ -269,7 +281,7 @@
             const content = document.getElementById('drawerContent');
             
             content.innerHTML = dayEvents.length === 0 
-                ? `<div class="text-center py-20 opacity-30">📭<br><p class="text-[10px] font-black uppercase mt-2">No data found</p></div>`
+                ? `<div class="text-center py-20 opacity-30">📭<br><p class="text-[10px] font-black uppercase mt-2">No activities logged</p></div>`
                 : dayEvents.map(e => `
                     <div class="bg-white p-6 rounded-[2.5rem] border-2 border-transparent hover:border-emerald-500 cursor-pointer transition-all shadow-sm group" onclick="viewProgram('${e.id}')">
                         <div class="flex justify-between items-start mb-4">
@@ -294,7 +306,9 @@
             document.getElementById('viewProgUser').innerText = prog.user_id || 'Unknown';
             
             let list = [];
-            try { list = typeof prog.content === 'string' ? JSON.parse(prog.content) : prog.content; } catch (e) { list = []; }
+            try { 
+                list = (typeof prog.content === 'string') ? JSON.parse(prog.content) : (prog.content || []); 
+            } catch (e) { list = []; }
 
             document.getElementById('viewProgRows').innerHTML = list.map(row => `
                 <tr>
