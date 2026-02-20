@@ -8,128 +8,172 @@
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Bungee&display=swap');
         
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; }
+        :root { --mc-green: #2D4E53; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; color: #1e293b; }
 
-        /* Floating Nav Animation */
-        .floating-nav {
-            transition: all 0.3s ease;
-        }
-
-        .calendar-day {
-            min-height: 110px;
-            transition: all 0.2s ease;
-            cursor: pointer;
+        /* Navigation Glassmorphism */
+        .glass-nav { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.5); }
+        
+        /* Calendar Styling */
+        .calendar-day { 
+            min-height: 120px; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            cursor: pointer; 
+            background: white;
             border: 1px solid #f1f5f9;
         }
+        .calendar-day:hover { transform: translateY(-4px); z-index: 10; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05); border-color: var(--mc-green); }
+        .today { background-color: #f0fdf4 !important; border: 2px solid #22c55e !important; }
 
-        .calendar-day:hover { background-color: #f8fafc; transform: translateY(-2px); z-index: 10; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
-
-        .today { background-color: #eff6ff !important; border: 2px solid #3b82f6 !important; }
-
-        #eventDrawer { transition: transform 0.3s ease-in-out; transform: translateX(100%); }
+        /* Drawer Transition */
+        #eventDrawer { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); transform: translateX(100%); }
         #eventDrawer.open { transform: translateX(0); }
 
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        /* Cards & UI Elements */
+        .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
+        .official-stamp { border: 4px double currentColor; border-radius: 10px; padding: 10px; display: inline-block; transform: rotate(-5deg); text-align: center; font-family: 'Bungee', cursive; }
+        
+        .animate-slide-up { animation: slideUp 0.5s ease-out forwards; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
-<body class="min-h-screen pb-10">
+<body class="min-h-screen pb-20">
 
-    <div class="fixed top-0 left-0 right-0 z-[100] px-4 py-3 md:px-8 md:py-4 pointer-events-none">
-        <nav class="max-w-7xl mx-auto h-16 bg-white/80 backdrop-blur-md border border-white/20 shadow-lg shadow-slate-200/50 rounded-2xl px-6 flex items-center justify-between pointer-events-auto floating-nav">
-            <div class="flex items-center gap-3">
-                <img src="mcb.png" alt="MCB Logo" class="h-9 w-9 object-contain">
-                <div class="flex flex-col leading-none">
-                    <span class="text-lg font-800 tracking-tighter uppercase italic text-slate-800">Report <span class="text-emerald-600">Portal</span></span>
-                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Mobilization Church Balilihan</span>
+    <nav class="sticky top-0 z-[100] glass-nav mb-8">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="bg-white p-2 rounded-2xl shadow-sm border border-slate-100">
+                    <img src="mcb.png" class="w-10 h-10 object-contain" alt="Logo">
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-slate-800 text-lg md:text-xl uppercase tracking-tighter leading-none">Report <span class="text-emerald-600">Portal</span></h1>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Mobilization Church Balilihan</p>
                 </div>
             </div>
-            
-            <div class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-emerald-50 rounded-full border border-emerald-100">
-                <span class="relative flex h-2 w-2">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
-                <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">System Active</span>
+            <div class="hidden md:flex items-center gap-2 px-4 py-2 bg-emerald-50 rounded-full border border-emerald-100">
+                <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                <span class="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Live System</span>
             </div>
-        </nav>
-    </div>
+        </div>
+    </nav>
 
-    <main class="max-w-7xl mx-auto p-4 md:p-8 pt-24 md:pt-28 w-full">
+    <main class="max-w-7xl mx-auto px-4 space-y-8">
         
-        <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200 mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="bg-white p-8 rounded-[2.5rem] card-shadow border border-white flex flex-col md:flex-row justify-between items-center gap-6 animate-slide-up">
             <div>
-                <h2 class="text-3xl font-black text-slate-800 tracking-tight uppercase leading-tight italic">Activity <span class="text-emerald-600">Dashboard</span></h2>
-                <p class="text-slate-500 text-sm font-medium">Monitoring systematic program submissions and status.</p>
+                <h2 class="text-3xl font-black text-slate-800 tracking-tight uppercase italic leading-none">Activity <span class="text-emerald-600">Dashboard</span></h2>
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mt-2">Monthly Program Monitoring</p>
             </div>
             
-            <div class="flex items-center bg-slate-100 p-1.5 rounded-2xl border border-slate-200 shadow-inner">
-                <button onclick="changeMonth(-1)" class="p-2.5 hover:bg-white hover:shadow-sm rounded-xl transition-all text-slate-600 active:scale-90">
+            <div class="flex items-center bg-slate-50 p-2 rounded-[1.5rem] border border-slate-100 shadow-inner">
+                <button onclick="changeMonth(-1)" class="w-10 h-10 flex items-center justify-center hover:bg-white hover:shadow-md rounded-xl transition-all text-slate-600">
                     <i class="fa-solid fa-chevron-left"></i>
                 </button>
-                <div id="currentMonthYear" class="px-6 font-black text-slate-800 min-w-[160px] text-center uppercase tracking-tighter text-sm">
+                <div id="currentMonthYear" class="px-8 font-black text-slate-800 min-w-[180px] text-center uppercase tracking-tighter">
                     Loading...
                 </div>
-                <button onclick="changeMonth(1)" class="p-2.5 hover:bg-white hover:shadow-sm rounded-xl transition-all text-slate-600 active:scale-90">
+                <button onclick="changeMonth(1)" class="w-10 h-10 flex items-center justify-center hover:bg-white hover:shadow-md rounded-xl transition-all text-slate-600">
                     <i class="fa-solid fa-chevron-right"></i>
                 </button>
             </div>
         </div>
 
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
-                <div class="w-10 h-10 bg-blue-100 text-blue-600 flex items-center justify-center rounded-2xl mb-4 text-sm"><i class="fa-solid fa-layer-group"></i></div>
-                <p class="text-[10px] font-black text-slate-400 uppercase leading-none mb-1 tracking-widest">Total Reports</p>
-                <h3 id="statTotal" class="text-3xl font-black text-slate-800 leading-none">0</h3>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 animate-slide-up" style="animation-delay: 0.1s;">
+            <div class="bg-white p-8 rounded-[2.5rem] card-shadow border border-white text-center">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Total Reports</p>
+                <h3 id="statTotal" class="text-4xl font-black text-slate-800 tracking-tighter">0</h3>
             </div>
-            <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
-                <div class="w-10 h-10 bg-emerald-100 text-emerald-600 flex items-center justify-center rounded-2xl mb-4 text-sm"><i class="fa-solid fa-circle-check"></i></div>
-                <p class="text-[10px] font-black text-slate-400 uppercase leading-none mb-1 tracking-widest">Approved</p>
-                <h3 id="statApproved" class="text-3xl font-black text-emerald-600 leading-none">0</h3>
+            <div class="bg-white p-8 rounded-[2.5rem] card-shadow border border-white text-center">
+                <p class="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] mb-2">Approved</p>
+                <h3 id="statApproved" class="text-4xl font-black text-emerald-600 tracking-tighter">0</h3>
             </div>
-            <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
-                <div class="w-10 h-10 bg-rose-100 text-rose-600 flex items-center justify-center rounded-2xl mb-4 text-sm"><i class="fa-solid fa-circle-xmark"></i></div>
-                <p class="text-[10px] font-black text-slate-400 uppercase leading-none mb-1 tracking-widest">Rejected</p>
-                <h3 id="statRejected" class="text-3xl font-black text-rose-600 leading-none">0</h3>
+            <div class="bg-white p-8 rounded-[2.5rem] card-shadow border border-white text-center">
+                <p class="text-[10px] font-black text-amber-500 uppercase tracking-[0.2em] mb-2">Pending</p>
+                <h3 id="statPending" class="text-4xl font-black text-amber-500 tracking-tighter">0</h3>
             </div>
-            <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
-                <div class="w-10 h-10 bg-amber-100 text-amber-600 flex items-center justify-center rounded-2xl mb-4 text-sm"><i class="fa-solid fa-clock"></i></div>
-                <p class="text-[10px] font-black text-slate-400 uppercase leading-none mb-1 tracking-widest">Pending</p>
-                <h3 id="statPending" class="text-3xl font-black text-amber-600 leading-none">0</h3>
+            <div class="bg-[#2D4E53] p-8 rounded-[2.5rem] flex flex-col items-center justify-center text-white shadow-xl">
+                <i class="fa-solid fa-calendar-check text-2xl mb-2 opacity-50"></i>
+                <p class="text-[10px] font-black uppercase tracking-widest">Attendance Ready</p>
             </div>
         </div>
 
-        <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden">
-            <div class="grid grid-cols-7 bg-slate-50 border-b border-slate-200 py-5 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+        <div class="bg-white rounded-[3rem] card-shadow border border-white overflow-hidden animate-slide-up" style="animation-delay: 0.2s;">
+            <div class="grid grid-cols-7 bg-slate-50/50 border-b border-slate-100 py-6 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">
                 <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
             </div>
-            <div id="calendarBody" class="grid grid-cols-7 bg-white">
+            <div id="calendarBody" class="grid grid-cols-7">
                 </div>
         </div>
     </main>
 
-    <div id="eventDrawer" class="fixed top-0 right-0 h-full w-full md:w-96 bg-white shadow-2xl z-[150] p-0 flex flex-col border-l border-slate-200">
-        <div class="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+    <div id="eventDrawer" class="fixed top-0 right-0 h-full w-full md:w-[400px] bg-white shadow-2xl z-[150] flex flex-col border-l border-slate-100">
+        <div class="p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
             <div>
                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Activities for</p>
                 <h3 class="text-2xl font-black text-slate-800 uppercase italic leading-none" id="selectedDateText">---</h3>
             </div>
-            <button onclick="closeDrawer()" class="w-12 h-12 flex items-center justify-center bg-white border border-slate-200 rounded-full text-slate-400 hover:text-slate-800 shadow-sm transition-all text-2xl font-light">&times;</button>
+            <button onclick="closeDrawer()" class="w-12 h-12 flex items-center justify-center rounded-full bg-white shadow-sm text-slate-400 hover:text-rose-500 transition-all text-2xl">&times;</button>
         </div>
-        <div id="drawerContent" class="flex-grow p-6 space-y-4 overflow-y-auto bg-slate-50/30">
-        </div>
-        <div class="p-6 border-t border-slate-100 bg-white">
-            <p class="text-[10px] font-black text-slate-300 text-center uppercase tracking-[0.3em]">MCB System v2.0</p>
+        <div id="drawerContent" class="flex-grow p-6 space-y-4 overflow-y-auto custom-scroll">
+            </div>
+    </div>
+
+    <div id="programModal" class="fixed inset-0 z-[200] flex items-center justify-center hidden p-4">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md"></div>
+        <div class="bg-white w-full max-w-2xl max-h-[90vh] rounded-[3rem] shadow-2xl overflow-hidden flex flex-col relative animate-slide-up">
+            
+            <div class="p-6 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] ml-4">Program View Only</span>
+                <button onclick="closeProgramModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white text-slate-400 hover:text-rose-500 shadow-sm transition-all"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="flex-grow overflow-y-auto p-10 md:p-14 custom-scroll">
+                <div class="flex items-center justify-center gap-6 border-b-4 border-[#2D4E53] pb-8 mb-10 text-center">
+                    <img src="mcb.png" class="w-20 h-20 object-contain" alt="Logo">
+                    <div class="text-left">
+                        <h1 class="text-2xl font-black text-[#2D4E53] uppercase leading-none">Mobilization Church</h1>
+                        <p class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">Balilihan, Bohol</p>
+                        <div class="mt-3 inline-block bg-[#2D4E53] text-white text-[8px] px-3 py-1 rounded-full font-black tracking-widest uppercase">Service Program Transcript</div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-end mb-12">
+                    <div>
+                        <p class="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-1">Event Title</p>
+                        <h2 id="viewProgTitle" class="text-3xl font-black text-slate-800 uppercase italic tracking-tighter">---</h2>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-1">Schedule</p>
+                        <h2 id="viewProgDate" class="text-lg font-bold text-[#2D4E53]">---</h2>
+                    </div>
+                </div>
+
+                <table class="w-full mb-12">
+                    <tbody id="viewProgRows" class="divide-y divide-slate-100">
+                        </tbody>
+                </table>
+
+                <div class="flex justify-between items-center pt-10 border-t border-slate-100">
+                    <div>
+                        <p class="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Requestor</p>
+                        <p id="viewProgUser" class="text-sm font-black text-slate-700">---</p>
+                    </div>
+                    <div id="viewProgStamp" class="official-stamp hidden">
+                        <div class="text-[8px] border-b border-current mb-1">M.C.B. OFFICIAL</div>
+                        <div class="text-2xl font-black text-emerald-600">APPROVED</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        const SB_URL = 'https://eejovtuputrwneovhfpc.supabase.co';
-        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlam92dHVwdXRyd25lb3ZoZnBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMjY5MzIsImV4cCI6MjA4NjgwMjkzMn0.JJz64gSTT9qSqOkiJvuL1PT_H_I4ZYJbchrmkoljwws';
-        const sb = supabase.createClient(SB_URL, SB_KEY);
+        const sb = supabase.createClient('https://eejovtuputrwneovhfpc.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlam92dHVwdXRyd25lb3ZoZnBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMjY5MzIsImV4cCI6MjA4NjgwMjkzMn0.JJz64gSTT9qSqOkiJvuL1PT_H_I4ZYJbchrmkoljwws');
         
         let currentDate = new Date();
         let allPrograms = [];
@@ -144,7 +188,6 @@
         function updateStats() {
             document.getElementById('statTotal').innerText = allPrograms.length;
             document.getElementById('statApproved').innerText = allPrograms.filter(i => i.status === 'approved').length;
-            document.getElementById('statRejected').innerText = allPrograms.filter(i => i.status === 'rejected').length;
             document.getElementById('statPending').innerText = allPrograms.filter(i => i.status === 'pending').length;
         }
 
@@ -153,13 +196,15 @@
             const month = currentDate.getMonth();
             const today = new Date();
             document.getElementById('currentMonthYear').innerText = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(currentDate);
-            const firstDay = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
             const calendarBody = document.getElementById('calendarBody');
             calendarBody.innerHTML = '';
 
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
             for (let i = 0; i < firstDay; i++) {
-                calendarBody.innerHTML += `<div class="calendar-day bg-slate-50/30 opacity-40"></div>`;
+                calendarBody.innerHTML += `<div class="calendar-day bg-slate-50/30 opacity-20"></div>`;
             }
 
             for (let day = 1; day <= daysInMonth; day++) {
@@ -168,13 +213,13 @@
                 const isToday = today.toDateString() === new Date(year, month, day).toDateString();
                 
                 calendarBody.innerHTML += `
-                    <div class="calendar-day ${isToday ? 'today' : ''} p-2 md:p-3 border-r border-b border-slate-100 flex flex-col" onclick="openDrawer('${dateStr}')">
-                        <span class="text-sm font-black ${isToday ? 'text-blue-600' : 'text-slate-300'} mb-2">${day}</span>
-                        <div class="space-y-1">
+                    <div class="calendar-day ${isToday ? 'today' : ''} p-4" onclick="openDrawer('${dateStr}')">
+                        <span class="text-sm font-black ${isToday ? 'text-emerald-600' : 'text-slate-300'}">${day}</span>
+                        <div class="mt-3 space-y-1.5">
                             ${dayEvents.slice(0, 3).map(e => `
-                                <div class="h-1.5 w-full rounded-full ${e.status === 'approved' ? 'bg-emerald-500' : (e.status === 'rejected' ? 'bg-rose-500' : 'bg-amber-500')}"></div>
+                                <div class="w-full h-1.5 rounded-full ${e.status === 'approved' ? 'bg-emerald-500' : (e.status === 'pending' ? 'bg-amber-400' : 'bg-rose-400')}"></div>
                             `).join('')}
-                            ${dayEvents.length > 3 ? `<div class="text-[8px] font-black text-slate-400 uppercase">+${dayEvents.length - 3} more</div>` : ''}
+                            ${dayEvents.length > 3 ? `<p class="text-[8px] font-black text-slate-400 uppercase">+${dayEvents.length - 3} more</p>` : ''}
                         </div>
                     </div>`;
             }
@@ -184,22 +229,24 @@
             const dayEvents = allPrograms.filter(p => p.program_date === dateStr);
             document.getElementById('selectedDateText').innerText = new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
             const content = document.getElementById('drawerContent');
+            
             if(dayEvents.length === 0) {
-                content.innerHTML = `<div class="flex flex-col items-center justify-center py-20 text-slate-300">
-                    <i class="fa-solid fa-calendar-xmark text-4xl mb-3 opacity-20"></i>
-                    <p class="font-bold uppercase text-[10px] tracking-[0.2em]">No activities found</p>
-                </div>`;
+                content.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-20 opacity-20">
+                        <i class="fa-solid fa-calendar-xmark text-5xl mb-4"></i>
+                        <p class="font-black uppercase text-[10px] tracking-widest">No activities scheduled</p>
+                    </div>`;
             } else {
                 content.innerHTML = dayEvents.map(e => `
-                    <div class="bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100 hover:border-emerald-200 transition-all group active:scale-[0.98]">
+                    <div class="bg-white p-6 rounded-[2rem] border border-slate-100 hover:border-emerald-500 cursor-pointer transition-all shadow-sm group" onclick="viewProgram('${e.id}')">
                         <div class="flex items-center gap-2 mb-3">
-                            <span class="w-2 h-2 rounded-full ${e.status === 'approved' ? 'bg-emerald-500' : 'bg-amber-500'} animate-pulse"></span>
-                            <span class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">${e.status}</span>
+                            <span class="w-2 h-2 rounded-full ${e.status === 'approved' ? 'bg-emerald-500' : 'bg-amber-400'} animate-pulse"></span>
+                            <span class="text-[9px] font-black uppercase tracking-widest text-slate-400">${e.status}</span>
                         </div>
-                        <h4 class="font-black text-slate-800 leading-tight group-hover:text-emerald-700 transition-colors uppercase italic text-sm">${e.title}</h4>
-                        <div class="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between">
-                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest italic">ID: ${e.user_id.slice(0,8)}</p>
-                            <i class="fa-solid fa-chevron-right text-[10px] text-slate-300 group-hover:text-emerald-500"></i>
+                        <h4 class="font-black text-slate-800 uppercase italic text-sm group-hover:text-emerald-600 transition-colors">${e.title}</h4>
+                        <div class="mt-4 flex items-center justify-between">
+                            <p class="text-[9px] font-bold text-slate-300 uppercase tracking-widest italic">User: ${e.user_id.slice(0,10)}...</p>
+                            <i class="fa-solid fa-arrow-right-long text-slate-200 group-hover:text-emerald-500 transform group-hover:translate-x-1 transition-all"></i>
                         </div>
                     </div>
                 `).join('');
@@ -207,6 +254,34 @@
             document.getElementById('eventDrawer').classList.add('open');
         }
 
+        async function viewProgram(id) {
+            const prog = allPrograms.find(p => p.id === id);
+            if(!prog) return;
+
+            document.getElementById('viewProgTitle').innerText = prog.title;
+            document.getElementById('viewProgDate').innerText = new Date(prog.program_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            document.getElementById('viewProgUser').innerText = prog.user_id;
+            
+            const rowContainer = document.getElementById('viewProgRows');
+            rowContainer.innerHTML = prog.content.map(row => `
+                <tr class="group">
+                    <td class="py-5 font-black uppercase text-xs text-slate-700 tracking-tight">${row.act}</td>
+                    <td class="py-5 text-right text-slate-400 font-bold italic text-xs">${row.who}</td>
+                </tr>
+            `).join('');
+
+            const stamp = document.getElementById('viewProgStamp');
+            if(prog.status === 'approved') {
+                stamp.classList.remove('hidden');
+                stamp.style.color = '#10b981';
+            } else {
+                stamp.classList.add('hidden');
+            }
+
+            document.getElementById('programModal').classList.remove('hidden');
+        }
+
+        function closeProgramModal() { document.getElementById('programModal').classList.add('hidden'); }
         function closeDrawer() { document.getElementById('eventDrawer').classList.remove('open'); }
         function changeMonth(offset) { currentDate.setMonth(currentDate.getMonth() + offset); renderCalendar(); }
 
