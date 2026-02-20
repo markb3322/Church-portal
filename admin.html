@@ -8,7 +8,7 @@
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Bungee&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Bungee&family=Special+Elite&display=swap');
         
         :root { --mc-green: #2D4E53; --mc-gold: #D4AF37; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; min-height: 100vh; color: #1e293b; }
@@ -16,31 +16,36 @@
         .glass-nav { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.5); }
         .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05); }
         
-        .ann-date-box {
-            background: linear-gradient(135deg, #2D4E53, #437178);
-            color: white;
-            min-width: 100px;
-            border-radius: 1.8rem;
-            box-shadow: 0 10px 20px rgba(45, 78, 83, 0.2);
+        .rubber-stamp {
+            font-family: 'Special Elite', cursive;
+            border-width: 4px; border-style: double;
+            padding: 8px 12px; display: inline-block;
+            transform: rotate(-2deg); text-transform: uppercase;
+            line-height: 1.1; text-align: center;
+            position: relative; background: rgba(255,255,255,0.1);
+            border-radius: 4px; min-width: 140px;
         }
 
-        .rejection-sticky {
-            background: #fff9c4;
-            border-left: 5px solid #fbc02d;
-            box-shadow: 5px 5px 15px rgba(0,0,0,0.08);
-            position: relative;
-            overflow: hidden;
-            transform: rotate(-1deg);
+        .rubber-stamp::after {
+            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            opacity: 0.2; pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+
+        .ann-date-box {
+            background: linear-gradient(135deg, #2D4E53, #437178);
+            color: white; min-width: 100px; border-radius: 1.8rem;
+            box-shadow: 0 10px 20px rgba(45, 78, 83, 0.2);
         }
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-slide { animation: slideUp 0.5s ease-out forwards; }
-
         .btn-primary { background: var(--mc-green); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(45, 78, 83, 0.4); }
         
         .custom-scroll::-webkit-scrollbar { width: 4px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .color-dot { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 3px solid white; box-shadow: 0 0 0 1px #ddd; transition: all 0.2s; }
+        .color-dot.active { transform: scale(1.2); box-shadow: 0 0 0 2px var(--mc-green); }
     </style>
 </head>
 <body class="pb-20">
@@ -61,6 +66,24 @@
     </nav>
 
     <main class="max-w-7xl mx-auto px-4 space-y-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 animate-slide">
+            <div class="bg-white p-5 rounded-[2rem] card-shadow border border-white">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pending</p>
+                <h2 id="countPending" class="text-3xl font-black text-amber-500">0</h2>
+            </div>
+            <div class="bg-white p-5 rounded-[2rem] card-shadow border border-white">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Approved</p>
+                <h2 id="countApproved" class="text-3xl font-black text-emerald-600">0</h2>
+            </div>
+            <div class="bg-white p-5 rounded-[2rem] card-shadow border border-white">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Revision</p>
+                <h2 id="countRevision" class="text-3xl font-black text-blue-600">0</h2>
+            </div>
+            <div class="bg-white p-5 rounded-[2rem] card-shadow border border-white">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Rejected</p>
+                <h2 id="countRejected" class="text-3xl font-black text-rose-600">0</h2>
+            </div>
+        </div>
         
         <div class="animate-slide">
             <div class="bg-white p-4 md:p-6 rounded-[2.5rem] card-shadow border border-white flex flex-col md:flex-row gap-6 relative group overflow-hidden">
@@ -73,10 +96,8 @@
                 <div class="flex-1 flex flex-col justify-center py-2">
                     <div class="flex items-center gap-3 mb-3">
                         <span class="bg-emerald-50 text-emerald-600 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Public Billboard</span>
-                        <div class="h-[1px] flex-1 bg-slate-100"></div>
                     </div>
                     <p id="liveNewsPreview" class="text-slate-800 font-bold text-lg md:text-xl leading-relaxed italic">"Loading latest update..."</p>
-                    
                     <button onclick="toggleNewsEdit()" class="mt-5 self-start btn-primary text-white px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg">
                         <i class="fa-solid fa-pen-to-square mr-2"></i> Update Billboard
                     </button>
@@ -87,62 +108,42 @@
                         <h4 class="text-slate-800 font-black uppercase tracking-widest text-xs">Update Announcement</h4>
                         <button onclick="toggleNewsEdit()" class="text-slate-400 hover:text-rose-500 transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
                     </div>
-                    <textarea id="annText" class="flex-1 bg-slate-50 border-2 border-slate-100 rounded-[2rem] p-6 text-slate-700 outline-none focus:border-[#2D4E53] transition-all resize-none font-bold text-lg" placeholder="What's the new message for the congregation?"></textarea>
-                    <button onclick="postAnn()" class="mt-6 btn-primary text-white py-5 rounded-[2rem] font-black uppercase text-xs tracking-widest shadow-xl">Publish to User Portal</button>
+                    <textarea id="annText" class="flex-1 bg-slate-50 border-2 border-slate-100 rounded-[2rem] p-6 text-slate-700 outline-none focus:border-[#2D4E53] transition-all resize-none font-bold text-lg" placeholder="What's the message?"></textarea>
+                    <button id="postBtn" onclick="postAnn()" class="mt-6 btn-primary text-white py-5 rounded-[2rem] font-black uppercase text-xs tracking-widest shadow-xl">Publish to User Portal</button>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 animate-slide" style="animation-delay: 0.1s;">
-            <div class="bg-white p-8 rounded-[2.5rem] card-shadow border border-white text-center">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 block">Pending Review</span>
-                <h4 id="pCount" class="text-5xl font-black text-amber-500 tracking-tighter">0</h4>
-            </div>
-            <div class="bg-white p-8 rounded-[2.5rem] card-shadow border border-white text-center">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 block">Approved Total</span>
-                <h4 id="aCount" class="text-5xl font-black text-emerald-500 tracking-tighter">0</h4>
-            </div>
-            <div class="bg-[#2D4E53] p-8 rounded-[2.5rem] flex flex-col items-center justify-center text-white shadow-xl">
-                <i class="fa-solid fa-shield-check text-3xl mb-2 opacity-50"></i>
-                <p class="text-[10px] font-black uppercase tracking-[0.2em]">Verified Secure Access</p>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-12 gap-8 animate-slide" style="animation-delay: 0.2s;">
-            <div class="col-span-12 lg:col-span-4 h-[650px] flex flex-col bg-white rounded-[2.5rem] card-shadow border border-white overflow-hidden">
-                <div class="p-6 border-b border-slate-50 bg-slate-50/50 flex justify-between items-center">
-                    <h3 class="font-black text-[11px] uppercase tracking-[0.2em] text-slate-500">Incoming Requests</h3>
-                    <div class="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></div>
+        <div class="grid grid-cols-12 gap-8 animate-slide">
+            <div class="col-span-12 lg:col-span-4 h-[600px] flex flex-col bg-white rounded-[2.5rem] card-shadow border border-white overflow-hidden">
+                <div class="p-6 border-b border-slate-50 bg-slate-50/50">
+                    <h3 class="font-black text-[11px] uppercase tracking-[0.2em] text-slate-500">Submissions Queue</h3>
                 </div>
                 <div id="pList" class="flex-1 overflow-y-auto custom-scroll p-4 space-y-3">
-                    </div>
+                    <p class="text-center py-10 text-[10px] font-black text-slate-300 uppercase">Fetching Requests...</p>
+                </div>
             </div>
 
-            <div id="detailView" class="col-span-12 lg:col-span-8 bg-white rounded-[2.5rem] p-10 card-shadow border-2 border-dashed border-slate-100 min-h-[650px] flex items-center justify-center relative overflow-hidden">
-                <div class="text-center">
-                    <div class="bg-slate-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fa-solid fa-magnifying-glass text-2xl text-slate-300"></i>
-                    </div>
-                    <p class="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">Select a submission to inspect</p>
+            <div id="detailView" class="col-span-12 lg:col-span-8 bg-white rounded-[2.5rem] p-10 card-shadow border border-white min-h-[600px] flex items-center justify-center relative overflow-hidden">
+                <div id="detailPlaceholder" class="text-center">
+                    <i class="fa-solid fa-stamp text-5xl text-slate-100 mb-4"></i>
+                    <p class="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">Select a program to stamp</p>
                 </div>
+                <div id="detailContent" class="hidden w-full h-full flex flex-col"></div>
             </div>
         </div>
 
-        <div class="bg-white rounded-[3rem] card-shadow border border-white overflow-hidden animate-slide" style="animation-delay: 0.3s;">
-            <div class="p-8 border-b border-slate-50 flex justify-between items-center">
-                <div>
-                    <h3 class="text-xl font-black text-slate-800 tracking-tight">Program <span class="text-emerald-600">Registry</span></h3>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">List of all officially approved services</p>
-                </div>
-                <span class="text-[10px] font-black bg-emerald-50 text-emerald-600 px-4 py-2 rounded-full uppercase tracking-widest">Database Active</span>
+        <div class="bg-white rounded-[3rem] card-shadow border border-white overflow-hidden animate-slide">
+            <div class="p-8 border-b border-slate-50">
+                <h3 class="text-xl font-black text-slate-800 tracking-tight">Program <span class="text-emerald-600">Registry</span></h3>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Official Record of Stamps</p>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
                     <thead>
                         <tr class="bg-slate-50">
                             <th class="p-6 text-[10px] font-black uppercase text-slate-400 tracking-widest">Service Title</th>
-                            <th class="p-6 text-[10px] font-black uppercase text-slate-400 tracking-widest">Requested By</th>
-                            <th class="p-6 text-[10px] font-black uppercase text-slate-400 tracking-widest">Date Approved</th>
+                            <th class="p-6 text-[10px] font-black uppercase text-slate-400 tracking-widest">Official Stamp</th>
                             <th class="p-6 text-[10px] font-black uppercase text-slate-400 tracking-widest text-right">Control</th>
                         </tr>
                     </thead>
@@ -152,130 +153,160 @@
         </div>
     </main>
 
-    <div id="rejectModal" class="fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-md flex items-center justify-center hidden p-4">
-        <div class="rejection-sticky w-full max-w-md p-10 rounded-2xl relative shadow-2xl">
-            <div class="flex items-center gap-3 mb-6">
-                <i class="fa-solid fa-message-exclamation text-amber-600 text-xl"></i>
-                <h3 class="text-lg font-black text-slate-800 uppercase tracking-tight">Feedback Note</h3>
+    <div id="statusModal" class="fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-md flex items-center justify-center hidden p-4">
+        <div class="bg-white w-full max-md p-8 rounded-[2.5rem] shadow-2xl">
+            <h3 class="text-xl font-black text-slate-800 uppercase tracking-tight mb-4 text-center">Set Stamp Details</h3>
+            <p class="text-[10px] font-black text-slate-400 uppercase text-center mb-4 tracking-widest">Pick Ink Color</p>
+            <div class="flex justify-center gap-4 mb-8">
+                <div onclick="setInk('#059669', this)" class="color-dot bg-emerald-600 active"></div>
+                <div onclick="setInk('#2563eb', this)" class="color-dot bg-blue-600"></div>
+                <div onclick="setInk('#dc2626', this)" class="color-dot bg-rose-600"></div>
+                <div onclick="setInk('#d97706', this)" class="color-dot bg-amber-600"></div>
             </div>
-            <p class="text-[11px] font-bold text-amber-700 mb-4 uppercase tracking-widest">Instructions for the requestor:</p>
-            <textarea id="rejectionReason" class="w-full h-40 bg-white/50 border-2 border-amber-200 rounded-2xl p-4 outline-none focus:border-amber-500 transition-all font-bold text-slate-700 italic" placeholder="e.g. Please update the speaker for the second session..."></textarea>
-            <div class="mt-8 flex gap-3">
-                <button onclick="closeRejectModal()" class="flex-1 py-4 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600">Cancel</button>
-                <button id="confirmRejectBtn" class="flex-1 bg-slate-800 text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg hover:bg-black transition-all">Send Note</button>
+            <div class="grid grid-cols-1 gap-3">
+                <button onclick="updateFinalStatus('approved')" class="p-5 rounded-2xl border-2 border-slate-50 hover:bg-emerald-50 hover:border-emerald-200 transition-all font-black text-xs uppercase tracking-widest">Approve</button>
+                <button onclick="updateFinalStatus('revision')" class="p-5 rounded-2xl border-2 border-slate-50 hover:bg-blue-50 hover:border-blue-200 transition-all font-black text-xs uppercase tracking-widest">Revision</button>
+                <button onclick="updateFinalStatus('rejected')" class="p-5 rounded-2xl border-2 border-slate-50 hover:bg-rose-50 hover:border-rose-200 transition-all font-black text-xs uppercase tracking-widest">Reject</button>
             </div>
+            <button onclick="closeStatusModal()" class="w-full mt-6 py-2 text-[10px] font-black uppercase text-slate-400">Cancel</button>
         </div>
     </div>
 
     <script>
         const sb = supabase.createClient('https://eejovtuputrwneovhfpc.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlam92dHVwdXRyd25lb3ZoZnBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMjY5MzIsImV4cCI6MjA4NjgwMjkzMn0.JJz64gSTT9qSqOkiJvuL1PT_H_I4ZYJbchrmkoljwws');
-
-        let selectedProgId = null;
-
-        function toggleNewsEdit() {
-            const overlay = document.getElementById('newsEditOverlay');
-            overlay.classList.toggle('translate-y-full'); 
-            overlay.classList.toggle('translate-y-0');
-        }
+        
+        let activeId = null;
+        let selectedInk = '#059669';
 
         async function fetchCurrentNews() {
-            const { data } = await sb.from('announcements').select('*').order('created_at', {ascending: false}).limit(1);
-            if(data?.[0]) {
-                const ann = data[0];
-                const dateObj = new Date(ann.created_at);
-                document.getElementById('liveNewsPreview').innerText = `"${ann.content}"`;
-                document.getElementById('annMonth').innerText = dateObj.toLocaleString('default', { month: 'short' }).toUpperCase();
-                document.getElementById('annDay').innerText = dateObj.getDate();
-                document.getElementById('annTime').innerText = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            }
+            try {
+                const { data, error } = await sb.from('announcements').select('*').order('created_at', {ascending: false}).limit(1);
+                if(data && data[0]) {
+                    const ann = data[0];
+                    const d = new Date(ann.created_at);
+                    document.getElementById('liveNewsPreview').innerText = `"${ann.content}"`;
+                    document.getElementById('annMonth').innerText = d.toLocaleString('default', { month: 'short' }).toUpperCase();
+                    document.getElementById('annDay').innerText = d.getDate();
+                    document.getElementById('annTime').innerText = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                }
+            } catch (e) { console.error("News error:", e); }
         }
+
+        function toggleNewsEdit() { document.getElementById('newsEditOverlay').classList.toggle('translate-y-full'); }
 
         async function postAnn() {
             const content = document.getElementById('annText').value;
-            if(!content) return;
-            const { error } = await sb.from('announcements').insert({ content });
-            if(!error) { 
-                alert("Billboard Updated!"); 
-                document.getElementById('annText').value = ""; 
-                toggleNewsEdit(); 
-                fetchCurrentNews(); 
-            }
+            if(!content) return alert("Empty message.");
+            const btn = document.getElementById('postBtn');
+            btn.disabled = true;
+            const { error } = await sb.from('announcements').insert([{ content }]);
+            if(!error) { alert("Billboard Updated!"); toggleNewsEdit(); fetchCurrentNews(); document.getElementById('annText').value = ""; }
+            else { alert("Error: " + error.message); }
+            btn.disabled = false;
         }
 
         async function loadData() {
-            const { data: pendings } = await sb.from('programs').select('*').eq('status', 'pending');
-            document.getElementById('pCount').innerText = pendings?.length || 0;
-            document.getElementById('pList').innerHTML = pendings?.map(i => `
-                <div onclick="showProg('${i.id}')" class="p-5 bg-white rounded-2xl border-2 border-slate-50 hover:border-[#2D4E53] cursor-pointer transition-all shadow-sm group animate-slide">
-                    <p class="font-black text-xs text-slate-800 uppercase tracking-tight group-hover:text-[#2D4E53]">${i.title}</p>
-                    <p class="text-[9px] text-slate-400 font-bold uppercase mt-1 tracking-widest"><i class="fa-solid fa-user-circle mr-1"></i> ${i.user_id}</p>
-                </div>
-            `).join('') || '<div class="text-center py-20 opacity-20"><i class="fa-solid fa-inbox text-3xl mb-2"></i><p class="text-[10px] font-black uppercase">No pending</p></div>';
+            const { data: progs, error } = await sb.from('programs').select('*').order('created_at', {ascending: false});
+            if(error) { console.error("Load error:", error); return; }
 
-            const { data: approved } = await sb.from('programs').select('*').eq('status', 'approved').order('approved_at', {ascending: false});
-            document.getElementById('aCount').innerText = approved?.length || 0;
-            document.getElementById('approvedTable').innerHTML = approved?.map(i => `
-                <tr class="hover:bg-slate-50/50 transition-colors group">
-                    <td class="p-6 font-black text-xs uppercase text-slate-700 tracking-tight">${i.title}</td>
-                    <td class="p-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest">${i.user_id}</td>
-                    <td class="p-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest">${new Date(i.approved_at).toLocaleDateString()}</td>
-                    <td class="p-6 text-right"><button onclick="deleteRecord('${i.id}')" class="text-slate-200 hover:text-rose-500 transition-colors"><i class="fa-solid fa-trash-can"></i></button></td>
-                </tr>`).join('');
+            // Update Counters
+            document.getElementById('countPending').innerText = progs.filter(x => x.status === 'pending').length;
+            document.getElementById('countApproved').innerText = progs.filter(x => x.status === 'approved').length;
+            document.getElementById('countRevision').innerText = progs.filter(x => x.status === 'revision').length;
+            document.getElementById('countRejected').innerText = progs.filter(x => x.status === 'rejected').length;
+
+            // Render Queue
+            const q = progs.filter(x => x.status === 'pending');
+            document.getElementById('pList').innerHTML = q.length ? q.map(i => `
+                <div onclick="showProg('${i.id}')" class="p-5 bg-white rounded-2xl border-2 border-slate-50 hover:border-[#2D4E53] cursor-pointer transition-all shadow-sm">
+                    <p class="font-black text-xs text-slate-800 uppercase tracking-tight">${i.title}</p>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase mt-1">By: ${i.user_id}</p>
+                </div>`).join('') : '<p class="text-center py-10 text-[10px] font-black text-slate-300">No Pending Items</p>';
+
+            // Render Registry
+            const r = progs.filter(x => x.status !== 'pending');
+            document.getElementById('approvedTable').innerHTML = r.length ? r.map(i => {
+                const date = new Date(i.approved_at || i.created_at);
+                const ink = i.ink_color || '#1e293b';
+                return `
+                <tr class="hover:bg-slate-50 cursor-pointer" onclick="showProg('${i.id}')">
+                    <td class="p-6">
+                        <p class="font-black text-xs uppercase text-slate-700">${i.title}</p>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase mt-1">${i.user_id}</p>
+                    </td>
+                    <td class="p-6">
+                        <div class="rubber-stamp" style="color: ${ink}; border-color: ${ink};">
+                            <div class="text-[7px] font-black tracking-[0.2em] mb-1">MCB BALILIHAN</div>
+                            <div class="text-xl font-black">${i.status}</div>
+                            <div class="text-[7px] font-bold mt-1">${date.toLocaleDateString()}</div>
+                        </div>
+                    </td>
+                    <td class="p-6 text-right">
+                        <button onclick="event.stopPropagation(); deleteRecord('${i.id}')" class="text-slate-200 hover:text-rose-500"><i class="fa-solid fa-trash-can"></i></button>
+                    </td>
+                </tr>`}).join('') : '<tr><td colspan="3" class="p-10 text-center text-[10px] font-black text-slate-300">Registry Empty</td></tr>';
         }
 
         async function showProg(id) {
-            selectedProgId = id;
-            const { data: i } = await sb.from('programs').select('*').eq('id', id).single();
-            const detailView = document.getElementById('detailView');
-            detailView.className = "col-span-12 lg:col-span-8 bg-white rounded-[2.5rem] p-10 card-shadow border border-white animate-slide block relative overflow-hidden";
-            detailView.innerHTML = `
-                <div class="h-full flex flex-col">
-                    <div class="mb-8 border-b border-slate-50 pb-6">
-                        <div class="flex items-center gap-2 mb-2">
-                            <span class="w-2 h-2 bg-amber-500 rounded-full"></span>
-                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Reviewing Request</span>
-                        </div>
-                        <h2 class="text-3xl font-black text-slate-800 uppercase tracking-tighter leading-none">${i.title}</h2>
-                        <p class="text-[11px] font-bold text-emerald-600 uppercase tracking-widest mt-2"><i class="fa-solid fa-circle-user mr-1"></i> Requested by: ${i.user_id}</p>
+            activeId = id;
+            const { data: i, error } = await sb.from('programs').select('*').eq('id', id).single();
+            if(error) return;
+
+            document.getElementById('detailPlaceholder').classList.add('hidden');
+            const dc = document.getElementById('detailContent');
+            dc.classList.remove('hidden');
+            
+            let contentHtml = "";
+            try {
+                const list = typeof i.content === 'string' ? JSON.parse(i.content) : i.content;
+                contentHtml = list.map(c => `
+                    <div class="bg-slate-50 p-5 rounded-[1.5rem] border border-slate-100 flex justify-between items-center">
+                        <span class="text-[12px] font-black text-slate-800 uppercase">${c.act}</span>
+                        <span class="text-[10px] font-bold text-slate-400 bg-white px-4 py-2 rounded-xl border border-slate-50 uppercase">${c.who}</span>
+                    </div>`).join('');
+            } catch(e) { contentHtml = "<p>Data format error</p>"; }
+
+            dc.innerHTML = `
+                <div class="mb-8 border-b border-slate-50 pb-6 flex justify-between items-end">
+                    <div>
+                        <h2 class="text-4xl font-black text-slate-800 uppercase tracking-tighter">${i.title}</h2>
+                        <p class="text-[11px] font-bold text-emerald-600 uppercase tracking-widest mt-1">Submission by: ${i.user_id}</p>
                     </div>
-                    <div class="flex-1 overflow-y-auto custom-scroll space-y-3 mb-8 pr-4">
-                        ${i.content.map(c => `
-                            <div class="bg-slate-50 p-5 rounded-[1.5rem] border border-slate-100 flex justify-between items-center group hover:bg-white hover:shadow-md transition-all">
-                                <span class="text-[12px] font-black text-slate-800 uppercase tracking-tight">${c.act}</span>
-                                <span class="text-[10px] font-bold text-slate-400 uppercase bg-white px-4 py-2 rounded-xl group-hover:bg-slate-50 transition-all">${c.who}</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <button onclick="approveProg('${i.id}')" class="btn-primary text-white py-5 rounded-[2rem] font-black uppercase text-xs tracking-widest shadow-xl">Approve Program</button>
-                        <button onclick="openRejectModal()" class="bg-rose-50 text-rose-600 border border-rose-100 py-5 rounded-[2rem] font-black uppercase text-xs tracking-widest hover:bg-rose-100 transition-all">Need Revision</button>
-                    </div>
-                </div>`;
+                    <div class="text-right"><span class="text-xs font-black uppercase text-slate-500">${i.status}</span></div>
+                </div>
+                <div class="flex-1 overflow-y-auto custom-scroll space-y-3 mb-8 pr-4">${contentHtml}</div>
+                <button onclick="openStatusModal()" class="w-full btn-primary text-white py-6 rounded-[2rem] font-black uppercase text-sm tracking-[0.2em] shadow-xl">Update Official Stamp</button>`;
         }
 
-        async function approveProg(id) {
-            const { error } = await sb.from('programs').update({ status: 'approved', approved_at: new Date().toISOString(), rejection_reason: null }).eq('id', id);
-            if(!error) location.reload();
+        function setInk(color, el) {
+            selectedInk = color;
+            document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+            el.classList.add('active');
         }
+        function openStatusModal() { document.getElementById('statusModal').classList.remove('hidden'); }
+        function closeStatusModal() { document.getElementById('statusModal').classList.add('hidden'); }
 
-        function openRejectModal() { document.getElementById('rejectModal').classList.remove('hidden'); }
-        function closeRejectModal() { document.getElementById('rejectModal').classList.add('hidden'); }
+        async function updateFinalStatus(newStatus) {
+            if (!activeId) return;
+            const { error } = await sb.from('programs').update({ 
+                status: newStatus, 
+                approved_at: new Date().toISOString(),
+                ink_color: selectedInk 
+            }).eq('id', activeId);
 
-        document.getElementById('confirmRejectBtn').onclick = async function() {
-            const reason = document.getElementById('rejectionReason').value;
-            if(!reason) return alert("Please provide a reason.");
-            await sb.from('programs').update({ status: 'rejected', rejection_reason: reason }).eq('id', selectedProgId);
-            location.reload();
-        };
+            if(!error) { closeStatusModal(); loadData(); showProg(activeId); }
+            else { alert("Failed to update status."); }
+        }
 
         async function deleteRecord(id) {
-            if(confirm("Permanently archive this record?")) { await sb.from('programs').delete().eq('id', id); location.reload(); }
+            if(confirm("Delete this record?")) { await sb.from('programs').delete().eq('id', id); loadData(); }
         }
 
         setInterval(() => { 
-            document.getElementById('liveTime').innerText = new Date().toLocaleString('en-US', { hour12: true, dateStyle: 'medium', timeStyle: 'short' }); 
+            const el = document.getElementById('liveTime');
+            if(el) el.innerText = new Date().toLocaleString('en-US', { hour12: true, dateStyle: 'medium', timeStyle: 'short' }); 
         }, 1000);
-        
+
         fetchCurrentNews();
         loadData();
     </script>
