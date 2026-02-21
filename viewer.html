@@ -24,8 +24,6 @@
         .dot-program { background-color: var(--mc-emerald); box-shadow: 0 0 6px var(--mc-emerald); }
         .dot-music { background-color: var(--mc-violet); box-shadow: 0 0 6px var(--mc-violet); }
         
-        .rubber-stamp { font-family: 'Special Elite', cursive; border: 2px solid currentColor; padding: 2px 8px; transform: rotate(-10deg); border-radius: 4px; display: inline-block; font-size: 0.75rem; }
-        
         .nav-link { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; transition: 0.2s; cursor: pointer; }
         .nav-link:hover { color: var(--mc-emerald); }
 
@@ -52,8 +50,8 @@
                     <a href="dashboard.html" class="nav-link text-emerald-600">Dashboard</a>
                     <button onclick="openLoginModal()" class="nav-link text-amber-600">Admin</button>
                 </div>
-                <div class="text-right hidden sm:block">
-                    <div id="greetingText" class="text-[8px] font-black text-emerald-500 uppercase tracking-widest mb-0.5 text-right">---</div>
+                <div class="text-right flex flex-col items-end">
+                    <div id="greetingText" class="text-[9px] font-black text-emerald-500 uppercase tracking-widest mb-0.5">---</div>
                     <div id="liveClock" class="text-[10px] font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-lg border border-slate-200">---</div>
                 </div>
                 <button onclick="toggleMenu()" class="md:hidden text-slate-600 p-2"><i class="fa-solid fa-bars-staggered"></i></button>
@@ -202,34 +200,49 @@
         function toggleMenu() { document.getElementById('mobileMenu').classList.toggle('hidden'); }
         function openLoginModal() { document.getElementById('loginModal').classList.remove('hidden'); document.getElementById('adminPinInput').focus(); }
         function closeLoginModal() { document.getElementById('loginModal').classList.add('hidden'); }
+        
         function checkAdminPin() { 
             if (document.getElementById('adminPinInput').value === "1234") window.location.href = "admin.html"; 
             else { alert("Access Denied"); document.getElementById('adminPinInput').value = ''; }
         }
 
+        // --- UPDATED GREETING LOGIC ---
         function updateClock() {
             const now = new Date();
             const hour = now.getHours();
             const gText = document.getElementById('greetingText');
             const lClock = document.getElementById('liveClock');
-            if(gText) gText.innerText = hour < 12 ? "Good Morning!" : hour < 18 ? "Good Afternoon!" : "Good Evening!";
+            
+            let greeting = "";
+            if (hour >= 0 && hour < 12) {
+                greeting = "Maayong Buntag!";
+            } else if (hour === 12) {
+                greeting = "Maayong Udto!";
+            } else if (hour > 12 && hour < 18) {
+                greeting = "Maayong Hapon!";
+            } else {
+                greeting = "Maayong Gabii!";
+            }
+
+            if(gText) gText.innerText = greeting;
             if(lClock) lClock.innerText = now.toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         }
-        setInterval(updateClock, 1000); updateClock();
+        setInterval(updateClock, 1000); 
+        updateClock();
 
         async function loadViewerData() {
             try {
-                const { data: ann, error: annErr } = await sb.from('music_announcements').select('*');
-                if(!annErr && ann) {
+                const { data: ann } = await sb.from('music_announcements').select('*');
+                if(ann) {
                     announcements = ann;
-                    const pAnn = announcements.find(a => a.type.toLowerCase().trim() === 'pastor');
-                    const mAnn = announcements.find(a => a.type.toLowerCase().trim() === 'music');
+                    const pAnn = ann.find(a => a.type.toLowerCase().trim() === 'pastor');
+                    const mAnn = ann.find(a => a.type.toLowerCase().trim() === 'music');
                     document.getElementById('pastorNote').innerText = pAnn ? `"${pAnn.content}"` : "Waiting for word...";
                     document.getElementById('musicNote').innerText = mAnn ? mAnn.content : "No music updates.";
                 }
-                const { data: programs, error: progErr } = await sb.from('programs').select('*').eq('status', 'approved').order('program_date', {ascending: false});
-                if(!progErr) {
-                    allData = programs || [];
+                const { data: programs } = await sb.from('programs').select('*').eq('status', 'approved').order('program_date', {ascending: false});
+                if(programs) {
+                    allData = programs;
                     renderTables();
                     buildCalendar();
                 }
@@ -241,6 +254,7 @@
             const musicBody = document.getElementById('musicBody');
             const pData = allData.filter(d => d.title.toLowerCase().trim() !== 'music');
             const mData = allData.filter(d => d.title.toLowerCase().trim() === 'music');
+            
             progBody.innerHTML = pData.slice(0, 5).map(d => `
                 <div onclick="viewItem('${d.id}')" class="flex justify-between items-center p-3 bg-slate-50 hover:bg-emerald-50 rounded-xl cursor-pointer transition-all border border-transparent hover:border-emerald-100">
                     <div class="overflow-hidden">
@@ -248,8 +262,8 @@
                         <p class="text-[8px] font-bold text-slate-400 uppercase mt-0.5">${d.program_date}</p>
                     </div>
                     <i class="fa-solid fa-chevron-right text-[8px] text-slate-300 ml-2"></i>
-                </div>
-            `).join('') || '<p class="text-center text-[9px] text-slate-300 py-4">Database Cleared</p>';
+                </div>`).join('') || '<p class="text-center text-[9px] text-slate-300 py-4">Database Cleared</p>';
+
             musicBody.innerHTML = mData.slice(0, 5).map(d => `
                 <div onclick="viewItem('${d.id}')" class="flex justify-between items-center p-3 bg-slate-50 hover:bg-violet-50 rounded-xl cursor-pointer transition-all border border-transparent hover:border-violet-100">
                     <div class="overflow-hidden">
@@ -257,8 +271,7 @@
                         <p class="text-[8px] font-bold text-slate-400 uppercase mt-0.5">${d.program_date}</p>
                     </div>
                     <i class="fa-solid fa-guitar text-[8px] text-slate-300 ml-2"></i>
-                </div>
-            `).join('') || '<p class="text-center text-[9px] text-slate-300 py-4">Database Cleared</p>';
+                </div>`).join('') || '<p class="text-center text-[9px] text-slate-300 py-4">Database Cleared</p>';
         }
 
         function viewAnnouncement(type) {
@@ -279,11 +292,12 @@
             if(!item) return;
             const isMusic = item.title.toLowerCase().trim() === 'music';
             document.getElementById('modalTitle').innerText = isMusic ? `Lineup: ${item.user_id}` : item.title;
-            document.getElementById('modalType').innerText = isMusic ? "MUSIC SERVICE" : "OFFICIAL PROGRAM";
             let rows = [];
             try { rows = typeof item.content === 'string' ? JSON.parse(item.content) : item.content; } catch(e) { rows = []; }
-            let contentHtml = `<div class="bg-slate-50 p-4 rounded-2xl text-center mb-6"><p class="text-sm font-black text-emerald-600">${item.program_date}</p></div>`;
-            rows.forEach(r => { contentHtml += `<div class="flex justify-between p-3 border-b border-slate-50"><span class="text-[9px] font-bold text-slate-400 uppercase">${r.act || 'Activity'}</span><span class="text-[11px] font-black text-slate-700">${r.who || '---'}</span></div>`; });
+            let contentHtml = `<div class="bg-slate-50 p-4 rounded-2xl text-center mb-6 font-black text-emerald-600">${item.program_date}</div>`;
+            rows.forEach(r => { 
+                contentHtml += `<div class="flex justify-between p-3 border-b border-slate-50"><span class="text-[9px] font-bold text-slate-400 uppercase">${r.act || 'Activity'}</span><span class="text-[11px] font-black text-slate-700">${r.who || '---'}</span></div>`; 
+            });
             document.getElementById('modalContent').innerHTML = contentHtml;
             document.getElementById('viewModal').classList.remove('hidden');
         }
