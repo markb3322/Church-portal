@@ -3,10 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Premium Viewer Portal | MCB Balilihan</title>
+    <title>Viewer Portal | MCB Balilihan</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#10b981">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="mcb.png">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         
@@ -272,13 +280,22 @@
     </nav>
 
     <script>
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                .then(reg => console.log('SW Registered'))
+                .catch(err => console.log('SW Registration Failed', err));
+            });
+        }
+
         const sb = supabase.createClient('https://eejovtuputrwneovhfpc.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlam92dHVwdXRyd25lb3ZoZnBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMjY5MzIsImV4cCI6MjA4NjgwMjkzMn0.JJz64gSTT9qSqOkiJvuL1PT_H_I4ZYJbchrmkoljwws');
         
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
         let allPrograms = [];
 
-        const PHIL_HOLIDAYS = { "01-01": "New Year's Day", "12-25": "Christmas Day" /* ... other holidays ... */ };
+        const PHIL_HOLIDAYS = { "01-01": "New Year's Day", "12-25": "Christmas Day" };
 
         function updateClock() {
             const now = new Date();
@@ -292,7 +309,6 @@
             try {
                 const { data: annData } = await sb.from('music_announcements').select('*').order('created_at', { ascending: false });
                 if(annData) { updateAnnStatus('pastor', annData); updateAnnStatus('music', annData); }
-                
                 const { data: programs } = await sb.from('programs').select('*').eq('status', 'approved').order('program_date', { ascending: true });
                 if(programs) { allPrograms = programs; buildCalendar(); populateTables(programs); }
             } catch (e) { console.error(e); }
@@ -315,12 +331,10 @@
             const pBody = document.getElementById('programBody');
             const mBody = document.getElementById('musicBody');
             pBody.innerHTML = ''; mBody.innerHTML = '';
-            
             data.forEach(row => {
                 const isMusic = row.title.toLowerCase() === 'music';
                 const html = `<tr><td>${row.program_date}</td><td class="font-bold">${isMusic ? 'Sunday Service' : row.title}</td><td>${row.user_id}</td></tr>`;
-                if(isMusic) mBody.innerHTML += html;
-                else pBody.innerHTML += html;
+                if(isMusic) mBody.innerHTML += html; else pBody.innerHTML += html;
             });
         }
 
