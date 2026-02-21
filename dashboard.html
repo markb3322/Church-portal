@@ -2,197 +2,250 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Activity Report | MCB Balilihan</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Bungee&family=Special+Elite&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Special+Elite&display=swap');
         
-        :root { --mc-green: #2D4E53; --mc-emerald: #10b981; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        :root { 
+            --mc-green: #2D4E53; 
+            --mc-emerald: #10b981;
+            --mc-soft-bg: #fdfdfe;
+        }
 
-        .glass-card { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.8); }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: radial-gradient(circle at top right, #f8fafc, #eff6ff);
+            color: #1e293b; 
+            display: flex; 
+            flex-direction: column; 
+            min-height: 100vh; 
+            overflow-x: hidden;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.03);
+        }
         
         .calendar-day { 
             min-height: 110px; 
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); 
             background: white;
             border: 1px solid #f1f5f9;
-            border-radius: 1.5rem;
+            border-radius: 1.8rem;
             margin: 2px;
-            cursor: pointer;
+            position: relative;
         }
-        .calendar-day:hover { transform: scale(1.02); z-index: 10; box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.05); border-color: var(--mc-emerald); }
-        .today { background: linear-gradient(135deg, #f0fdf4, #dcfce7) !important; border: 2px solid #22c55e !important; }
+        .calendar-day:hover { 
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05); 
+            border-color: var(--mc-emerald);
+            z-index: 10;
+        }
+        .today { 
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%) !important; 
+            border: 2px solid #10b981 !important; 
+        }
 
-        #eventDrawer { transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); transform: translateX(100%); }
+        #eventDrawer { 
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); 
+            transform: translateX(100%); 
+            box-shadow: -20px 0 50px rgba(0,0,0,0.05);
+        }
         #eventDrawer.open { transform: translateX(0); }
 
         .rubber-stamp { 
             font-family: 'Special Elite', cursive; 
-            border: 3px double currentColor; 
-            padding: 5px 15px; 
-            transform: rotate(-10deg); 
-            text-transform: uppercase;
-            border-radius: 4px;
-            font-weight: bold;
+            border: 4px double currentColor; 
+            padding: 8px 20px; 
+            transform: rotate(-8deg); 
+            border-radius: 6px;
+            font-size: 1.2rem;
         }
         
-        .floating { animation: floating 3s ease-in-out infinite; }
-        @keyframes floating { 0% { transform: translateY(0px); } 50% { transform: translateY(-5px); } 100% { transform: translateY(0px); } }
+        .floating { animation: floating 4s ease-in-out infinite; }
+        @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .stat-card {
+            transition: transform 0.3s ease;
+            border-bottom: 4px solid transparent;
+        }
+        .stat-card:hover { transform: scale(1.03); }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        main { flex-grow: 1; }
     </style>
 </head>
-<body class="min-h-screen pb-20">
-
-    <nav class="sticky top-0 z-[100] bg-white/80 backdrop-blur-md border-b border-slate-100">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+<body class="antialiased pb-4"> <nav class="sticky top-0 z-[100] bg-white/70 backdrop-blur-xl border-b border-slate-100">
+        <div class="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
             <div class="flex items-center gap-4">
-                <div class="bg-white p-2 rounded-2xl shadow-sm border border-slate-100 floating">
-                    <img src="mcb.png" class="w-10 h-10 object-contain" alt="Logo">
+                <div class="bg-white p-2 rounded-2xl shadow-sm border border-slate-50 floating">
+                    <img src="mcb.png" class="w-8 h-8 object-contain" alt="Logo">
                 </div>
                 <div>
-                    <h1 class="font-extrabold text-slate-800 text-lg md:text-xl uppercase tracking-tighter leading-none">Activity <span class="text-emerald-500">Tracker</span> 📊</h1>
-                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">MCB Balilihan • Report Portal</p>
+                    <h1 class="font-black text-slate-800 text-lg md:text-xl uppercase tracking-tighter leading-none">Activity <span class="text-emerald-500">Tracker</span></h1>
+                    <p class="text-[8px] font-extrabold text-slate-400 uppercase tracking-[0.3em] mt-1 flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span> System Monitor
+                    </p>
                 </div>
             </div>
-            <div id="liveClock" class="hidden md:block text-[11px] font-black text-slate-500 bg-slate-100 px-4 py-2 rounded-full border border-slate-200 uppercase tracking-widest">
+            <div id="liveClock" class="hidden md:flex items-center gap-2 text-[10px] font-black text-slate-600 bg-slate-50 px-4 py-2 rounded-full border border-slate-200 uppercase tracking-widest shadow-sm">
                 🕒 Loading...
             </div>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-4 mt-8 space-y-8">
-        
-        <div class="bg-white p-8 rounded-[3rem] shadow-sm border border-white flex flex-col md:flex-row justify-between items-center gap-6">
+    <main class="max-w-7xl mx-auto px-6 mt-6 space-y-6 pb-10">
+        <div class="bg-white/40 p-6 md:p-8 rounded-[2.5rem] glass-panel border border-white flex flex-col md:flex-row justify-between items-center gap-6">
             <div class="text-center md:text-left">
-                <h2 class="text-4xl font-black text-slate-800 tracking-tighter uppercase italic leading-none">Event <span class="text-emerald-500">Monitor</span></h2>
-                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mt-2 ml-1">Monthly Analytics & Records ✨</p>
+                <h2 class="text-4xl font-black text-slate-800 tracking-tighter uppercase italic leading-none">Event <span class="text-emerald-500">Log</span></h2>
+                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em] mt-2">Monthly Analytics & Records ✨</p>
             </div>
             
-            <div class="flex items-center bg-slate-100 p-2 rounded-[2rem] border border-slate-200">
-                <button onclick="changeMonth(-1)" class="w-12 h-12 flex items-center justify-center bg-white hover:bg-emerald-500 hover:text-white shadow-sm rounded-full transition-all">
-                    <i class="fa-solid fa-arrow-left"></i>
+            <div class="flex items-center bg-white p-1.5 rounded-full border border-slate-100 shadow-lg shadow-slate-200/50">
+                <button onclick="changeMonth(-1)" class="w-10 h-10 flex items-center justify-center bg-slate-50 hover:bg-emerald-500 hover:text-white rounded-full transition-all">
+                    <i class="fa-solid fa-chevron-left text-xs"></i>
                 </button>
-                <div id="currentMonthYear" class="px-8 font-black text-slate-800 min-w-[200px] text-center uppercase tracking-tighter text-lg">
+                <div id="currentMonthYear" class="px-6 font-black text-slate-800 min-w-[180px] text-center uppercase tracking-tighter text-lg">
                     ---
                 </div>
-                <button onclick="changeMonth(1)" class="w-12 h-12 flex items-center justify-center bg-white hover:bg-emerald-500 hover:text-white shadow-sm rounded-full transition-all">
-                    <i class="fa-solid fa-arrow-right"></i>
+                <button onclick="changeMonth(1)" class="w-10 h-10 flex items-center justify-center bg-slate-50 hover:bg-emerald-500 hover:text-white rounded-full transition-all">
+                    <i class="fa-solid fa-chevron-right text-xs"></i>
                 </button>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
             <div class="md:col-span-8 grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-white p-6 rounded-[2.5rem] border border-white shadow-sm">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Logs 📋</p>
-                    <h3 id="statTotal" class="text-4xl font-black text-slate-800 tracking-tighter">0</h3>
+                <div class="bg-white p-5 rounded-[2rem] border border-white shadow-sm stat-card border-b-slate-200">
+                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Logs</p>
+                    <h3 id="statTotal" class="text-3xl font-black text-slate-800 tracking-tighter">0</h3>
                 </div>
-                <div class="bg-white p-6 rounded-[2.5rem] border border-white shadow-sm">
-                    <p class="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-1">Success ✅</p>
-                    <h3 id="statApproved" class="text-4xl font-black text-emerald-500 tracking-tighter">0</h3>
+                <div class="bg-white p-5 rounded-[2rem] border border-white shadow-sm stat-card border-b-emerald-400">
+                    <p class="text-[9px] font-black text-emerald-500 uppercase tracking-widest mb-1">Success ✅</p>
+                    <h3 id="statApproved" class="text-3xl font-black text-emerald-500 tracking-tighter">0</h3>
                 </div>
-                <div class="bg-white p-6 rounded-[2.5rem] border border-white shadow-sm">
-                    <p class="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-1">Queue ⏳</p>
-                    <h3 id="statPending" class="text-4xl font-black text-amber-500 tracking-tighter">0</h3>
+                <div class="bg-white p-5 rounded-[2rem] border border-white shadow-sm stat-card border-b-amber-400">
+                    <p class="text-[9px] font-black text-amber-500 uppercase tracking-widest mb-1">Queue ⏳</p>
+                    <h3 id="statPending" class="text-3xl font-black text-amber-500 tracking-tighter">0</h3>
                 </div>
-                <div class="bg-white p-6 rounded-[2.5rem] border border-white shadow-sm">
-                    <p class="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-1">Dropped ❌</p>
-                    <h3 id="statRejected" class="text-4xl font-black text-rose-500 tracking-tighter">0</h3>
+                <div class="bg-white p-5 rounded-[2rem] border border-white shadow-sm stat-card border-b-rose-400">
+                    <p class="text-[9px] font-black text-rose-500 uppercase tracking-widest mb-1">Dropped ❌</p>
+                    <h3 id="statRejected" class="text-3xl font-black text-rose-500 tracking-tighter">0</h3>
                 </div>
             </div>
 
-            <div class="md:col-span-4 bg-[#2D4E53] p-8 rounded-[3rem] text-white shadow-xl flex flex-col justify-between overflow-hidden relative">
-                <div class="absolute -right-4 -top-4 text-white/5 text-8xl"><i class="fa-solid fa-bolt"></i></div>
-                <h4 class="font-black uppercase tracking-widest text-[11px] mb-4">Category Breakdown ⚡</h4>
-                <div class="space-y-4 relative z-10">
-                    <div class="flex justify-between items-center bg-white/10 p-4 rounded-2xl">
-                        <span class="text-xs font-bold">Programs 📖</span>
+            <div class="md:col-span-4 bg-[#2D4E53] p-6 rounded-[2.5rem] text-white shadow-xl flex flex-col justify-between overflow-hidden relative">
+                <div class="absolute -right-4 -top-4 text-white/5 text-8xl rotate-12"><i class="fa-solid fa-chart-pie"></i></div>
+                <h4 class="font-black uppercase tracking-[0.2em] text-[9px] mb-4 opacity-60">Category Breakdown</h4>
+                <div class="space-y-3 relative z-10">
+                    <div class="flex justify-between items-center bg-white/5 backdrop-blur-md p-4 rounded-2xl border border-white/10">
+                        <span class="text-[10px] font-black uppercase tracking-widest">Programs 📖</span>
                         <span id="statGeneral" class="text-2xl font-black">0</span>
                     </div>
-                    <div class="flex justify-between items-center bg-white/10 p-4 rounded-2xl">
-                        <span class="text-xs font-bold">Music 🎸</span>
+                    <div class="flex justify-between items-center bg-white/5 backdrop-blur-md p-4 rounded-2xl border border-white/10">
+                        <span class="text-[10px] font-black uppercase tracking-widest">Music 🎸</span>
                         <span id="statMusic" class="text-2xl font-black">0</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-[3.5rem] shadow-sm border border-white overflow-hidden p-4">
+        <div class="bg-white/60 p-5 rounded-[3rem] glass-panel border border-white">
             <div class="grid grid-cols-7 mb-4">
-                <div class="py-4 text-center text-[10px] font-black text-emerald-600/50 uppercase tracking-[0.3em]">Sun</div>
-                <div class="py-4 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Mon</div>
-                <div class="py-4 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Tue</div>
-                <div class="py-4 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Wed</div>
-                <div class="py-4 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Thu</div>
-                <div class="py-4 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Fri</div>
-                <div class="py-4 text-center text-[10px] font-black text-rose-600/50 uppercase tracking-[0.3em]">Sat</div>
+                <div class="py-2 text-center text-[10px] font-black text-emerald-600/60 uppercase tracking-[0.4em]">Sun</div>
+                <div class="py-2 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">Mon</div>
+                <div class="py-2 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">Tue</div>
+                <div class="py-2 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">Wed</div>
+                <div class="py-2 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">Thu</div>
+                <div class="py-2 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">Fri</div>
+                <div class="py-2 text-center text-[10px] font-black text-rose-600/60 uppercase tracking-[0.4em]">Sat</div>
             </div>
             <div id="calendarBody" class="grid grid-cols-7 gap-2"></div>
         </div>
     </main>
 
-    <div id="eventDrawer" class="fixed top-0 right-0 h-full w-full md:w-[450px] bg-slate-50 shadow-2xl z-[150] flex flex-col border-l border-slate-100">
-        <div class="p-8 border-b border-white flex justify-between items-center bg-white">
-            <div>
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Activity List for</p>
-                <h3 class="text-3xl font-black text-slate-800 uppercase italic tracking-tighter" id="selectedDateText">---</h3>
+    <footer class="mt-8 py-6 border-t border-slate-200 bg-white/50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <img src="mcb.png" class="w-8 h-8 object-contain grayscale opacity-70" alt="MCB Logo">
+                    <div class="text-left">
+                        <p class="text-[11px] font-black uppercase tracking-tight text-slate-800">Mobilization Church Balilihan</p>
+                        <p class="text-[8px] font-bold text-slate-400 uppercase tracking-[0.3em]">© 2026 • System Analytics</p>
+                    </div>
+                </div>
+
+                <div class="text-center md:text-right">
+                    <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Developed by:</p>
+                    <p class="text-[11px] font-extrabold text-[#2D4E53] uppercase tracking-tighter">
+                        Mark Brian D. Angco 🫶
+                    </p>
+                </div>
             </div>
-            <button onclick="closeDrawer()" class="w-14 h-14 flex items-center justify-center rounded-2xl bg-slate-100 text-slate-400 hover:text-rose-500 transition-all text-2xl shadow-inner">
-                <i class="fa-solid fa-xmark"></i>
+        </div>
+    </footer>
+
+    <div id="eventDrawer" class="fixed top-0 right-0 h-full w-full md:w-[450px] bg-slate-50/95 backdrop-blur-2xl z-[150] flex flex-col border-l border-white/50">
+        <div class="p-8 border-b border-white flex justify-between items-center bg-white/50">
+            <div>
+                <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Records for</p>
+                <h3 class="text-2xl font-black text-slate-800 uppercase italic tracking-tighter" id="selectedDateText">---</h3>
+            </div>
+            <button onclick="closeDrawer()" class="w-12 h-12 flex items-center justify-center rounded-xl bg-white text-slate-400 hover:text-rose-500 transition-all shadow-sm border border-slate-100">
+                <i class="fa-solid fa-xmark text-lg"></i>
             </button>
         </div>
         <div id="drawerContent" class="flex-grow p-6 space-y-4 overflow-y-auto"></div>
     </div>
 
     <div id="programModal" class="fixed inset-0 z-[200] flex items-center justify-center hidden p-4">
-        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-xl" onclick="closeProgramModal()"></div>
-        <div class="bg-white w-full max-w-2xl max-h-[90vh] rounded-[3.5rem] shadow-2xl overflow-hidden flex flex-col relative animate-slide-up border-4 border-white">
-            
-            <div class="flex-grow overflow-y-auto p-10 md:p-14">
-                <div class="flex flex-col items-center mb-10 text-center">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeProgramModal()"></div>
+        <div class="bg-white w-full max-w-2xl max-h-[90vh] rounded-[3rem] shadow-2xl overflow-hidden flex flex-col relative border-[6px] border-white">
+            <div class="flex-grow overflow-y-auto p-10 md:p-12">
+                <div class="flex flex-col items-center mb-8 text-center">
                     <img src="mcb.png" class="w-16 h-16 object-contain mb-4" alt="Logo">
-                    <h1 class="text-xl font-black text-slate-800 uppercase leading-none tracking-tighter">Mobilization Church</h1>
-                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.4em] mt-1">Official Program Report 📄</p>
+                    <h1 class="text-xl font-black text-slate-800 uppercase tracking-tighter">Mobilization Church</h1>
+                    <p class="text-[9px] font-extrabold text-slate-400 uppercase tracking-[0.4em] mt-1">Official Program Report</p>
                 </div>
-
-                <div class="flex justify-between items-start bg-slate-50 p-6 rounded-3xl mb-8 border border-slate-100">
-                    <div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Program Title</p>
-                        <h2 id="viewProgTitle" class="text-2xl font-black text-slate-800 uppercase italic">---</h2>
+                <div id="programDetailsArea">
+                     <div class="grid grid-cols-2 gap-4 bg-slate-50 p-6 rounded-[2rem] mb-8 border border-slate-100">
+                        <div>
+                            <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Title</p>
+                            <h2 id="viewProgTitle" class="text-xl font-black text-slate-800 uppercase italic leading-none">---</h2>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Date Issued</p>
+                            <p id="viewProgDate" class="font-black text-emerald-600 text-base uppercase">---</p>
+                        </div>
                     </div>
-                    <div class="text-right">
-                        <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Date</p>
-                        <p id="viewProgDate" class="font-bold text-emerald-600">---</p>
-                    </div>
+                    <table class="w-full mb-8">
+                        <thead>
+                            <tr class="border-b-2 border-slate-100">
+                                <th class="py-4 text-left text-[9px] font-black uppercase text-slate-400 tracking-widest">Activity Detail</th>
+                                <th class="py-4 text-right text-[9px] font-black uppercase text-slate-400 tracking-widest">In-Charge</th>
+                            </tr>
+                        </thead>
+                        <tbody id="viewProgRows" class="divide-y divide-slate-50"></tbody>
+                    </table>
                 </div>
-
-                <table class="w-full mb-10">
-                    <thead>
-                        <tr class="border-b-2 border-slate-100">
-                            <th class="py-4 text-left text-[10px] font-black uppercase text-slate-400">Activity ⚡</th>
-                            <th class="py-4 text-right text-[10px] font-black uppercase text-slate-400">Lead/Who 👤</th>
-                        </tr>
-                    </thead>
-                    <tbody id="viewProgRows" class="divide-y divide-slate-50"></tbody>
-                </table>
-
                 <div class="flex justify-between items-center pt-8 border-t-2 border-dashed border-slate-100">
                     <div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Prepared by</p>
+                        <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Reporting Officer</p>
                         <p id="viewProgUser" class="text-sm font-black text-slate-700">---</p>
                     </div>
-                    <div id="viewProgStamp" class="rubber-stamp hidden">
-                        APPROVED
-                    </div>
+                    <div id="viewProgStamp" class="rubber-stamp hidden">APPROVED</div>
                 </div>
             </div>
-            <button onclick="closeProgramModal()" class="m-8 bg-slate-800 text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-emerald-600 transition-all">Close Report 🚩</button>
+            <button onclick="closeProgramModal()" class="m-8 bg-slate-900 text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] hover:bg-emerald-600 transition-all">Dismiss Report</button>
         </div>
     </div>
 
@@ -212,15 +265,12 @@
             } catch (err) { console.error("Database Error:", err.message); }
         }
 
-        // --- FIXED STATS LOGIC ---
         function updateStats() {
             const total = allPrograms.length;
             const approved = allPrograms.filter(i => i.status === 'approved').length;
             const pending = allPrograms.filter(i => i.status === 'pending').length;
             const rejected = allPrograms.filter(i => i.status === 'rejected').length;
             
-            // Mas pinalakas na filter: it's either check column 'title' or 'category'
-            // Base sa common practice, ang music lineup ay may title na 'Music'
             const musicCount = allPrograms.filter(i => 
                 (i.title && i.title.toLowerCase().includes('music')) || 
                 (i.category && i.category.toLowerCase() === 'music')
@@ -232,8 +282,6 @@
             document.getElementById('statApproved').innerText = approved;
             document.getElementById('statPending').innerText = pending;
             document.getElementById('statRejected').innerText = rejected;
-            
-            // Updating the breakdown card
             document.getElementById('statMusic').innerText = musicCount;
             document.getElementById('statGeneral').innerText = generalCount;
         }
@@ -260,14 +308,14 @@
                 const isToday = today.toDateString() === new Date(year, month, day).toDateString();
                 
                 calendarBody.innerHTML += `
-                    <div class="calendar-day ${isToday ? 'today' : ''} p-3 flex flex-col justify-between" onclick="openDrawer('${dateStr}')">
-                        <span class="text-xs font-black ${isToday ? 'text-emerald-600' : 'text-slate-300'}">${day}</span>
-                        <div class="flex flex-wrap gap-1">
+                    <div class="calendar-day ${isToday ? 'today' : ''} p-4 flex flex-col justify-between cursor-pointer" onclick="openDrawer('${dateStr}')">
+                        <span class="text-[10px] font-black ${isToday ? 'text-emerald-700' : 'text-slate-300'}">${day}</span>
+                        <div class="flex flex-wrap gap-1 mt-1">
                             ${dayEvents.slice(0, 4).map(e => {
                                 let color = 'bg-amber-400';
                                 if(e.status === 'approved') color = 'bg-emerald-500';
                                 if(e.status === 'rejected') color = 'bg-rose-500';
-                                return `<div class="w-2 h-2 rounded-full ${color}"></div>`;
+                                return `<div class="w-2 h-2 rounded-full ${color} ring-1 ring-white"></div>`;
                             }).join('')}
                         </div>
                     </div>`;
@@ -281,17 +329,17 @@
             const content = document.getElementById('drawerContent');
             
             content.innerHTML = dayEvents.length === 0 
-                ? `<div class="text-center py-20 opacity-30">📭<br><p class="text-[10px] font-black uppercase mt-2">No activities logged</p></div>`
+                ? `<div class="text-center py-10 opacity-20"><i class="fa-solid fa-folder-open text-4xl mb-2"></i><br><p class="text-[8px] font-black uppercase tracking-widest">No logs</p></div>`
                 : dayEvents.map(e => `
-                    <div class="bg-white p-6 rounded-[2.5rem] border-2 border-transparent hover:border-emerald-500 cursor-pointer transition-all shadow-sm group" onclick="viewProgram('${e.id}')">
-                        <div class="flex justify-between items-start mb-4">
-                            <span class="px-3 py-1 rounded-full text-[8px] font-black uppercase ${e.status === 'approved' ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-400'}">
-                                ${e.status} ${e.status === 'approved' ? '✨' : '⏳'}
+                    <div class="bg-white p-5 rounded-[1.5rem] border border-slate-100 hover:border-emerald-500 cursor-pointer transition-all duration-300 group" onclick="viewProgram('${e.id}')">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest ${e.status === 'approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-50 text-slate-400'}">
+                                ${e.status}
                             </span>
-                            <i class="fa-solid fa-chevron-right text-slate-200 group-hover:text-emerald-500 transition-all"></i>
+                            <i class="fa-solid fa-arrow-right text-[8px] text-slate-300 group-hover:text-emerald-500"></i>
                         </div>
-                        <h4 class="font-black text-slate-800 uppercase italic leading-tight">${e.title || 'Untitled Program'}</h4>
-                        <p class="text-[9px] font-bold text-slate-400 mt-2 uppercase">👤 Lead: ${e.user_id || 'System'}</p>
+                        <h4 class="font-black text-slate-800 uppercase italic tracking-tight leading-none text-base">${e.title || 'Report Entry'}</h4>
+                        <p class="text-[8px] font-bold text-slate-400 mt-2 uppercase tracking-widest">👤 User: ${e.user_id}</p>
                     </div>
                 `).join('');
             document.getElementById('eventDrawer').classList.add('open');
@@ -301,9 +349,9 @@
             const prog = allPrograms.find(p => p.id == id);
             if(!prog) return;
 
-            document.getElementById('viewProgTitle').innerText = prog.title || 'No Title';
+            document.getElementById('viewProgTitle').innerText = prog.title || 'Untitled';
             document.getElementById('viewProgDate').innerText = prog.program_date;
-            document.getElementById('viewProgUser').innerText = prog.user_id || 'Unknown';
+            document.getElementById('viewProgUser').innerText = prog.user_id || 'System';
             
             let list = [];
             try { 
@@ -311,9 +359,9 @@
             } catch (e) { list = []; }
 
             document.getElementById('viewProgRows').innerHTML = list.map(row => `
-                <tr>
-                    <td class="py-4 font-black uppercase text-xs text-slate-700">${row.act || '---'}</td>
-                    <td class="py-4 text-right text-slate-400 font-bold italic text-xs">${row.who || '---'}</td>
+                <tr class="group">
+                    <td class="py-4 font-black uppercase text-[10px] text-slate-700">${row.act || '---'}</td>
+                    <td class="py-4 text-right text-slate-400 font-bold italic text-[10px] uppercase">${row.who || '---'}</td>
                 </tr>
             `).join('');
 
@@ -333,7 +381,8 @@
 
         setInterval(() => {
             const now = new Date();
-            document.getElementById('liveClock').innerText = '🕒 ' + now.toLocaleTimeString();
+            const liveClock = document.getElementById('liveClock');
+            if(liveClock) liveClock.innerHTML = `<span class="text-emerald-400">🕒</span> ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}`;
         }, 1000);
 
         document.addEventListener('DOMContentLoaded', loadData);
