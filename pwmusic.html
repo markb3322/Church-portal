@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Music Portal | MCB Balilihan</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
@@ -36,9 +36,7 @@
         .filter-btn.active { background-color: var(--mc-green); color: white; border-color: var(--mc-green); }
     </style>
 </head>
-<body class="pb-12">
-
-    <div id="printableLineup">
+<body class="pb-4"> <div id="printableLineup">
         <div class="official-header text-center">
             <img src="mcb.png" class="w-20 h-20 mx-auto mb-2" alt="Logo">
             <h1 class="text-2xl font-black text-[#2D4E53]">MOBILIZATION CHURCH BALILIHAN</h1>
@@ -66,7 +64,7 @@
         </div>
     </div>
 
-    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 mb-4">
         <div class="max-w-6xl mx-auto px-6 py-3 flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <img src="mcb.png" class="w-10 h-10 object-contain" alt="MCB Logo">
@@ -75,124 +73,151 @@
                     <p class="text-[9px] font-bold text-emerald-600 uppercase mt-1">Mobilization Church Balilihan</p>
                 </div>
             </div>
+            <div class="flex items-center gap-2 bg-slate-100/80 px-3 py-1.5 rounded-full border border-slate-200">
+                <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                <div id="liveTime" class="text-[9px] md:text-[11px] font-black text-slate-600 uppercase tracking-tight"></div>
+            </div>
         </div>
     </nav>
 
-    <main class="max-w-6xl mx-auto px-4 mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div class="lg:col-span-4 space-y-6">
-            <section class="music-card p-6 border-t-4 border-[#D4AF37] board-card">
-                <i class="fa-solid fa-quote-right quote-icon text-[#D4AF37]"></i>
-                <div class="flex items-center gap-2 mb-4">
-                    <span class="bg-amber-100 text-[#D4AF37] p-2 rounded-lg text-xs"><i class="fa-solid fa-person-rays"></i></span>
-                    <h3 class="text-[10px] font-black uppercase text-slate-500 tracking-widest">Pastor's Board</h3>
-                </div>
-                <div class="bg-gradient-to-br from-amber-50 to-white p-5 rounded-2xl border border-amber-100">
-                    <p id="pastorText" class="text-sm font-bold text-slate-700 leading-relaxed italic">"Loading message..."</p>
-                    <div class="mt-4 flex items-center justify-between border-t border-amber-100 pt-3">
-                        <span class="text-[9px] font-black text-amber-600 bg-amber-100 px-2 py-0.5 rounded">OFFICIAL</span>
-                        <span id="pastorTimeAgo" class="text-[9px] font-bold text-slate-400">---</span>
+    <main class="max-w-6xl mx-auto px-4 space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-4 space-y-6">
+                <section class="music-card p-6 border-t-4 border-[#D4AF37] board-card">
+                    <i class="fa-solid fa-quote-right quote-icon text-[#D4AF37]"></i>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="bg-amber-100 text-[#D4AF37] p-2 rounded-lg text-xs"><i class="fa-solid fa-person-rays"></i></span>
+                        <h3 class="text-[10px] font-black uppercase text-slate-500 tracking-widest">Pastor's Board</h3>
                     </div>
-                </div>
-            </section>
-
-            <section class="music-card p-6 border-t-4 border-[#2D4E53] board-card">
-                <i class="fa-solid fa-bullhorn quote-icon text-[#2D4E53]"></i>
-                <div class="flex items-center gap-2 mb-4">
-                    <span class="bg-slate-100 text-[#2D4E53] p-2 rounded-lg text-xs"><i class="fa-solid fa-circle-info"></i></span>
-                    <h3 class="text-[10px] font-black uppercase text-slate-500 tracking-widest">Music Desk</h3>
-                </div>
-                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
-                    <p id="announcementText" class="text-xs font-bold text-slate-600 leading-relaxed">Loading desk updates...</p>
-                    <div class="mt-4 flex items-center justify-end gap-2 text-slate-400">
-                        <i class="fa-regular fa-clock text-[9px]"></i>
-                        <span id="annTimeAgo" class="text-[9px] font-bold">---</span>
-                    </div>
-                </div>
-            </section>
-
-            <section class="music-card p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-widest" id="monthYear">📅 Month</h3>
-                    <div class="flex gap-2">
-                        <button onclick="changeMonth(-1)" class="p-2 hover:bg-slate-100 rounded-full text-slate-400"><i class="fa-solid fa-chevron-left text-xs"></i></button>
-                        <button onclick="changeMonth(1)" class="p-2 hover:bg-slate-100 rounded-full text-slate-400"><i class="fa-solid fa-chevron-right text-xs"></i></button>
-                    </div>
-                </div>
-                <div id="calendarGrid" class="grid grid-cols-7 gap-1.5 text-center">
-                    <div class="text-[8px] font-black text-slate-300">S</div><div class="text-[8px] font-black text-slate-300">M</div><div class="text-[8px] font-black text-slate-300">T</div><div class="text-[8px] font-black text-slate-300">W</div><div class="text-[8px] font-black text-slate-300">T</div><div class="text-[8px] font-black text-slate-300">F</div><div class="text-[8px] font-black text-slate-300">S</div>
-                </div>
-            </section>
-        </div>
-
-        <div class="lg:col-span-8 space-y-6">
-            <section class="music-card p-8">
-                <h2 class="text-xl font-black text-slate-800 mb-8">✨ Create New Line Up</h2>
-                <form id="setlistForm" class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <input type="text" id="leader" placeholder="Worship Leader Name" class="w-full p-4 bg-slate-50 rounded-2xl font-bold outline-none border focus:border-[#2D4E53]" required>
-                        <input type="date" id="sDate" class="w-full p-4 bg-slate-50 rounded-2xl font-bold outline-none border focus:border-[#2D4E53]" required>
-                    </div>
-
-                    <div class="p-5 bg-slate-50 rounded-[2rem] border border-dashed border-slate-300">
-                        <h4 class="text-[10px] font-black text-slate-500 mb-4 uppercase">🎵 Opening Song</h4>
-                        <div id="openingContainer" class="space-y-3">
-                            <input type="text" class="opening-in w-full p-3 bg-white rounded-xl text-sm font-bold border" placeholder="Enter Opening Song">
+                    <div class="bg-gradient-to-br from-amber-50 to-white p-5 rounded-2xl border border-amber-100">
+                        <p id="pastorText" class="text-sm font-bold text-slate-700 leading-relaxed italic">"Loading message..."</p>
+                        <div class="mt-4 flex items-center justify-between border-t border-amber-100 pt-3">
+                            <span class="text-[9px] font-black text-amber-600 bg-amber-100 px-2 py-0.5 rounded">OFFICIAL</span>
+                            <span id="pastorTimeAgo" class="text-[9px] font-bold text-slate-400">---</span>
                         </div>
                     </div>
+                </section>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="p-5 bg-emerald-50/50 rounded-[2rem]">
-                            <h4 class="text-[10px] font-black text-emerald-600 mb-4 uppercase">🔥 Praise</h4>
-                            <div id="praiseContainer" class="space-y-3">
-                                <input type="text" class="praise-in w-full p-3 bg-white rounded-xl text-sm font-bold border" placeholder="Song 1">
+                <section class="music-card p-6 border-t-4 border-[#2D4E53] board-card">
+                    <i class="fa-solid fa-bullhorn quote-icon text-[#2D4E53]"></i>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="bg-slate-100 text-[#2D4E53] p-2 rounded-lg text-xs"><i class="fa-solid fa-circle-info"></i></span>
+                        <h3 class="text-[10px] font-black uppercase text-slate-500 tracking-widest">Music Desk</h3>
+                    </div>
+                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                        <p id="announcementText" class="text-xs font-bold text-slate-600 leading-relaxed">Loading desk updates...</p>
+                        <div class="mt-4 flex items-center justify-end gap-2 text-slate-400">
+                            <i class="fa-regular fa-clock text-[9px]"></i>
+                            <span id="annTimeAgo" class="text-[9px] font-bold">---</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="music-card p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-widest" id="monthYear">📅 Month</h3>
+                        <div class="flex gap-2">
+                            <button onclick="changeMonth(-1)" class="p-2 hover:bg-slate-100 rounded-full text-slate-400"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                            <button onclick="changeMonth(1)" class="p-2 hover:bg-slate-100 rounded-full text-slate-400"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                        </div>
+                    </div>
+                    <div id="calendarGrid" class="grid grid-cols-7 gap-1.5 text-center">
+                        <div class="text-[8px] font-black text-slate-300">S</div><div class="text-[8px] font-black text-slate-300">M</div><div class="text-[8px] font-black text-slate-300">T</div><div class="text-[8px] font-black text-slate-300">W</div><div class="text-[8px] font-black text-slate-300">T</div><div class="text-[8px] font-black text-slate-300">F</div><div class="text-[8px] font-black text-slate-300">S</div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="lg:col-span-8 space-y-6">
+                <section class="music-card p-8">
+                    <h2 class="text-xl font-black text-slate-800 mb-8 uppercase italic">Submit <span class="text-emerald-600">New Line Up</span></h2>
+                    <form id="setlistForm" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <input type="text" id="leader" placeholder="Worship Leader Name" class="w-full p-4 bg-slate-50 rounded-2xl font-bold outline-none border focus:border-[#2D4E53]" required>
+                            <input type="date" id="sDate" class="w-full p-4 bg-slate-50 rounded-2xl font-bold outline-none border focus:border-[#2D4E53]" required>
+                        </div>
+
+                        <div class="p-5 bg-slate-50 rounded-[2rem] border border-dashed border-slate-300">
+                            <h4 class="text-[10px] font-black text-slate-500 mb-4 uppercase">🎵 Opening Song</h4>
+                            <div id="openingContainer" class="space-y-3">
+                                <input type="text" class="opening-in w-full p-3 bg-white rounded-xl text-sm font-bold border" placeholder="Enter Opening Song">
                             </div>
-                            <button type="button" onclick="addIn('praiseContainer')" class="mt-4 text-[10px] font-bold text-emerald-500">➕ Add Song</button>
                         </div>
-                        <div class="p-5 bg-blue-50/50 rounded-[2rem]">
-                            <h4 class="text-[10px] font-black text-blue-600 mb-4 uppercase">🙏 Worship</h4>
-                            <div id="worshipContainer" class="space-y-3">
-                                <input type="text" class="worship-in w-full p-3 bg-white rounded-xl text-sm font-bold border" placeholder="Song 1">
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="p-5 bg-emerald-50/50 rounded-[2rem]">
+                                <h4 class="text-[10px] font-black text-emerald-600 mb-4 uppercase">🔥 Praise</h4>
+                                <div id="praiseContainer" class="space-y-3">
+                                    <input type="text" class="praise-in w-full p-3 bg-white rounded-xl text-sm font-bold border" placeholder="Song 1">
+                                </div>
+                                <button type="button" onclick="addIn('praiseContainer')" class="mt-4 text-[10px] font-bold text-emerald-500">➕ Add Song</button>
                             </div>
-                            <button type="button" onclick="addIn('worshipContainer')" class="mt-4 text-[10px] font-bold text-blue-500">➕ Add Song</button>
+                            <div class="p-5 bg-blue-50/50 rounded-[2rem]">
+                                <h4 class="text-[10px] font-black text-blue-600 mb-4 uppercase">🙏 Worship</h4>
+                                <div id="worshipContainer" class="space-y-3">
+                                    <input type="text" class="worship-in w-full p-3 bg-white rounded-xl text-sm font-bold border" placeholder="Song 1">
+                                </div>
+                                <button type="button" onclick="addIn('worshipContainer')" class="mt-4 text-[10px] font-bold text-blue-500">➕ Add Song</button>
+                            </div>
+                        </div>
+
+                        <div class="p-5 bg-slate-50 rounded-[2rem] border border-dashed border-slate-300">
+                            <h4 class="text-[10px] font-black text-slate-500 mb-4 uppercase">🎹 Closing Song</h4>
+                            <div id="closingContainer" class="space-y-3">
+                                <input type="text" class="closing-in w-full p-3 bg-white rounded-xl text-sm font-bold border" placeholder="Enter Closing Song">
+                            </div>
+                        </div>
+
+                        <button type="submit" id="subBtn" class="w-full bg-[#2D4E53] text-white py-5 rounded-3xl font-black uppercase text-[10px] tracking-widest shadow-xl hover:bg-[#1e3538] transition-all">🚀 Submit Lineup</button>
+                    </form>
+                </section>
+
+                <section class="music-card p-6">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">📊 Tracking</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="filterTable('all')" class="filter-btn active text-[9px] font-black px-3 py-1.5 rounded-full border border-slate-200 uppercase transition-all">All</button>
+                            <button onclick="filterTable('approved')" class="filter-btn text-[9px] font-black px-3 py-1.5 rounded-full border border-slate-200 text-emerald-600 uppercase transition-all">Approved</button>
+                            <button onclick="filterTable('pending')" class="filter-btn text-[9px] font-black px-3 py-1.5 rounded-full border border-slate-200 text-amber-500 uppercase transition-all">Pending</button>
+                            <button onclick="filterTable('rejected')" class="filter-btn text-[9px] font-black px-3 py-1.5 rounded-full border border-slate-200 text-rose-500 uppercase transition-all">Rejected</button>
                         </div>
                     </div>
-
-                    <div class="p-5 bg-slate-50 rounded-[2rem] border border-dashed border-slate-300">
-                        <h4 class="text-[10px] font-black text-slate-500 mb-4 uppercase">🎹 Closing Song</h4>
-                        <div id="closingContainer" class="space-y-3">
-                            <input type="text" class="closing-in w-full p-3 bg-white rounded-xl text-sm font-bold border" placeholder="Enter Closing Song">
-                        </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="border-b border-slate-100">
+                                    <th class="pb-4 text-[9px] font-black text-slate-300 uppercase">Leader</th>
+                                    <th class="pb-4 text-[9px] font-black text-slate-300 uppercase">Date</th>
+                                    <th class="pb-4 text-right text-[9px] font-black text-slate-300 uppercase">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyBody" class="divide-y divide-slate-50"></tbody>
+                        </table>
                     </div>
-
-                    <button type="submit" id="subBtn" class="w-full bg-[#2D4E53] text-white py-5 rounded-3xl font-black uppercase text-xs shadow-xl hover:bg-[#1e3538] transition-all">🚀 Submit Lineup</button>
-                </form>
-            </section>
-
-            <section class="music-card p-6">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">📊 Tracking</h3>
-                    <div class="flex flex-wrap gap-2">
-                        <button onclick="filterTable('all')" class="filter-btn active text-[9px] font-black px-3 py-1.5 rounded-full border border-slate-200 uppercase transition-all">All</button>
-                        <button onclick="filterTable('approved')" class="filter-btn text-[9px] font-black px-3 py-1.5 rounded-full border border-slate-200 text-emerald-600 uppercase transition-all">Approved</button>
-                        <button onclick="filterTable('pending')" class="filter-btn text-[9px] font-black px-3 py-1.5 rounded-full border border-slate-200 text-amber-500 uppercase transition-all">Pending</button>
-                        <button onclick="filterTable('rejected')" class="filter-btn text-[9px] font-black px-3 py-1.5 rounded-full border border-slate-200 text-rose-500 uppercase transition-all">Rejected</button>
-                    </div>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead>
-                            <tr class="border-b border-slate-100">
-                                <th class="pb-4 text-[9px] font-black text-slate-300 uppercase">Leader</th>
-                                <th class="pb-4 text-[9px] font-black text-slate-300 uppercase">Date</th>
-                                <th class="pb-4 text-right text-[9px] font-black text-slate-300 uppercase">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="historyBody" class="divide-y divide-slate-50"></tbody>
-                    </table>
-                </div>
-            </section>
+                </section>
+            </div>
         </div>
     </main>
+
+    <footer class="mt-8 py-6 border-t border-slate-200">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <img src="mcb.png" class="w-8 h-8 object-contain grayscale opacity-70" alt="MCB Logo">
+                    <div class="text-left">
+                        <p class="text-[11px] font-black uppercase tracking-tight text-slate-800">Mobilization Church Balilihan</p>
+                        <p class="text-[8px] font-bold text-slate-400 uppercase tracking-[0.3em]">© 2026 • Faith Worship Service</p>
+                    </div>
+                </div>
+
+                <div class="text-center md:text-right">
+                    <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Developed by:</p>
+                    <p class="text-[11px] font-extrabold text-[#2D4E53] uppercase tracking-tighter">
+                        Mark Brian D. Angco 🫶
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <script>
         const sb = supabase.createClient('https://eejovtuputrwneovhfpc.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlam92dHVwdXRyd25lb3ZoZnBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMjY5MzIsImV4cCI6MjA4NjgwMjkzMn0.JJz64gSTT9qSqOkiJvuL1PT_H_I4ZYJbchrmkoljwws');
@@ -200,6 +225,15 @@
         let currentYear = new Date().getFullYear();
         let currentMonth = new Date().getMonth();
         let fullHistory = [];
+
+        function updateClock() {
+            const now = new Date();
+            const options = { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true };
+            const liveTimeElement = document.getElementById('liveTime');
+            if(liveTimeElement) liveTimeElement.innerText = now.toLocaleString('en-US', options);
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
 
         function timeAgo(date) {
             const seconds = Math.floor((new Date() - new Date(date)) / 1000);
@@ -265,7 +299,6 @@
         }
 
         async function downloadImage(item) {
-            // Update to handle Opening and Closing Song
             const opening = item.content.find(c => c.act === "OPENING")?.who || "---";
             const praises = item.content.find(c => c.act === "PRAISE")?.who || "---";
             const worships = item.content.find(c => c.act === "WORSHIP")?.who || "---";
