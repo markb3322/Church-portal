@@ -10,198 +10,169 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Special+Elite&display=swap');
         
-        :root { 
-            --mc-green: #2D4E53; 
-            --mc-soft-bg: #f8fafc;
-        }
+        :root { --mc-green: #2D4E53; --mc-soft-bg: #f8fafc; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--mc-soft-bg); color: #1e293b; display: flex; flex-direction: column; min-height: 100vh; }
+        .glass-nav { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
+        .rubber-stamp { font-family: 'Special Elite', cursive; border: 3px double; padding: 4px 10px; transform: rotate(-3deg); border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; }
 
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: var(--mc-soft-bg);
-            background-image: radial-gradient(#e2e8f0 0.5px, transparent 0.5px);
-            background-size: 24px 24px;
-            min-height: 100vh; 
-            color: #1e293b; 
-        }
+        .slide-content { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out; }
+        .slide-content.open { max-height: 500px; }
 
-        .glass-nav { 
-            background: rgba(255, 255, 255, 0.85); 
-            backdrop-filter: blur(12px); 
-            border-bottom: 1px solid rgba(226, 232, 240, 0.8); 
-        }
-
-        .card-shadow { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.02); }
-
-        .rubber-stamp { 
-            font-family: 'Special Elite', cursive; 
-            border: 3px double; 
-            padding: 4px 10px; 
-            transform: rotate(-3deg); 
-            text-transform: uppercase; 
-            border-radius: 4px; 
-            font-size: 11px; 
-            font-weight: bold; 
-            display: inline-block;
-        }
-
-        .slide-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .slide-content.open {
-            max-height: 1000px;
-        }
-
-        .ann-date-box { 
-            background: linear-gradient(135deg, #2D4E53, #437178); 
-            color: white; 
-            min-width: 80px; 
-            border-radius: 1.5rem; 
-        }
-        .ann-date-box.music-theme { background: linear-gradient(135deg, #D4AF37, #B8860B); }
-
+        .ann-date-box { background: linear-gradient(135deg, #2D4E53, #437178); color: white; min-width: 70px; border-radius: 1.2rem; }
+        .music-theme { background: linear-gradient(135deg, #D4AF37, #B8860B) !important; }
         .custom-scroll::-webkit-scrollbar { width: 5px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        main { flex-grow: 1; }
     </style>
 </head>
-<body class="pb-20">
+<body class="pb-0">
 
-    <nav class="sticky top-0 z-50 glass-nav mb-8">
-        <div class="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
-            
+    <nav class="sticky top-0 z-50 glass-nav mb-6">
+        <div class="max-w-7xl mx-auto px-4 py-2 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <img src="mcb.png" alt="Logo" class="w-10 h-10 rounded-full border-2 border-white shadow-sm object-cover bg-white">
-                <div class="flex flex-col md:flex-row md:items-baseline md:gap-2">
-                    <h1 class="font-black text-slate-800 text-lg uppercase tracking-tighter">
-                        MC <span class="text-emerald-600">Portal Admin</span>
-                    </h1>
-                    <span class="hidden md:block text-slate-300">|</span>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Mobilization Church Balilihan</p>
+                <img src="mcb.png" alt="Logo" class="w-8 h-8 rounded-full border border-slate-200 bg-white">
+                <div>
+                    <h1 class="font-black text-slate-800 text-sm md:text-base uppercase tracking-tighter leading-none">Admin <span class="text-emerald-600">Portal</span></h1>
+                    <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">Mobilization Church</p>
                 </div>
             </div>
 
-            <div id="liveTime" class="text-[9px] font-black text-slate-500 bg-white px-3 py-1.5 rounded-full border border-slate-100 shadow-sm flex items-center gap-2">
-                🕒 Loading...
+            <div class="bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200 flex items-center gap-2">
+                <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                <div id="liveTime" class="text-[9px] md:text-[10px] font-black text-slate-600 uppercase">Loading...</div>
             </div>
-
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-4 space-y-8">
+    <main class="max-w-7xl mx-auto px-4 space-y-6">
         
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="bg-white p-6 rounded-[2rem] card-shadow border border-white">
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">⏳ Pending</p>
-                <h2 id="countPending" class="text-4xl font-black text-amber-500">0</h2>
+            <div class="bg-white p-5 rounded-[1.5rem] card-shadow border-b-4 border-amber-400">
+                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">⏳ Pending</p>
+                <h2 id="countPending" class="text-3xl font-black text-slate-700">0</h2>
             </div>
-            <div class="bg-white p-6 rounded-[2rem] card-shadow border border-white">
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">🎵 Total</p>
-                <h2 id="countMusic" class="text-4xl font-black text-slate-700">0</h2>
+            <div class="bg-white p-5 rounded-[1.5rem] card-shadow border-b-4 border-slate-400">
+                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">🎵 Total</p>
+                <h2 id="countMusic" class="text-3xl font-black text-slate-700">0</h2>
             </div>
-            <div class="bg-white p-6 rounded-[2rem] card-shadow border border-white">
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">✅ Approved</p>
-                <h2 id="countApproved" class="text-4xl font-black text-emerald-600">0</h2>
+            <div class="bg-white p-5 rounded-[1.5rem] card-shadow border-b-4 border-emerald-500">
+                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">✅ Approved</p>
+                <h2 id="countApproved" class="text-3xl font-black text-emerald-600">0</h2>
             </div>
-            <div class="bg-white p-6 rounded-[2rem] card-shadow border border-white">
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">❌ Rejected</p>
-                <h2 id="countRejected" class="text-4xl font-black text-rose-600">0</h2>
+            <div class="bg-white p-5 rounded-[1.5rem] card-shadow border-b-4 border-rose-500">
+                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">❌ Rejected</p>
+                <h2 id="countRejected" class="text-3xl font-black text-rose-600">0</h2>
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-white rounded-[2.5rem] card-shadow border border-white overflow-hidden">
-                <div class="p-6 flex gap-6">
-                    <div class="ann-date-box p-4 shrink-0 flex flex-col items-center justify-center">
-                        <span id="genMonth" class="text-[9px] font-black opacity-60 uppercase">---</span>
-                        <span id="genDay" class="text-3xl font-black leading-none my-1">--</span>
+            <div class="bg-white rounded-[2rem] card-shadow border border-white overflow-hidden">
+                <div class="p-5 flex gap-5">
+                    <div class="ann-date-box p-3 shrink-0 flex flex-col items-center justify-center">
+                        <span id="genMonth" class="text-[8px] font-black opacity-70 uppercase">---</span>
+                        <span id="genDay" class="text-2xl font-black leading-none my-1">--</span>
                     </div>
                     <div class="flex-1">
-                        <span class="bg-emerald-50 text-emerald-600 text-[9px] font-black px-3 py-1 rounded-full uppercase mb-2 inline-block">📖 Pastor's Board</span>
-                        <p id="liveNews" class="text-slate-800 font-bold italic text-sm line-clamp-2 leading-relaxed">"Loading..."</p>
-                        <button onclick="toggleSlide('pastor')" class="mt-4 text-[#2D4E53] text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:opacity-70 transition-all">
-                            <i class="fa-solid fa-pen-to-square"></i> Update Word
+                        <span class="bg-emerald-50 text-emerald-600 text-[8px] font-black px-2 py-0.5 rounded-full uppercase mb-2 inline-block">📖 Pastor's Board</span>
+                        <p id="liveNews" class="text-slate-800 font-bold italic text-xs line-clamp-2">"Loading..."</p>
+                        <button onclick="toggleSlide('pastor')" class="mt-3 text-emerald-700 text-[9px] font-black uppercase tracking-widest flex items-center gap-1">
+                            <i class="fa-solid fa-pen"></i> Update Word
                         </button>
                     </div>
                 </div>
-                <div id="slide-pastor" class="slide-content bg-slate-50 border-t border-slate-100">
-                    <div class="p-8">
-                        <textarea id="text-pastor" class="w-full h-32 bg-white border-2 border-slate-200 rounded-2xl p-4 text-sm focus:border-emerald-500 outline-none shadow-inner" placeholder="Isulat ang mensahe dito..."></textarea>
-                        <div class="flex gap-2 mt-4">
-                            <button onclick="saveEntry('pastor')" class="flex-1 bg-emerald-600 text-white py-3 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg">🚀 Publish Now</button>
-                            <button onclick="toggleSlide('pastor')" class="px-6 py-3 text-slate-400 font-black text-[10px] uppercase">Cancel</button>
-                        </div>
+                <div id="slide-pastor" class="slide-content bg-slate-50 border-t">
+                    <div class="p-6">
+                        <textarea id="text-pastor" class="w-full h-24 bg-white border rounded-xl p-3 text-xs focus:border-emerald-500 outline-none" placeholder="Message..."></textarea>
+                        <button onclick="saveEntry('pastor')" class="w-full mt-3 bg-emerald-600 text-white py-3 rounded-xl font-black text-[9px] uppercase tracking-widest">Publish Now</button>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-[2.5rem] card-shadow border border-white overflow-hidden transition-all">
-                <div class="p-6 flex gap-6">
-                    <div class="ann-date-box music-theme p-4 shrink-0 flex flex-col items-center justify-center">
-                        <span id="musMonth" class="text-[9px] font-black opacity-60 uppercase">---</span>
-                        <span id="musDay" class="text-3xl font-black leading-none my-1">--</span>
+            <div class="bg-white rounded-[2rem] card-shadow border border-white overflow-hidden">
+                <div class="p-5 flex gap-5">
+                    <div class="ann-date-box music-theme p-3 shrink-0 flex flex-col items-center justify-center">
+                        <span id="musMonth" class="text-[8px] font-black opacity-70 uppercase">---</span>
+                        <span id="musDay" class="text-2xl font-black leading-none my-1">--</span>
                     </div>
                     <div class="flex-1">
-                        <span class="bg-slate-800 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase mb-2 inline-block">🎸 Music Team Feed</span>
-                        <p id="liveMusicNews" class="text-slate-800 font-bold italic text-sm line-clamp-2 leading-relaxed">"Loading..."</p>
-                        <button onclick="toggleSlide('music')" class="mt-4 text-amber-600 text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:opacity-70 transition-all">
+                        <span class="bg-amber-50 text-amber-600 text-[8px] font-black px-2 py-0.5 rounded-full uppercase mb-2 inline-block">🎸 Music Team Feed</span>
+                        <p id="liveMusicNews" class="text-slate-800 font-bold italic text-xs line-clamp-2">"Loading..."</p>
+                        <button onclick="toggleSlide('music')" class="mt-3 text-amber-600 text-[9px] font-black uppercase tracking-widest flex items-center gap-1">
                             <i class="fa-solid fa-bullhorn"></i> Update Feed
                         </button>
                     </div>
                 </div>
-                <div id="slide-music" class="slide-content bg-slate-50 border-t border-slate-100">
-                    <div class="p-8">
-                        <textarea id="text-music" class="w-full h-32 bg-white border-2 border-slate-200 rounded-2xl p-4 text-sm focus:border-amber-500 outline-none shadow-inner" placeholder="Anong balita sa Music Team?"></textarea>
-                        <div class="flex gap-2 mt-4">
-                            <button onclick="saveEntry('music')" class="flex-1 bg-amber-600 text-white py-3 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg">🚀 Publish Now</button>
-                            <button onclick="toggleSlide('music')" class="px-6 py-3 text-slate-400 font-black text-[10px] uppercase">Cancel</button>
-                        </div>
+                <div id="slide-music" class="slide-content bg-slate-50 border-t">
+                    <div class="p-6">
+                        <textarea id="text-music" class="w-full h-24 bg-white border rounded-xl p-3 text-xs focus:border-amber-500 outline-none" placeholder="Music updates..."></textarea>
+                        <button onclick="saveEntry('music')" class="w-full mt-3 bg-amber-600 text-white py-3 rounded-xl font-black text-[9px] uppercase tracking-widest">Publish Now</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-12 gap-8">
-            <div class="col-span-12 lg:col-span-4 h-[500px] flex flex-col bg-white rounded-[2.5rem] card-shadow border border-white overflow-hidden">
-                <div class="p-6 border-b border-slate-50 bg-slate-50/50">
-                    <h3 class="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400">📥 Review Queue</h3>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-4 h-[450px] flex flex-col bg-white rounded-[2rem] card-shadow border border-white overflow-hidden">
+                <div class="p-4 border-b bg-slate-50/50">
+                    <h3 class="font-black text-[9px] uppercase tracking-widest text-slate-400 italic">📥 Review Queue</h3>
                 </div>
-                <div id="pList" class="flex-1 overflow-y-auto p-5 space-y-4 custom-scroll"></div>
+                <div id="pList" class="flex-1 overflow-y-auto p-4 space-y-3 custom-scroll"></div>
             </div>
-            <div class="col-span-12 lg:col-span-8 bg-white rounded-[2.5rem] p-10 card-shadow border border-white min-h-[500px] flex flex-col relative overflow-hidden">
-                <div id="detailPlaceholder" class="m-auto text-center opacity-30">
-                    <i class="fa-solid fa-stamp text-4xl mb-4"></i>
+            
+            <div class="lg:col-span-8 bg-white rounded-[2rem] p-8 card-shadow border border-white min-h-[450px] flex flex-col relative">
+                <div id="detailPlaceholder" class="m-auto text-center opacity-20">
+                    <i class="fa-solid fa-stamp text-5xl mb-4"></i>
                     <p class="text-[10px] font-black uppercase tracking-widest">Select an entry for review</p>
                 </div>
                 <div id="detailContent" class="hidden w-full h-full flex flex-col"></div>
             </div>
         </div>
 
-        <div class="bg-white rounded-[3rem] card-shadow border border-white overflow-hidden">
-            <div class="p-8 border-b border-slate-50 bg-slate-50/30">
-                <h3 class="text-xl font-black text-slate-800">System Registry 📒</h3>
+        <div class="bg-white rounded-[2rem] card-shadow border border-white overflow-hidden">
+            <div class="p-6 border-b bg-slate-50/10">
+                <h3 class="text-lg font-black text-slate-800">System Registry 📒</h3>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
                     <thead><tr class="bg-slate-50/50">
-                        <th class="p-6 text-[10px] font-black uppercase text-slate-400">Entry Details</th>
-                        <th class="p-6 text-[10px] font-black uppercase text-slate-400 text-center">Status</th>
-                        <th class="p-6 text-[10px] font-black uppercase text-slate-400 text-right">Action</th>
+                        <th class="p-4 text-[9px] font-black uppercase text-slate-400">Entry Details</th>
+                        <th class="p-4 text-[9px] font-black uppercase text-slate-400 text-center">Status</th>
+                        <th class="p-4 text-[9px] font-black uppercase text-slate-400 text-right">Action</th>
                     </tr></thead>
-                    <tbody id="registryTable" class="divide-y divide-slate-100"></tbody>
+                    <tbody id="registryTable" class="divide-y divide-slate-50"></tbody>
                 </table>
             </div>
         </div>
     </main>
 
-    <div id="statusModal" class="fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-md flex items-center justify-center hidden p-4">
-        <div class="bg-white w-full max-w-sm p-10 rounded-[3rem] shadow-2xl text-center">
-            <h3 class="text-lg font-black text-slate-800 uppercase mb-8 tracking-tighter">Final Decision</h3>
-            <div class="grid gap-4">
-                <button onclick="updateStatus('approved')" class="p-5 rounded-2xl border-2 border-emerald-100 bg-emerald-50 text-emerald-700 font-black uppercase text-[10px]">✅ Approve</button>
-                <button onclick="updateStatus('rejected')" class="p-5 rounded-2xl border-2 border-rose-100 bg-rose-50 text-rose-700 font-black uppercase text-[10px]">❌ Reject</button>
+    <footer class="mt-12 border-t border-slate-200 bg-white py-8">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="text-center md:text-left">
+                <p class="text-[11px] font-black text-slate-800 uppercase tracking-tighter">
+                    Mobilization Church Balilihan © <span id="footerYear"></span>
+                </p>
+                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
+                    Faith • Worship • Service
+                </p>
             </div>
-            <button onclick="closeStatusModal()" class="mt-8 text-[10px] font-black text-slate-400 uppercase tracking-widest">Close</button>
+            
+            <div class="flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100">
+                <span class="text-[9px] font-black text-slate-400 uppercase">Developed By:</span>
+                <span class="text-[10px] font-extrabold text-[#2D4E53] uppercase tracking-tight">Mark Brian Angco 🫶</span>
+            </div>
+        </div>
+    </footer>
+
+    <div id="statusModal" class="fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center hidden p-4">
+        <div class="bg-white w-full max-w-xs p-8 rounded-[2.5rem] shadow-2xl text-center">
+            <h3 class="text-sm font-black text-slate-800 uppercase mb-6 tracking-tight">Set Status</h3>
+            <div class="grid gap-3">
+                <button onclick="updateStatus('approved')" class="p-4 rounded-xl bg-emerald-50 text-emerald-700 font-black uppercase text-[10px] border border-emerald-100">✅ Approve</button>
+                <button onclick="updateStatus('rejected')" class="p-4 rounded-xl bg-rose-50 text-rose-700 font-black uppercase text-[10px] border border-rose-100">❌ Reject</button>
+            </div>
+            <button onclick="closeStatusModal()" class="mt-6 text-[9px] font-black text-slate-400 uppercase">Close</button>
         </div>
     </div>
 
@@ -210,24 +181,32 @@
         
         let activeId = null;
 
+        // Dynamic Year for Footer
+        document.getElementById('footerYear').innerText = new Date().getFullYear();
+
         function toggleSlide(type) {
             const panel = document.getElementById(`slide-${type}`);
             panel.classList.toggle('open');
-            if(panel.classList.contains('open')) {
-                document.getElementById(`text-${type}`).focus();
-            }
         }
 
         async function saveEntry(type) {
             const textarea = document.getElementById(`text-${type}`);
             const content = textarea.value;
-            if(!content) return alert("Paki-sulat muna ang mensahe!");
-            const { error } = await sb.from('music_announcements').insert([{ content, type, author: 'Admin', active: true }]);
+            if(!content) return alert("Empty content!");
+
+            const { error } = await sb.from('music_announcements').insert([{ 
+                content: content, 
+                type: type, 
+                author: 'Admin'
+            }]);
+
             if(!error) {
                 textarea.value = "";
                 toggleSlide(type);
                 fetchNews();
-                alert("Published! ✨");
+                alert("Successfully Updated! ✨");
+            } else {
+                alert("Error: " + error.message);
             }
         }
 
@@ -239,6 +218,7 @@
                 document.getElementById('genMonth').innerText = d.toLocaleString('default',{month:'short'}).toUpperCase();
                 document.getElementById('genDay').innerText = d.getDate();
             }
+
             const { data: m } = await sb.from('music_announcements').select('*').eq('type', 'music').order('created_at',{ascending:false}).limit(1);
             if(m?.[0]) {
                 const d = new Date(m[0].created_at);
@@ -249,8 +229,8 @@
         }
 
         async function loadData() {
-            const { data: progs, error } = await sb.from('programs').select('*').order('created_at', {ascending: false});
-            if(error) return;
+            const { data: progs } = await sb.from('programs').select('*').order('created_at', {ascending: false});
+            if(!progs) return;
 
             document.getElementById('countPending').innerText = progs.filter(x => x.status === 'pending').length;
             document.getElementById('countMusic').innerText = progs.length;
@@ -259,24 +239,24 @@
 
             const q = progs.filter(x => x.status === 'pending');
             document.getElementById('pList').innerHTML = q.length ? q.map(i => `
-                <div onclick="showProg('${i.id}')" class="p-6 bg-white rounded-3xl border border-slate-50 hover:border-emerald-500 hover:shadow-xl cursor-pointer transition-all">
-                    <p class="font-black text-sm text-slate-800 uppercase tracking-tighter">${i.user_id}</p>
-                    <p class="text-[9px] text-slate-400 font-bold uppercase mt-1 tracking-widest">${i.title}</p>
-                </div>`).join('') : '<p class="text-center py-10 text-[10px] text-slate-300 font-black uppercase">Queue Clear</p>';
+                <div onclick="showProg('${i.id}')" class="p-4 bg-white rounded-2xl border border-slate-100 hover:border-emerald-500 cursor-pointer transition-all shadow-sm">
+                    <p class="font-black text-xs text-slate-800 uppercase">${i.user_id}</p>
+                    <p class="text-[8px] text-slate-400 font-bold uppercase truncate">${i.title}</p>
+                </div>`).join('') : '<p class="text-center py-10 text-[9px] text-slate-300 font-black uppercase">Queue Clear</p>';
 
             document.getElementById('registryTable').innerHTML = progs.filter(x => x.status !== 'pending').map(i => {
                 const color = i.status === 'approved' ? '#10b981' : '#ef4444';
                 return `
-                <tr class="hover:bg-slate-50/80 transition-colors">
-                    <td class="p-6">
-                        <p class="font-black text-xs uppercase tracking-tighter text-slate-700">${i.user_id}</p>
-                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">${i.title}</p>
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="p-4">
+                        <p class="font-black text-[10px] uppercase text-slate-700">${i.user_id}</p>
+                        <p class="text-[8px] font-bold text-slate-400 uppercase">${i.title}</p>
                     </td>
-                    <td class="p-6 text-center">
-                        <div class="rubber-stamp" style="color:${color}; border-color:${color}; opacity: 0.8;">${i.status}</div>
+                    <td class="p-4 text-center">
+                        <div class="rubber-stamp" style="color:${color}; border-color:${color};">${i.status}</div>
                     </td>
-                    <td class="p-6 text-right">
-                        <button onclick="deleteRow('${i.id}')" class="text-slate-300 hover:text-rose-500 transition-all"><i class="fa-solid fa-trash-can text-sm"></i></button>
+                    <td class="p-4 text-right">
+                        <button onclick="deleteRow('${i.id}')" class="text-slate-300 hover:text-rose-500 transition-all"><i class="fa-solid fa-trash text-xs"></i></button>
                     </td>
                 </tr>`;
             }).join('');
@@ -290,23 +270,27 @@
             const dc = document.getElementById('detailContent');
             dc.classList.remove('hidden');
 
-            const contentHtml = i.content && Array.isArray(i.content) ? i.content.map((item, idx) => `
-                <div class="bg-slate-50 p-4 rounded-2xl flex gap-4">
-                    <span class="bg-white w-6 h-6 rounded flex items-center justify-center font-black text-[10px] text-emerald-600">${idx+1}</span>
-                    <div>
-                        <p class="text-[9px] font-black text-slate-400 uppercase mb-1">${item.act || 'Activity'}</p>
-                        <p class="text-xs font-bold text-slate-700">${item.who || '---'}</p>
+            let contentArray = [];
+            try {
+                contentArray = typeof i.content === 'string' ? JSON.parse(i.content) : i.content;
+            } catch(e) { contentArray = []; }
+
+            const contentHtml = contentArray.map((item, idx) => `
+                <div class="bg-slate-50 p-3 rounded-xl flex gap-3 border border-slate-100">
+                    <span class="bg-emerald-500 w-5 h-5 rounded flex items-center justify-center font-black text-[9px] text-white shrink-0">${idx+1}</span>
+                    <div class="truncate">
+                        <p class="text-[8px] font-black text-slate-400 uppercase">${item.act || 'Activity'}</p>
+                        <p class="text-[11px] font-bold text-slate-700 truncate">${item.who || '---'}</p>
                     </div>
-                </div>
-            `).join('') : '';
+                </div>`).join('');
 
             dc.innerHTML = `
-                <div class="mb-8">
-                    <h2 class="text-3xl font-black text-slate-800 uppercase tracking-tighter mb-1">${i.user_id}</h2>
-                    <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">${i.title} • ${i.program_date}</p>
+                <div class="mb-6">
+                    <h2 class="text-xl font-black text-slate-800 uppercase tracking-tighter">${i.user_id}</h2>
+                    <p class="text-[9px] font-bold text-emerald-600 uppercase tracking-widest">${i.title} • ${i.program_date}</p>
                 </div>
-                <div class="flex-1 overflow-y-auto space-y-3 mb-8 custom-scroll">${contentHtml}</div>
-                <button onclick="openStatusModal()" class="w-full bg-[#2D4E53] text-white py-5 rounded-[2rem] font-black uppercase text-[11px] tracking-widest shadow-2xl">Finalize Decision</button>`;
+                <div class="flex-1 overflow-y-auto space-y-2 mb-6 custom-scroll pr-2">${contentHtml}</div>
+                <button onclick="openStatusModal()" class="w-full bg-[#2D4E53] text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl transition-all hover:bg-emerald-700">Set Status</button>`;
         }
 
         function openStatusModal() { document.getElementById('statusModal').classList.remove('hidden'); }
@@ -317,17 +301,16 @@
             if(!error) { closeStatusModal(); loadData(); document.getElementById('detailContent').classList.add('hidden'); document.getElementById('detailPlaceholder').classList.remove('hidden'); }
         }
 
-        async function deleteRow(id) { if(confirm("Delete record?")) { await sb.from('programs').delete().eq('id', id); loadData(); } }
+        async function deleteRow(id) { if(confirm("Delete record permanent?")) { await sb.from('programs').delete().eq('id', id); loadData(); } }
 
-        setInterval(() => { 
+        function updateClock() {
             const el = document.getElementById('liveTime');
             if(el) {
                 const now = new Date();
-                const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                el.innerHTML = `🕒 ${timeStr} | ${dateStr}`;
+                el.innerText = now.toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
             }
-        }, 1000);
+        }
+        setInterval(updateClock, 1000);
 
         fetchNews(); loadData();
     </script>
