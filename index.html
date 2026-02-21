@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title> Viewer Portal | MCB Balilihan</title>
+    <title>Premium Viewer Portal | MCB Balilihan</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#10b981">
@@ -51,6 +51,7 @@
             transition: 0.3s; border: 1px solid #f1f5f9; cursor: pointer;
         }
         .calendar-day:hover { background: var(--mc-emerald); color: white; transform: translateY(-3px); }
+        .holiday-day { border: 2px solid #ef4444 !important; color: #ef4444; }
 
         .bottom-menu {
             position: fixed; bottom: 0; left: 0; right: 0; height: 75px;
@@ -86,7 +87,7 @@
     <nav class="sticky top-0 z-[100] glass-nav px-6 py-3">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <img src="mcb.png" class="w-10 h-10 object-contain" alt="Logo">
+                <img src="mcb.png" class="w-10 h-10 object-contain" alt="Logo" onerror="this.src='https://via.placeholder.com/40'">
                 <div>
                     <h1 class="font-black text-slate-800 uppercase text-sm tracking-tighter leading-none">MCB <span class="text-emerald-500">Viewer</span></h1>
                     <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Mobilization Church Balilihan</p>
@@ -198,8 +199,8 @@
                     </div>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="changeMonth(-1)" class="w-8 h-8 flex items-center justify-center bg-white border rounded-lg">←</button>
-                    <button onclick="changeMonth(1)" class="w-8 h-8 flex items-center justify-center bg-white border rounded-lg">→</button>
+                    <button onclick="changeMonth(-1)" class="w-8 h-8 flex items-center justify-center bg-white border rounded-lg hover:bg-slate-50 transition-colors">←</button>
+                    <button onclick="changeMonth(1)" class="w-8 h-8 flex items-center justify-center bg-white border rounded-lg hover:bg-slate-50 transition-colors">→</button>
                 </div>
             </div>
             <div id="calendarGrid" class="grid grid-cols-7 gap-2 relative z-10"></div>
@@ -236,10 +237,10 @@
             <h3 class="text-xl font-black text-slate-800 uppercase italic">Admin Access</h3>
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-8">Enter Security PIN</p>
             <div class="flex justify-center gap-3 mb-8">
-                <input type="password" maxlength="1" class="pin-input" onkeyup="moveFocus(this, 'p2')" id="p1">
-                <input type="password" maxlength="1" class="pin-input" onkeyup="moveFocus(this, 'p3')" id="p2">
-                <input type="password" maxlength="1" class="pin-input" onkeyup="moveFocus(this, 'p4')" id="p3">
-                <input type="password" maxlength="1" class="pin-input" onkeyup="validatePin(this)" id="p4">
+                <input type="password" inputmode="numeric" maxlength="1" class="pin-input" onkeyup="moveFocus(this, 'p2')" id="p1">
+                <input type="password" inputmode="numeric" maxlength="1" class="pin-input" onkeyup="moveFocus(this, 'p3')" id="p2">
+                <input type="password" inputmode="numeric" maxlength="1" class="pin-input" onkeyup="moveFocus(this, 'p4')" id="p3">
+                <input type="password" inputmode="numeric" maxlength="1" class="pin-input" onkeyup="validatePinFinal(this)" id="p4">
             </div>
             <button onclick="closePinModal()" class="text-[9px] font-black text-slate-400 uppercase tracking-widest underline">Cancel</button>
         </div>
@@ -280,12 +281,10 @@
     </nav>
 
     <script>
-        // PWA Service Worker Registration
+        // PWA SW Registration with path fix
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./service-worker.js')
-                .then(reg => console.log('Service Worker Registered'))
-                .catch(err => console.log('Service Worker Registration Failed', err));
+                navigator.serviceWorker.register('./service-worker.js').catch(err => console.log(err));
             });
         }
 
@@ -294,6 +293,25 @@
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
         let allPrograms = [];
+
+        // 2026 Philippine Holidays
+        const PHIL_HOLIDAYS_2026 = {
+            "01-01": "New Year's Day",
+            "02-17": "Chinese New Year",
+            "02-25": "EDSA Revolution",
+            "04-02": "Maundy Thursday",
+            "04-03": "Good Friday",
+            "04-04": "Black Saturday",
+            "04-09": "Araw ng Kagitingan",
+            "05-01": "Labor Day",
+            "06-12": "Independence Day",
+            "08-31": "National Heroes Day",
+            "11-01": "All Saints' Day",
+            "11-30": "Bonifacio Day",
+            "12-08": "Feast of the Immaculate Conception",
+            "12-25": "Christmas Day",
+            "12-30": "Rizal Day"
+        };
 
         function updateClock() {
             const now = new Date();
@@ -340,26 +358,51 @@
             const grid = document.getElementById('calendarGrid'); grid.innerHTML = '';
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
             const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            
             document.getElementById('calendarMonth').innerText = new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long', year: 'numeric' });
+            
             for(let i=0; i<firstDay; i++) grid.appendChild(document.createElement('div'));
+            
             for(let i=1; i<=daysInMonth; i++) {
-                const fullDate = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                const dayKey = `${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                const fullDate = `${currentYear}-${dayKey}`;
+                
+                const isHoliday = PHIL_HOLIDAYS_2026[dayKey];
                 const hasP = allPrograms.some(p => p.program_date === fullDate && p.title.toLowerCase() !== 'music');
                 const hasM = allPrograms.some(p => p.program_date === fullDate && p.title.toLowerCase() === 'music');
+                
                 const dayDiv = document.createElement('div');
-                dayDiv.className = "calendar-day";
-                dayDiv.innerHTML = `<span>${i}</span><div class="flex gap-0.5 mt-1">${hasP ? '<div class="w-1 h-1 rounded-full bg-emerald-500"></div>' : ''}${hasM ? '<div class="w-1 h-1 rounded-full bg-violet-500"></div>' : ''}</div>`;
-                dayDiv.onclick = () => showDayDetails(fullDate);
+                dayDiv.className = `calendar-day ${isHoliday ? 'holiday-day' : ''}`;
+                dayDiv.innerHTML = `
+                    <span>${i}</span>
+                    <div class="flex gap-0.5 mt-1">
+                        ${hasP ? '<div class="w-1 h-1 rounded-full bg-emerald-500"></div>' : ''}
+                        ${hasM ? '<div class="w-1 h-1 rounded-full bg-violet-500"></div>' : ''}
+                    </div>`;
+                dayDiv.onclick = () => showDayDetails(fullDate, isHoliday);
                 grid.appendChild(dayDiv);
             }
         }
 
-        function showDayDetails(dateStr) {
+        function showDayDetails(dateStr, holidayName) {
             const display = document.getElementById('selectedDateDisplay');
             const list = document.getElementById('eventListDisplay');
             const dayEvents = allPrograms.filter(d => d.program_date === dateStr);
+            
             display.innerText = new Date(dateStr).toDateString();
-            list.innerHTML = dayEvents.length ? dayEvents.map(ev => `<div class="p-3 bg-white border rounded-xl"><p class="text-[8px] font-black text-emerald-500 uppercase">${ev.title}</p><p class="font-bold text-slate-700 text-[10px]">${ev.user_id}</p></div>`).join('') : '<p class="text-[9px] text-slate-400 italic">No events.</p>';
+            
+            let html = holidayName ? `<div class="p-3 bg-red-50 border border-red-100 rounded-xl mb-2"><p class="text-[8px] font-black text-red-500 uppercase">PHILIPPINE HOLIDAY</p><p class="font-bold text-red-700 text-[10px]">${holidayName}</p></div>` : '';
+            
+            if(dayEvents.length) {
+                html += dayEvents.map(ev => `
+                    <div class="p-3 bg-white border rounded-xl">
+                        <p class="text-[8px] font-black text-emerald-500 uppercase">${ev.title}</p>
+                        <p class="font-bold text-slate-700 text-[10px]">${ev.user_id}</p>
+                    </div>`).join('');
+            } else if (!holidayName) {
+                html = '<p class="text-[9px] text-slate-400 italic">No events scheduled.</p>';
+            }
+            list.innerHTML = html;
         }
 
         function openAnnModal(msg, time, type) {
@@ -367,15 +410,42 @@
             document.getElementById('modalContent').innerText = `"${msg}"\n\nPosted: ${time}`;
             document.getElementById('generalModal').classList.remove('hidden');
         }
+
         function closeModal() { document.getElementById('generalModal').classList.add('hidden'); }
         function showPinModal() { document.getElementById('pinModal').classList.remove('hidden'); }
-        function closePinModal() { document.getElementById('pinModal').classList.add('hidden'); }
-        function moveFocus(c, n) { if(c.value) document.getElementById(n).focus(); }
-        function validatePin() {
-            const pin = document.getElementById('p1').value + document.getElementById('p2').value + document.getElementById('p3').value + document.getElementById('p4').value;
-            if(pin === "0000") window.location.href = 'admin.html';
+        function closePinModal() { 
+            document.getElementById('pinModal').classList.add('hidden');
+            document.querySelectorAll('.pin-input').forEach(i => i.value = '');
         }
-        function changeMonth(s) { currentMonth += s; if(currentMonth>11){currentMonth=0;currentYear++} if(currentMonth<0){currentMonth=11;currentYear--} buildCalendar(); }
+
+        function moveFocus(c, n) { 
+            if(c.value && n) document.getElementById(n).focus(); 
+        }
+
+        function validatePinFinal(c) {
+            const p1 = document.getElementById('p1').value;
+            const p2 = document.getElementById('p2').value;
+            const p3 = document.getElementById('p3').value;
+            const p4 = c.value;
+            const pin = p1 + p2 + p3 + p4;
+            
+            if(pin.length === 4) {
+                if(pin === "0000") {
+                    window.location.href = 'admin.html';
+                } else {
+                    alert("Incorrect PIN. Access Denied.");
+                    document.querySelectorAll('.pin-input').forEach(i => i.value = '');
+                    document.getElementById('p1').focus();
+                }
+            }
+        }
+
+        function changeMonth(s) { 
+            currentMonth += s; 
+            if(currentMonth > 11) { currentMonth = 0; currentYear++; } 
+            if(currentMonth < 0) { currentMonth = 11; currentYear--; } 
+            buildCalendar(); 
+        }
 
         loadViewerData();
     </script>
