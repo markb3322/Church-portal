@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Viewer Portal | MCB Balilihan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Special+Elite&display=swap');
+        
+        :root { --mc-green: #2D4E53; --mc-gold: #D4AF37; --mc-emerald: #10b981; --mc-violet: #8b5cf6; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fcfcfd; color: #1e293b; min-height: 100vh; display: flex; flex-direction: column; }
+        
+        .glass-card { background: rgba(255, 255, 255, 0.9); border-radius: 1.5rem; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.02); transition: all 0.3s ease; }
+        .glass-card:hover { border-color: rgba(16, 185, 129, 0.2); cursor: pointer; }
+        
+        /* CALENDAR STYLE */
+        .calendar-day { aspect-ratio: 1/1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 1rem; transition: 0.2s; border: 1px solid #f8fafc; cursor: pointer; background: #fff; position: relative; }
+        .calendar-day:hover { transform: scale(1.05); background: #f1f5f9; box-shadow: 0 4px 12px rgba(0,0,0,0.05); z-index: 10; }
+        .calendar-day.today { border: 2px solid var(--mc-gold); background: #fffef0; }
+        
+        .badge-dot { width: 5px; height: 5px; border-radius: 50%; }
+        .dot-program { background-color: var(--mc-emerald); box-shadow: 0 0 6px var(--mc-emerald); }
+        .dot-music { background-color: var(--mc-violet); box-shadow: 0 0 6px var(--mc-violet); }
+        
+        .rubber-stamp { font-family: 'Special Elite', cursive; border: 2px solid currentColor; padding: 2px 8px; transform: rotate(-10deg); border-radius: 4px; display: inline-block; font-size: 0.75rem; }
+        
+        .nav-link { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; transition: 0.2s; cursor: pointer; }
+        .nav-link:hover { color: var(--mc-emerald); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-up { animation: fadeIn 0.5s ease-out forwards; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <nav class="sticky top-0 z-[100] bg-white/80 backdrop-blur-md border-b border-slate-100">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <img src="mcb.png" class="w-9 h-9 object-contain" alt="Logo">
+                <div>
+                    <h1 class="font-black text-slate-800 uppercase text-xs leading-none tracking-tighter">MCB <span class="text-emerald-500">Viewer</span></h1>
+                    <p class="text-[7px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">Mobilization Church</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="hidden md:flex items-center gap-6 mr-2">
+                    <a href="user.html" class="nav-link text-slate-500">User</a>
+                    <a href="pwmusic.html" class="nav-link text-slate-500">Music</a>
+                    <a href="dashboard.html" class="nav-link text-emerald-600">Dashboard</a>
+                    <button onclick="openLoginModal()" class="nav-link text-amber-600">Admin</button>
+                </div>
+                <div class="text-right hidden sm:block">
+                    <div id="greetingText" class="text-[8px] font-black text-emerald-500 uppercase tracking-widest mb-0.5 text-right">---</div>
+                    <div id="liveClock" class="text-[10px] font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-lg border border-slate-200">---</div>
+                </div>
+                <button onclick="toggleMenu()" class="md:hidden text-slate-600 p-2"><i class="fa-solid fa-bars-staggered"></i></button>
+            </div>
+        </div>
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-b border-slate-100 p-6 space-y-4 shadow-xl">
+            <a href="user.html" class="block nav-link text-slate-600">User Portal</a>
+            <a href="pwmusic.html" class="block nav-link text-slate-600">Music Portal</a>
+            <a href="dashboard.html" class="block nav-link text-emerald-600">Dashboard</a>
+            <button onclick="openLoginModal()" class="block nav-link text-amber-600">Admin Login</button>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-6 py-8 space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div onclick="viewAnnouncement('pastor')" class="glass-card p-4 border-l-4 border-amber-400 flex items-center gap-4 animate-up">
+                <div class="bg-amber-50 w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-amber-500 text-xs"><i class="fa-solid fa-quote-left"></i></div>
+                <div class="overflow-hidden">
+                    <h3 class="text-[8px] font-black uppercase text-slate-400 tracking-widest">Pastor's Word</h3>
+                    <p id="pastorNote" class="text-xs font-bold text-slate-700 italic truncate">"Loading..."</p>
+                </div>
+            </div>
+            <div onclick="viewAnnouncement('music')" class="glass-card p-4 border-l-4 border-violet-500 flex items-center gap-4 animate-up" style="animation-delay: 0.1s;">
+                <div class="bg-violet-50 w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-violet-500 text-xs"><i class="fa-solid fa-bullhorn"></i></div>
+                <div class="overflow-hidden">
+                    <h3 class="text-[8px] font-black uppercase text-slate-400 tracking-widest">Music Update</h3>
+                    <p id="musicNote" class="text-xs font-bold text-slate-700 truncate">Loading...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-8 space-y-6">
+                <section class="glass-card p-6 animate-up" style="animation-delay: 0.2s;">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-sm font-black text-slate-800 uppercase italic tracking-tighter">Approved Programs</h3>
+                        <span class="text-[8px] font-bold bg-emerald-100 text-emerald-600 px-2 py-1 rounded">OFFICIAL</span>
+                    </div>
+                    <div class="space-y-2" id="programBody"></div>
+                </section>
+
+                <section class="glass-card p-6 animate-up" style="animation-delay: 0.3s;">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-sm font-black text-slate-800 uppercase italic tracking-tighter">Music Lineups</h3>
+                        <i class="fa-solid fa-guitar text-violet-400 text-xs"></i>
+                    </div>
+                    <div class="space-y-2" id="musicBody"></div>
+                </section>
+            </div>
+
+            <div class="lg:col-span-4">
+                <section class="glass-card p-6 sticky top-28 animate-up" style="animation-delay: 0.4s;">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 id="calendarMonth" class="text-xs font-black uppercase text-slate-800 tracking-tighter">---</h3>
+                        <div class="flex gap-2">
+                            <button onclick="changeMonth(-1)" class="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"><i class="fa-solid fa-chevron-left text-[10px]"></i></button>
+                            <button onclick="changeMonth(1)" class="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"><i class="fa-solid fa-chevron-right text-[10px]"></i></button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-7 gap-2 mb-2 text-[9px] font-black text-slate-300 text-center uppercase">
+                        <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                    </div>
+                    <div id="calendarGrid" class="grid grid-cols-7 gap-2"></div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer class="mt-auto bg-white border-t border-slate-100 py-10">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-8">
+                <div class="text-center md:text-left">
+                    <div class="flex items-center justify-center md:justify-start gap-2 mb-2">
+                        <img src="mcb.png" class="w-6 h-6 grayscale opacity-50" alt="Logo">
+                        <h4 class="text-xs font-black uppercase text-slate-400 tracking-widest">MCB Balilihan</h4>
+                    </div>
+                    <p class="text-[10px] text-slate-400 font-medium italic">Mobilization Church Balilihan</p>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <a href="https://www.facebook.com/MCBBalilihan" target="_blank" class="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400 hover:bg-blue-600 hover:text-white transition-all">
+                        <i class="fa-brands fa-facebook-f text-sm"></i>
+                    </a>
+                    <a href="mailto:contact@mcbbalilihan.org" class="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400 hover:bg-emerald-600 hover:text-white transition-all">
+                        <i class="fa-solid fa-envelope text-sm"></i>
+                    </a>
+                </div>
+
+                <div class="text-center md:text-right">
+                    <p class="text-[8px] font-black text-slate-300 uppercase tracking-widest">System Developer</p>
+                    <p class="text-[11px] font-bold text-slate-800">Mark Brian D. Angco 🫶</p>
+                </div>
+            </div>
+            <p class="mt-8 text-center text-[8px] font-bold text-slate-300 uppercase tracking-[0.3em]">&copy; 2026 MCB Balilihan</p>
+        </div>
+    </footer>
+
+    <div id="viewModal" class="fixed inset-0 z-[200] flex items-center justify-center hidden p-4">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeModal()"></div>
+        <div class="bg-white w-full max-w-lg rounded-[2.5rem] relative max-h-[85vh] flex flex-col animate-up">
+            <div class="p-8 overflow-y-auto">
+                <div class="text-center mb-8">
+                    <img src="mcb.png" class="w-10 h-10 mx-auto mb-4 grayscale" alt="Logo">
+                    <h4 id="modalType" class="text-[8px] font-black text-emerald-500 uppercase tracking-[0.4em] mb-2">REPORT</h4>
+                    <h2 id="modalTitle" class="text-xl font-black text-slate-800 uppercase italic tracking-tighter">---</h2>
+                </div>
+                <div id="modalContent" class="space-y-1"></div>
+            </div>
+            <button onclick="closeModal()" class="m-6 bg-slate-100 text-slate-500 py-4 rounded-2xl font-black uppercase text-[9px] tracking-widest hover:bg-slate-200 transition-all">Close Viewer</button>
+        </div>
+    </div>
+
+    <div id="loginModal" class="fixed inset-0 z-[300] flex items-center justify-center hidden p-4">
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeLoginModal()"></div>
+        <div class="bg-white w-full max-w-xs rounded-3xl shadow-2xl relative p-8 text-center animate-up">
+            <div class="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center text-amber-500 mx-auto mb-4"><i class="fa-solid fa-lock"></i></div>
+            <h2 class="text-xs font-black uppercase mb-6 tracking-widest text-slate-800">Admin PIN</h2>
+            <input type="password" id="adminPinInput" maxlength="4" placeholder="••••" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl py-3 text-center text-xl font-black mb-4 outline-none focus:border-emerald-500 tracking-[0.5em]">
+            <button onclick="checkAdminPin()" class="w-full bg-slate-900 text-white py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-600 transition-colors">Verify</button>
+        </div>
+    </div>
+
+    <script>
+        const sb = supabase.createClient('https://eejovtuputrwneovhfpc.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlam92dHVwdXRyd25lb3ZoZnBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMjY5MzIsImV4cCI6MjA4NjgwMjkzMn0.JJz64gSTT9qSqOkiJvuL1PT_H_I4ZYJbchrmkoljwws');
+
+        let allData = [];
+        let announcements = []; 
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+
+        function toggleMenu() { document.getElementById('mobileMenu').classList.toggle('hidden'); }
+        function openLoginModal() { document.getElementById('loginModal').classList.remove('hidden'); document.getElementById('adminPinInput').focus(); }
+        function closeLoginModal() { document.getElementById('loginModal').classList.add('hidden'); }
+        function checkAdminPin() { 
+            if (document.getElementById('adminPinInput').value === "1234") window.location.href = "admin.html"; 
+            else { alert("Access Denied"); document.getElementById('adminPinInput').value = ''; }
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const hour = now.getHours();
+            const gText = document.getElementById('greetingText');
+            const lClock = document.getElementById('liveClock');
+            if(gText) gText.innerText = hour < 12 ? "Good Morning!" : hour < 18 ? "Good Afternoon!" : "Good Evening!";
+            if(lClock) lClock.innerText = now.toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        }
+        setInterval(updateClock, 1000); updateClock();
+
+        async function loadViewerData() {
+            try {
+                // Fetch Announcements - Debugged Mapping
+                const { data: ann, error: annErr } = await sb.from('music_announcements').select('*');
+                if(!annErr && ann) {
+                    announcements = ann;
+                    // Pinapagana ang tamang paghahanap kahit iba ang casing sa database
+                    const pAnn = announcements.find(a => a.type.toLowerCase().trim() === 'pastor');
+                    const mAnn = announcements.find(a => a.type.toLowerCase().trim() === 'music');
+                    
+                    document.getElementById('pastorNote').innerText = pAnn ? `"${pAnn.content}"` : "No message today.";
+                    document.getElementById('musicNote').innerText = mAnn ? mAnn.content : "No music updates.";
+                }
+
+                // Fetch Programs
+                const { data: programs, error: progErr } = await sb.from('programs').select('*').eq('status', 'approved').order('program_date', {ascending: false});
+                if(!progErr) {
+                    allData = programs || [];
+                    renderTables();
+                    buildCalendar();
+                }
+            } catch (e) { console.error("Database Connection Error:", e); }
+        }
+
+        function viewAnnouncement(type) {
+            const ann = announcements.find(a => a.type.toLowerCase().trim() === type);
+            if(!ann) return;
+
+            document.getElementById('modalType').innerText = type === 'pastor' ? "PASTOR'S WORD" : "MUSIC ANNOUNCEMENT";
+            document.getElementById('modalTitle').innerText = type === 'pastor' ? "Message for the Church" : "Worship Updates";
+            
+            document.getElementById('modalContent').innerHTML = `
+                <div class="p-6 bg-slate-50 rounded-[2rem] border border-slate-100 text-center">
+                    <i class="fa-solid ${type === 'pastor' ? 'fa-quote-left text-amber-400' : 'fa-bullhorn text-violet-400'} text-3xl mb-4 block"></i>
+                    <p class="text-base font-bold text-slate-700 leading-relaxed italic">"${ann.content}"</p>
+                    <p class="text-[9px] mt-4 font-black text-slate-300 uppercase tracking-widest">Post Date: ${new Date(ann.created_at).toLocaleDateString()}</p>
+                </div>
+                <div class="mt-8 text-center"><div class="rubber-stamp ${type === 'pastor' ? 'text-amber-500' : 'text-violet-500'} font-black uppercase">Official Update</div></div>
+            `;
+            document.getElementById('viewModal').classList.remove('hidden');
+        }
+
+        function renderTables() {
+            const progBody = document.getElementById('programBody');
+            const musicBody = document.getElementById('musicBody');
+            
+            const pData = allData.filter(d => d.title.toLowerCase().trim() !== 'music');
+            const mData = allData.filter(d => d.title.toLowerCase().trim() === 'music');
+
+            progBody.innerHTML = pData.slice(0, 5).map(d => `
+                <div onclick="viewItem('${d.id}')" class="flex justify-between items-center p-3 bg-slate-50 hover:bg-emerald-50 rounded-xl cursor-pointer transition-all border border-transparent hover:border-emerald-100">
+                    <div class="overflow-hidden">
+                        <p class="text-[11px] font-black text-slate-800 uppercase tracking-tight truncate">${d.title}</p>
+                        <p class="text-[8px] font-bold text-slate-400 uppercase mt-0.5">${d.program_date}</p>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-[8px] text-slate-300 ml-2"></i>
+                </div>
+            `).join('') || '<p class="text-center text-[9px] text-slate-300 py-4">No active programs</p>';
+
+            musicBody.innerHTML = mData.slice(0, 5).map(d => `
+                <div onclick="viewItem('${d.id}')" class="flex justify-between items-center p-3 bg-slate-50 hover:bg-violet-50 rounded-xl cursor-pointer transition-all border border-transparent hover:border-violet-100">
+                    <div class="overflow-hidden">
+                        <p class="text-[11px] font-black text-slate-800 uppercase tracking-tight truncate">Lineup: ${d.user_id || 'Team'}</p>
+                        <p class="text-[8px] font-bold text-slate-400 uppercase mt-0.5">${d.program_date}</p>
+                    </div>
+                    <i class="fa-solid fa-guitar text-[8px] text-slate-300 ml-2"></i>
+                </div>
+            `).join('') || '<p class="text-center text-[9px] text-slate-300 py-4">No music lineups</p>';
+        }
+
+        function viewItem(id) {
+            const item = allData.find(d => d.id == id);
+            if(!item) return;
+
+            const isMusic = item.title.toLowerCase().trim() === 'music';
+            document.getElementById('modalTitle').innerText = isMusic ? `Lineup: ${item.user_id || 'Worship Team'}` : item.title;
+            document.getElementById('modalType').innerText = isMusic ? "MUSIC SERVICE" : "OFFICIAL PROGRAM";
+            
+            let rows = [];
+            try { rows = typeof item.content === 'string' ? JSON.parse(item.content) : item.content; } catch(e) { rows = []; }
+
+            let contentHtml = `<div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 mb-6 text-center"><p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Date</p><p class="text-sm font-black text-emerald-600 uppercase">${item.program_date}</p></div>`;
+            
+            if(Array.isArray(rows)) {
+                rows.forEach(r => { 
+                    contentHtml += `<div class="flex justify-between items-center p-3 border-b border-slate-50">
+                        <span class="text-[9px] font-bold text-slate-400 uppercase">${r.act || r.activity || 'Activity'}</span>
+                        <span class="text-[11px] font-black text-slate-700 italic">${r.who || r.person || '---'}</span>
+                    </div>`;
+                });
+            }
+            contentHtml += `<div class="mt-8 text-center"><div class="rubber-stamp text-emerald-500 font-black">MCB OFFICIAL</div></div>`;
+            
+            document.getElementById('modalContent').innerHTML = contentHtml;
+            document.getElementById('viewModal').classList.remove('hidden');
+        }
+
+        function buildCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            const monthText = document.getElementById('calendarMonth');
+            grid.innerHTML = '';
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const today = new Date();
+            
+            monthText.innerText = new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long', year: 'numeric' });
+            
+            for(let i=0; i<firstDay; i++) grid.appendChild(Object.assign(document.createElement('div'), {className: "opacity-0 pointer-events-none"}));
+            
+            for(let i=1; i<=daysInMonth; i++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = "calendar-day";
+                if(i === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear()) dayDiv.classList.add('today');
+                
+                const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+                const dayProgs = allData.filter(d => d.program_date === dateStr);
+                
+                dayDiv.innerHTML = `<span class="text-[10px] font-black text-slate-600">${i}</span>
+                                    <div class="flex gap-0.5 mt-1">
+                                        ${dayProgs.some(d=>d.title.toLowerCase().trim()!=='music') ? '<div class="badge-dot dot-program"></div>' : ''}
+                                        ${dayProgs.some(d=>d.title.toLowerCase().trim()==='music') ? '<div class="badge-dot dot-music"></div>' : ''}
+                                    </div>`;
+                
+                if(dayProgs.length > 0) dayDiv.onclick = () => viewItem(dayProgs[0].id);
+                grid.appendChild(dayDiv);
+            }
+        }
+
+        function changeMonth(s) { 
+            currentMonth += s; 
+            if(currentMonth>11){currentMonth=0;currentYear++} 
+            if(currentMonth<0){currentMonth=11;currentYear--} 
+            buildCalendar(); 
+        }
+        
+        function closeModal() { document.getElementById('viewModal').classList.add('hidden'); }
+        
+        // Initial Load
+        loadViewerData();
+    </script>
+</body>
+</html>
