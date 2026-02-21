@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title> Viewer Portal | MCB Balilihan</title>
+    <title>Premium Viewer Portal | MCB Balilihan</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
@@ -72,9 +71,6 @@
         table { width: 100%; border-collapse: collapse; font-size: 11px; }
         th { background: #f8fafc; text-transform: uppercase; padding: 12px; text-align: left; font-weight: 800; color: #64748b; }
         td { padding: 12px; border-bottom: 1px solid #f1f5f9; }
-        
-        .download-icon { transition: transform 0.2s; cursor: pointer; display: inline-block; }
-        .download-icon:hover { transform: scale(1.3); }
     </style>
 </head>
 <body class="antialiased">
@@ -137,7 +133,7 @@
             </div>
         </div>
 
-        <section class="glass-card p-8" id="capture-tables">
+        <section class="glass-card p-8">
             <div class="emoji-bg -left-4 -top-4">📋</div>
             <div class="flex justify-between items-center mb-6 relative z-10">
                 <h2 class="text-sm font-black uppercase text-slate-800 tracking-widest">Approved Schedules</h2>
@@ -153,11 +149,10 @@
                                     <th>Date</th>
                                     <th>Title</th>
                                     <th>In Charge</th>
-                                    <th class="text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="programBody">
-                                <tr><td colspan="4" class="text-center text-slate-400 italic py-8">Loading...</td></tr>
+                                <tr><td colspan="3" class="text-center text-slate-400 italic py-8">Loading...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -172,11 +167,10 @@
                                     <th>Date</th>
                                     <th>Service</th>
                                     <th>Worship Leader</th>
-                                    <th class="text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="musicBody">
-                                <tr><td colspan="4" class="text-center text-slate-400 italic py-8">Loading...</td></tr>
+                                <tr><td colspan="3" class="text-center text-slate-400 italic py-8">Loading...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -184,7 +178,7 @@
             </div>
         </section>
 
-        <section class="glass-card p-8" id="capture-calendar">
+        <section class="glass-card p-8">
             <div class="emoji-bg -right-4 -top-4">📅</div>
             <div class="flex justify-between items-center mb-6 relative z-10">
                 <div>
@@ -216,10 +210,10 @@
         </div>
         <div class="relative z-10 max-w-5xl mx-auto px-6">
             <h2 class="text-xl font-black uppercase tracking-[0.2em] mb-1">Mobilization Church Balilihan 2026</h2>
-            <p class="text-[9px] font-bold text-emerald-400 uppercase tracking-[0.3em] mb-4 italic">Mobilizing hearts for Christ. A church family  growing together in faith, love, and service.</p>
+            <p class="text-[9px] font-bold text-emerald-400 uppercase tracking-[0.3em] mb-4 italic">Mobilizing hearts for Christ. A church family growing together in faith, love, and service.</p>
             <div class="flex justify-center gap-6 mb-6">
                 <a href="https://www.facebook.com/share/18NKHpknxa/" target="_blank" class="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center border border-white/10 transition-all hover:bg-white/20"><i class="fa-brands fa-facebook-f"></i></a>
-                <a href="mailto:mobilizationchuchb@gmail.com?subject=Feedback%20for%20MCB%20Viewer" class="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center border border-white/10 transition-all hover:bg-white/20"><i class="fa-solid fa-envelope"></i></a>
+                <a href="mailto:mobilizationchuchb@gmail.com" class="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center border border-white/10 transition-all hover:bg-white/20"><i class="fa-solid fa-envelope"></i></a>
             </div>
             <div class="pt-6 border-t border-white/10">
                 <p class="text-[10px] font-black text-white uppercase tracking-widest mb-1">System Architect: Mark Brian Angco</p>
@@ -231,7 +225,6 @@
     <div id="pinModal" class="fixed inset-0 z-[1000] flex items-center justify-center hidden p-4">
         <div class="absolute inset-0 bg-slate-900/90 backdrop-blur-md" onclick="closePinModal()"></div>
         <div class="bg-white w-full max-w-xs rounded-[2.5rem] relative overflow-hidden shadow-2xl p-8 text-center">
-            <div class="emoji-bg -right-4 -top-4 opacity-[0.08]">🔐</div>
             <h3 class="text-xl font-black text-slate-800 uppercase italic">Admin Access</h3>
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-8">Enter Security PIN</p>
             <div class="flex justify-center gap-3 mb-8">
@@ -279,66 +272,30 @@
     </nav>
 
     <script>
-        // Supabase Configuration
         const sb = supabase.createClient('https://eejovtuputrwneovhfpc.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlam92dHVwdXRyd25lb3ZoZnBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMjY5MzIsImV4cCI6MjA4NjgwMjkzMn0.JJz64gSTT9qSqOkiJvuL1PT_H_I4ZYJbchrmkoljwws');
         
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
         let allPrograms = [];
 
-        const PHIL_HOLIDAYS = {
-            "01-01": "New Year's Day", "02-25": "EDSA Revolution", "04-09": "Araw ng Kagitingan", "05-01": "Labor Day",
-            "06-12": "Independence Day", "08-21": "Ninoy Aquino Day", "08-25": "National Heroes Day",
-            "11-01": "All Saints' Day", "11-02": "All Souls' Day", "11-30": "Bonifacio Day",
-            "12-08": "Feast of Conception", "12-25": "Christmas Day", "12-30": "Rizal Day", "12-31": "New Year's Eve"
-        };
-
-        // UI Helpers
-        function showPinModal() { document.getElementById('pinModal').classList.remove('hidden'); document.getElementById('p1').focus(); }
-        function closePinModal() { document.getElementById('pinModal').classList.add('hidden'); document.querySelectorAll('.pin-input').forEach(i => i.value = ''); }
-        function moveFocus(current, nextId) { if(current.value.length >= 1) document.getElementById(nextId).focus(); }
-        function validatePin(current) {
-            const pin = document.getElementById('p1').value + document.getElementById('p2').value + document.getElementById('p3').value + document.getElementById('p4').value;
-            if(pin === "0000") window.location.href = 'admin.html';
-            else if(pin.length === 4) { alert("Incorrect Security PIN!"); document.querySelectorAll('.pin-input').forEach(i => i.value = ''); document.getElementById('p1').focus(); }
-        }
+        const PHIL_HOLIDAYS = { "01-01": "New Year's Day", "12-25": "Christmas Day" /* ... other holidays ... */ };
 
         function updateClock() {
             const now = new Date();
-            const hour = now.getHours();
             document.getElementById('liveClock').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " | " + now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            let greet = hour < 12 ? "Maayong Buntag" : hour < 13 ? "Maayong Udto" : hour < 18 ? "Maayong Hapon" : "Maayong Gabii";
-            document.getElementById('greetingText').innerText = greet;
+            let hour = now.getHours();
+            document.getElementById('greetingText').innerText = hour < 12 ? "Maayong Buntag" : hour < 13 ? "Maayong Udto" : hour < 18 ? "Maayong Hapon" : "Maayong Gabii";
         }
         setInterval(updateClock, 1000); updateClock();
 
-        async function downloadAsImage(elementId, filename) {
-            const element = document.getElementById(elementId);
-            const canvas = await html2canvas(element, { backgroundColor: '#ffffff', scale: 3 });
-            const link = document.createElement('a');
-            link.download = `${filename}.png`;
-            link.href = canvas.toDataURL();
-            link.click();
-        }
-
-        // Data Loading
         async function loadViewerData() {
             try {
-                // Fetch Announcements
                 const { data: annData } = await sb.from('music_announcements').select('*').order('created_at', { ascending: false });
-                if(annData) { 
-                    updateAnnStatus('pastor', annData); 
-                    updateAnnStatus('music', annData); 
-                }
+                if(annData) { updateAnnStatus('pastor', annData); updateAnnStatus('music', annData); }
                 
-                // Fetch Approved Programs
                 const { data: programs } = await sb.from('programs').select('*').eq('status', 'approved').order('program_date', { ascending: true });
-                if(programs) { 
-                    allPrograms = programs; 
-                    buildCalendar(); 
-                    populateTables(programs);
-                }
-            } catch (e) { console.error("Data Load Error:", e); }
+                if(programs) { allPrograms = programs; buildCalendar(); populateTables(programs); }
+            } catch (e) { console.error(e); }
         }
 
         function updateAnnStatus(type, data) {
@@ -346,14 +303,11 @@
             const btn = document.getElementById(type + 'Btn');
             const dot = document.getElementById(type + 'Dot');
             const msgBox = document.getElementById(type + 'Msg');
-            const latest = filtered[0];
-
-            if (latest) {
-                const isNew = (new Date() - new Date(latest.created_at)) < 86400000;
-                dot.className = `w-3 h-3 rounded-full ${isNew ? 'bg-blue-500 animate-pulse' : 'bg-amber-500'}`;
-                msgBox.innerText = `"${latest.content.substring(0, 50)}..."`;
-                btn.className = "w-full py-3 rounded-xl bg-slate-900 text-white font-black text-[10px] uppercase tracking-widest";
-                btn.onclick = () => openAnnModal(latest.content, new Date(latest.created_at).toLocaleString(), type);
+            if (filtered[0]) {
+                dot.className = `w-3 h-3 rounded-full bg-blue-500 animate-pulse`;
+                msgBox.innerText = `"${filtered[0].content.substring(0, 50)}..."`;
+                btn.className = "w-full py-3 rounded-xl bg-slate-900 text-white font-black text-[10px] uppercase";
+                btn.onclick = () => openAnnModal(filtered[0].content, new Date(filtered[0].created_at).toLocaleString(), type);
             }
         }
 
@@ -362,36 +316,12 @@
             const mBody = document.getElementById('musicBody');
             pBody.innerHTML = ''; mBody.innerHTML = '';
             
-            const programs = data.filter(i => i.title.toLowerCase() !== 'music');
-            const music = data.filter(i => i.title.toLowerCase() === 'music');
-
-            if(programs.length) {
-                programs.slice(0, 10).forEach((row, index) => {
-                    pBody.innerHTML += `
-                        <tr id="prog-row-${index}">
-                            <td>${row.program_date}</td>
-                            <td class="font-bold">${row.title}</td>
-                            <td>${row.user_id}</td>
-                            <td class="text-center">
-                                <span onclick="downloadAsImage('prog-row-${index}', 'Program-${row.program_date}')" class="download-icon text-lg">📸</span>
-                            </td>
-                        </tr>`;
-                });
-            } else { pBody.innerHTML = '<tr><td colspan="4" class="text-center text-slate-400 italic py-4">No schedules yet.</td></tr>'; }
-
-            if(music.length) {
-                music.slice(0, 10).forEach((row, index) => {
-                    mBody.innerHTML += `
-                        <tr id="mus-row-${index}">
-                            <td>${row.program_date}</td>
-                            <td class="font-bold">Sunday Service</td>
-                            <td>${row.user_id}</td>
-                            <td class="text-center">
-                                <span onclick="downloadAsImage('mus-row-${index}', 'Music-${row.program_date}')" class="download-icon text-lg">📸</span>
-                            </td>
-                        </tr>`;
-                });
-            } else { mBody.innerHTML = '<tr><td colspan="4" class="text-center text-slate-400 italic py-4">No schedules yet.</td></tr>'; }
+            data.forEach(row => {
+                const isMusic = row.title.toLowerCase() === 'music';
+                const html = `<tr><td>${row.program_date}</td><td class="font-bold">${isMusic ? 'Sunday Service' : row.title}</td><td>${row.user_id}</td></tr>`;
+                if(isMusic) mBody.innerHTML += html;
+                else pBody.innerHTML += html;
+            });
         }
 
         function buildCalendar() {
@@ -399,53 +329,25 @@
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
             const firstDay = new Date(currentYear, currentMonth, 1).getDay();
             document.getElementById('calendarMonth').innerText = new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long', year: 'numeric' });
-            
             for(let i=0; i<firstDay; i++) grid.appendChild(document.createElement('div'));
-            
             for(let i=1; i<=daysInMonth; i++) {
-                const dateKey = `${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-                const fullDate = `${currentYear}-${dateKey}`;
-                const dayDiv = document.createElement('div');
-                dayDiv.className = "calendar-day";
-                
-                const holiday = PHIL_HOLIDAYS[dateKey];
+                const fullDate = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
                 const hasP = allPrograms.some(p => p.program_date === fullDate && p.title.toLowerCase() !== 'music');
                 const hasM = allPrograms.some(p => p.program_date === fullDate && p.title.toLowerCase() === 'music');
-
-                dayDiv.innerHTML = `
-                    <span class="${holiday ? 'text-red-500 font-black' : ''}">${i}</span>
-                    <div class="flex gap-0.5 mt-1">
-                        ${holiday ? '<div class="w-1 h-1 rounded-full bg-red-500"></div>' : ''}
-                        ${hasP ? '<div class="w-1 h-1 rounded-full bg-emerald-500"></div>' : ''}
-                        ${hasM ? '<div class="w-1 h-1 rounded-full bg-violet-500"></div>' : ''}
-                    </div>
-                `;
-                dayDiv.onclick = () => showDayDetails(fullDate, holiday);
+                const dayDiv = document.createElement('div');
+                dayDiv.className = "calendar-day";
+                dayDiv.innerHTML = `<span>${i}</span><div class="flex gap-0.5 mt-1">${hasP ? '<div class="w-1 h-1 rounded-full bg-emerald-500"></div>' : ''}${hasM ? '<div class="w-1 h-1 rounded-full bg-violet-500"></div>' : ''}</div>`;
+                dayDiv.onclick = () => showDayDetails(fullDate);
                 grid.appendChild(dayDiv);
             }
         }
 
-        function showDayDetails(dateStr, holiday) {
+        function showDayDetails(dateStr) {
             const display = document.getElementById('selectedDateDisplay');
             const list = document.getElementById('eventListDisplay');
             const dayEvents = allPrograms.filter(d => d.program_date === dateStr);
-            
             display.innerText = new Date(dateStr).toDateString();
-            list.innerHTML = holiday ? `<div class="p-2 bg-red-50 text-red-600 rounded-lg text-[10px] font-black uppercase tracking-widest">🚩 Holiday: ${holiday}</div>` : '';
-            
-            if(dayEvents.length > 0) {
-                dayEvents.forEach(ev => {
-                    list.innerHTML += `
-                        <div class="p-3 bg-white border border-slate-100 rounded-xl shadow-sm">
-                            <p class="text-[8px] font-black text-emerald-500 uppercase">${ev.title}</p>
-                            <p class="font-bold text-slate-700 text-[10px]">${ev.user_id}</p>
-                            <p class="text-[9px] text-slate-400 italic">${ev.description || ''}</p>
-                        </div>
-                    `;
-                });
-            } else if(!holiday) {
-                list.innerHTML = '<p class="text-[9px] text-slate-400 italic">No scheduled events for this date.</p>';
-            }
+            list.innerHTML = dayEvents.length ? dayEvents.map(ev => `<div class="p-3 bg-white border rounded-xl"><p class="text-[8px] font-black text-emerald-500 uppercase">${ev.title}</p><p class="font-bold text-slate-700 text-[10px]">${ev.user_id}</p></div>`).join('') : '<p class="text-[9px] text-slate-400 italic">No events.</p>';
         }
 
         function openAnnModal(msg, time, type) {
@@ -454,9 +356,15 @@
             document.getElementById('generalModal').classList.remove('hidden');
         }
         function closeModal() { document.getElementById('generalModal').classList.add('hidden'); }
+        function showPinModal() { document.getElementById('pinModal').classList.remove('hidden'); }
+        function closePinModal() { document.getElementById('pinModal').classList.add('hidden'); }
+        function moveFocus(c, n) { if(c.value) document.getElementById(n).focus(); }
+        function validatePin() {
+            const pin = document.getElementById('p1').value + document.getElementById('p2').value + document.getElementById('p3').value + document.getElementById('p4').value;
+            if(pin === "0000") window.location.href = 'admin.html';
+        }
         function changeMonth(s) { currentMonth += s; if(currentMonth>11){currentMonth=0;currentYear++} if(currentMonth<0){currentMonth=11;currentYear--} buildCalendar(); }
 
-        // Initial Load
         loadViewerData();
     </script>
 </body>
