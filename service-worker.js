@@ -1,7 +1,7 @@
 const CACHE_NAME = 'mcb-portal-v1';
 const ASSETS_TO_CACHE = [
   './',
-  './viewer.html',
+  './index.html',
   './manifest.json',
   './mcb.png'
 ];
