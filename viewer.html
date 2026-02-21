@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Viewer Portal | MCB Balilihan</title>
+    <title> Viewer Portal | MCB Balilihan</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#10b981">
@@ -280,12 +280,12 @@
     </nav>
 
     <script>
-        // Service Worker Registration
+        // PWA Service Worker Registration
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('service-worker.js')
-                .then(reg => console.log('SW Registered'))
-                .catch(err => console.log('SW Registration Failed', err));
+                navigator.serviceWorker.register('./service-worker.js')
+                .then(reg => console.log('Service Worker Registered'))
+                .catch(err => console.log('Service Worker Registration Failed', err));
             });
         }
 
@@ -294,8 +294,6 @@
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
         let allPrograms = [];
-
-        const PHIL_HOLIDAYS = { "01-01": "New Year's Day", "12-25": "Christmas Day" };
 
         function updateClock() {
             const now = new Date();
