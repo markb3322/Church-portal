@@ -66,19 +66,12 @@
     </nav>
 
     <main class="max-w-7xl mx-auto px-6 py-8 space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div onclick="viewAnnouncement('pastor')" class="glass-card p-4 border-l-4 border-amber-400 flex items-center gap-4 animate-up">
-                <div class="bg-amber-50 w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-amber-500 text-xs"><i class="fa-solid fa-quote-left"></i></div>
+        <div class="grid grid-cols-1 gap-4">
+            <div onclick="viewAnnouncement('pastor')" class="glass-card p-5 border-l-4 border-amber-400 flex items-center gap-4 animate-up">
+                <div class="bg-amber-50 w-12 h-12 shrink-0 rounded-full flex items-center justify-center text-amber-500 text-sm"><i class="fa-solid fa-quote-left"></i></div>
                 <div class="overflow-hidden">
-                    <h3 class="text-[8px] font-black uppercase text-slate-400 tracking-widest">Pastor's Word</h3>
-                    <p id="pastorNote" class="text-xs font-bold text-slate-700 italic truncate">"Loading..."</p>
-                </div>
-            </div>
-            <div onclick="viewAnnouncement('music')" class="glass-card p-4 border-l-4 border-violet-500 flex items-center gap-4 animate-up" style="animation-delay: 0.1s;">
-                <div class="bg-violet-50 w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-violet-500 text-xs"><i class="fa-solid fa-bullhorn"></i></div>
-                <div class="overflow-hidden">
-                    <h3 class="text-[8px] font-black uppercase text-slate-400 tracking-widest">Music Update</h3>
-                    <p id="musicNote" class="text-xs font-bold text-slate-700 truncate">Loading...</p>
+                    <h3 class="text-[9px] font-black uppercase text-slate-400 tracking-widest">Pastor's Word</h3>
+                    <p id="pastorNote" class="text-sm font-bold text-slate-700 italic truncate">"Loading..."</p>
                 </div>
             </div>
         </div>
@@ -213,15 +206,10 @@
             const lClock = document.getElementById('liveClock');
             
             let greeting = "";
-            if (hour >= 0 && hour < 12) {
-                greeting = "Maayong Buntag!";
-            } else if (hour === 12) {
-                greeting = "Maayong Udto!";
-            } else if (hour > 12 && hour < 18) {
-                greeting = "Maayong Hapon!";
-            } else {
-                greeting = "Maayong Gabii!";
-            }
+            if (hour >= 0 && hour < 12) greeting = "Maayong Buntag!";
+            else if (hour === 12) greeting = "Maayong Udto!";
+            else if (hour > 12 && hour < 18) greeting = "Maayong Hapon!";
+            else greeting = "Maayong Gabii!";
 
             if(gText) gText.innerText = greeting;
             if(lClock) lClock.innerText = now.toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -231,16 +219,17 @@
 
         async function loadViewerData() {
             try {
-                const { data: ann } = await sb.from('music_announcements').select('*');
-                if(ann) {
+                // Fetch announcements board
+                const { data: ann, error: annErr } = await sb.from('music_announcements').select('*');
+                if(!annErr && ann) {
                     announcements = ann;
-                    const pAnn = ann.find(a => a.type.toLowerCase().trim() === 'pastor');
-                    const mAnn = ann.find(a => a.type.toLowerCase().trim() === 'music');
+                    const pAnn = ann.find(a => a.type && a.type.toLowerCase().trim() === 'pastor');
                     document.getElementById('pastorNote').innerText = pAnn ? `"${pAnn.content}"` : "Waiting for word...";
-                    document.getElementById('musicNote').innerText = mAnn ? mAnn.content : "No music updates.";
                 }
-                const { data: programs } = await sb.from('programs').select('*').eq('status', 'approved').order('program_date', {ascending: false});
-                if(programs) {
+
+                // Fetch Programs
+                const { data: programs, error: progErr } = await sb.from('programs').select('*').eq('status', 'approved').order('program_date', {ascending: false});
+                if(!progErr && programs) {
                     allData = programs;
                     renderTables();
                     buildCalendar();
@@ -251,8 +240,9 @@
         function renderTables() {
             const progBody = document.getElementById('programBody');
             const musicBody = document.getElementById('musicBody');
-            const pData = allData.filter(d => d.title.toLowerCase().trim() !== 'music');
-            const mData = allData.filter(d => d.title.toLowerCase().trim() === 'music');
+            
+            const pData = allData.filter(d => d.title && d.title.toLowerCase().trim() !== 'music');
+            const mData = allData.filter(d => d.title && d.title.toLowerCase().trim() === 'music');
             
             progBody.innerHTML = pData.slice(0, 5).map(d => `
                 <div onclick="viewItem('${d.id}')" class="flex justify-between items-center p-3 bg-slate-50 hover:bg-emerald-50 rounded-xl cursor-pointer transition-all border border-transparent hover:border-emerald-100">
@@ -261,7 +251,7 @@
                         <p class="text-[8px] font-bold text-slate-400 uppercase mt-0.5">${d.program_date}</p>
                     </div>
                     <i class="fa-solid fa-chevron-right text-[8px] text-slate-300 ml-2"></i>
-                </div>`).join('') || '<p class="text-center text-[9px] text-slate-300 py-4">Database Cleared</p>';
+                </div>`).join('') || '<p class="text-center text-[9px] text-slate-300 py-4">No Approved Programs</p>';
 
             musicBody.innerHTML = mData.slice(0, 5).map(d => `
                 <div onclick="viewItem('${d.id}')" class="flex justify-between items-center p-3 bg-slate-50 hover:bg-violet-50 rounded-xl cursor-pointer transition-all border border-transparent hover:border-violet-100">
@@ -270,17 +260,17 @@
                         <p class="text-[8px] font-bold text-slate-400 uppercase mt-0.5">${d.program_date}</p>
                     </div>
                     <i class="fa-solid fa-guitar text-[8px] text-slate-300 ml-2"></i>
-                </div>`).join('') || '<p class="text-center text-[9px] text-slate-300 py-4">Database Cleared</p>';
+                </div>`).join('') || '<p class="text-center text-[9px] text-slate-300 py-4">No Music Lineups</p>';
         }
 
         function viewAnnouncement(type) {
-            const ann = announcements.find(a => a.type.toLowerCase().trim() === type);
+            const ann = announcements.find(a => a.type && a.type.toLowerCase().trim() === type.toLowerCase().trim());
             if(!ann) return;
-            document.getElementById('modalType').innerText = type === 'pastor' ? "PASTOR'S WORD" : "MUSIC ANNOUNCEMENT";
-            document.getElementById('modalTitle').innerText = type === 'pastor' ? "Message" : "Updates";
+            document.getElementById('modalType').innerText = "PASTOR'S WORD";
+            document.getElementById('modalTitle').innerText = "Message";
             document.getElementById('modalContent').innerHTML = `
                 <div class="p-6 bg-slate-50 rounded-[2rem] text-center">
-                    <i class="fa-solid ${type === 'pastor' ? 'fa-quote-left text-amber-400' : 'fa-bullhorn text-violet-400'} text-3xl mb-4 block"></i>
+                    <i class="fa-solid fa-quote-left text-amber-400 text-3xl mb-4 block"></i>
                     <p class="text-base font-bold text-slate-700 italic">"${ann.content}"</p>
                 </div>`;
             document.getElementById('viewModal').classList.remove('hidden');
@@ -289,14 +279,16 @@
         function viewItem(id) {
             const item = allData.find(d => d.id == id);
             if(!item) return;
-            const isMusic = item.title.toLowerCase().trim() === 'music';
+            const isMusic = item.title && item.title.toLowerCase().trim() === 'music';
             document.getElementById('modalTitle').innerText = isMusic ? `Lineup: ${item.user_id}` : item.title;
             let rows = [];
             try { rows = typeof item.content === 'string' ? JSON.parse(item.content) : item.content; } catch(e) { rows = []; }
             let contentHtml = `<div class="bg-slate-50 p-4 rounded-2xl text-center mb-6 font-black text-emerald-600">${item.program_date}</div>`;
-            rows.forEach(r => { 
-                contentHtml += `<div class="flex justify-between p-3 border-b border-slate-50"><span class="text-[9px] font-bold text-slate-400 uppercase">${r.act || 'Activity'}</span><span class="text-[11px] font-black text-slate-700">${r.who || '---'}</span></div>`; 
-            });
+            if(rows && rows.length > 0) {
+                rows.forEach(r => { 
+                    contentHtml += `<div class="flex justify-between p-3 border-b border-slate-50"><span class="text-[9px] font-bold text-slate-400 uppercase">${r.act || 'Activity'}</span><span class="text-[11px] font-black text-slate-700">${r.who || '---'}</span></div>`; 
+                });
+            } else { contentHtml += `<p class="text-center text-slate-400 text-xs py-4">No details listed.</p>`; }
             document.getElementById('modalContent').innerHTML = contentHtml;
             document.getElementById('viewModal').classList.remove('hidden');
         }
@@ -315,7 +307,7 @@
                 if(i === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear()) dayDiv.classList.add('today');
                 const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
                 const dayProgs = allData.filter(d => d.program_date === dateStr);
-                dayDiv.innerHTML = `<span class="text-[10px] font-black text-slate-600">${i}</span><div class="flex gap-0.5 mt-1">${dayProgs.some(d=>d.title.toLowerCase().trim()!=='music') ? '<div class="badge-dot dot-program"></div>' : ''}${dayProgs.some(d=>d.title.toLowerCase().trim()==='music') ? '<div class="badge-dot dot-music"></div>' : ''}</div>`;
+                dayDiv.innerHTML = `<span class="text-[10px] font-black text-slate-600">${i}</span><div class="flex gap-0.5 mt-1">${dayProgs.some(d => d.title && d.title.toLowerCase().trim() !== 'music') ? '<div class="badge-dot dot-program"></div>' : ''}${dayProgs.some(d => d.title && d.title.toLowerCase().trim() === 'music') ? '<div class="badge-dot dot-music"></div>' : ''}</div>`;
                 if(dayProgs.length > 0) dayDiv.onclick = () => viewItem(dayProgs[0].id);
                 grid.appendChild(dayDiv);
             }
