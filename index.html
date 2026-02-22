@@ -49,9 +49,13 @@
             aspect-ratio: 1/1; display: flex; flex-direction: column; align-items: center; justify-content: center; 
             border-radius: 1rem; background: white; font-size: 11px; font-weight: 800;
             transition: 0.3s; border: 1px solid #f1f5f9; cursor: pointer;
+            position: relative;
         }
         .calendar-day:hover { background: var(--mc-emerald); color: white; transform: translateY(-3px); }
         .holiday-day { border: 2px solid #ef4444 !important; color: #ef4444; }
+        .today-day { border: 2px solid var(--mc-gold) !important; background: #fffbeb; }
+        
+        .day-label { font-size: 9px; font-weight: 900; color: #94a3b8; text-align: center; text-transform: uppercase; padding-bottom: 8px; }
 
         .bottom-menu {
             position: fixed; bottom: 0; left: 0; right: 0; height: 75px;
@@ -95,7 +99,7 @@
             </div>
             <div class="text-right">
                 <div id="greetingText" class="text-[10px] font-black text-emerald-600 uppercase italic">Maayong Buntag</div>
-                <div id="liveClock" class="text-[9px] font-bold text-slate-500">--:-- -- | Feb 21, 2026</div>
+                <div id="liveClock" class="text-[9px] font-bold text-slate-500">--:-- -- | Feb 22, 2026</div>
             </div>
         </div>
     </nav>
@@ -108,7 +112,18 @@
                 <div class="text-5xl animate-cake">🎂</div>
                 <div>
                     <h2 class="text-lg font-black text-slate-800 uppercase italic tracking-tighter">Birthday Greetings</h2>
-                    <p class="text-[10px] font-bold text-pink-500 uppercase animate-pulse">✨ Live: Celebrants for this Month Iwill Fixed Soon</p>
+                    <p class="text-[10px] font-bold text-pink-500 uppercase animate-pulse">✨ Updating Fixed Soon on March 30, 2026</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="glass-card p-8 border-t-4 border-emerald-500">
+            <div class="emoji-bg -left-4 -top-4">🏛️</div>
+            <div class="relative z-10 flex flex-col items-center justify-center py-4">
+                <h2 class="text-sm font-black uppercase text-slate-800 tracking-widest mb-2">MCB Board Officers</h2>
+                <div class="flex items-center gap-2 bg-emerald-50 px-6 py-3 rounded-full border border-emerald-100">
+                    <span class="text-xl">🛠️</span>
+                    <p class="text-[11px] font-black text-emerald-600 uppercase tracking-[0.2em] animate-pulse">Updating Fixed Soon on March 30, 2026</p>
                 </div>
             </div>
         </section>
@@ -118,71 +133,47 @@
                 <div class="emoji-bg -left-4 -bottom-4">📢</div>
                 <div class="relative z-10">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-black text-slate-800 uppercase text-xs">Pastor's Announcement</h3>
-                        <div id="pastorDot" class="w-3 h-3 rounded-full bg-slate-300"></div>
+                        <div class="flex items-center gap-2">
+                            <div id="pastorDot" class="w-3 h-3 rounded-full bg-slate-300"></div>
+                            <h3 class="font-black text-slate-800 uppercase text-xs">Pastor's Announcement</h3>
+                        </div>
+                        <div id="pastorLegend" class="text-[7px] font-bold uppercase tracking-widest text-slate-400">Checking...</div>
                     </div>
                     <div class="bg-slate-50 p-4 rounded-2xl mb-4">
                         <p id="pastorMsg" class="text-xs text-slate-600 italic leading-relaxed">"No new announcements."</p>
                     </div>
-                    <button id="pastorBtn" class="w-full py-3 rounded-xl bg-slate-100 text-slate-400 font-black text-[10px] uppercase tracking-widest transition-all">Check Update</button>
+                    <button id="pastorBtn" class="w-full py-3 rounded-xl bg-slate-100 text-slate-400 font-black text-[10px] uppercase tracking-widest">Check Update</button>
                 </div>
             </div>
             <div class="glass-card p-8 min-h-[220px] flex flex-col justify-between border-t-4 border-amber-500">
                 <div class="emoji-bg -right-4 -bottom-4">🎸</div>
                 <div class="relative z-10">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-black text-slate-800 uppercase text-xs">Music Director Advisory</h3>
-                        <div id="musicDot" class="w-3 h-3 rounded-full bg-slate-300"></div>
+                        <div class="flex items-center gap-2">
+                            <div id="musicDot" class="w-3 h-3 rounded-full bg-slate-300"></div>
+                            <h3 class="font-black text-slate-800 uppercase text-xs">Music Director Advisory</h3>
+                        </div>
+                        <div id="musicLegend" class="text-[7px] font-bold uppercase tracking-widest text-slate-400">Checking...</div>
                     </div>
                     <div class="bg-slate-50 p-4 rounded-2xl mb-4">
                         <p id="musicMsg" class="text-xs text-slate-600 italic leading-relaxed">"Waiting for updates."</p>
                     </div>
-                    <button id="musicBtn" class="w-full py-3 rounded-xl bg-slate-100 text-slate-400 font-black text-[10px] uppercase tracking-widest transition-all">Check Update</button>
+                    <button id="musicBtn" class="w-full py-3 rounded-xl bg-slate-100 text-slate-400 font-black text-[10px] uppercase tracking-widest">Check Update</button>
                 </div>
             </div>
         </div>
 
         <section class="glass-card p-8">
             <div class="emoji-bg -left-4 -top-4">📋</div>
-            <div class="flex justify-between items-center mb-6 relative z-10">
-                <h2 class="text-sm font-black uppercase text-slate-800 tracking-widest">Approved Schedules</h2>
-            </div>
-            
+            <h2 class="text-sm font-black uppercase text-slate-800 tracking-widest mb-6">Approved Schedules</h2>
             <div class="space-y-8 relative z-10">
                 <div>
                     <h3 class="text-[10px] font-black text-emerald-600 uppercase mb-3 underline tracking-widest">Weekly Program Line-up</h3>
-                    <div class="table-container bg-white border border-slate-100">
-                        <table id="programTable">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Title</th>
-                                    <th>In Charge</th>
-                                </tr>
-                            </thead>
-                            <tbody id="programBody">
-                                <tr><td colspan="3" class="text-center text-slate-400 italic py-8">Loading...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <div class="table-container bg-white border border-slate-100"><table id="programTable"><thead><tr><th>Date</th><th>Title</th><th>In Charge</th></tr></thead><tbody id="programBody"><tr><td colspan="3" class="text-center text-slate-400 italic py-8">Loading...</td></tr></tbody></table></div>
                 </div>
-
                 <div>
                     <h3 class="text-[10px] font-black text-violet-600 uppercase mb-3 underline tracking-widest">Music Ministry Line-up</h3>
-                    <div class="table-container bg-white border border-slate-100">
-                        <table id="musicTable">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Service</th>
-                                    <th>Worship Leader</th>
-                                </tr>
-                            </thead>
-                            <tbody id="musicBody">
-                                <tr><td colspan="3" class="text-center text-slate-400 italic py-8">Loading...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <div class="table-container bg-white border border-slate-100"><table id="musicTable"><thead><tr><th>Date</th><th>Service</th><th>Worship Leader</th></tr></thead><tbody id="musicBody"><tr><td colspan="3" class="text-center text-slate-400 italic py-8">Loading...</td></tr></tbody></table></div>
                 </div>
             </div>
         </section>
@@ -196,6 +187,7 @@
                         <div class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-red-500"></div><span class="text-[7px] font-black text-slate-400 uppercase">Holiday</span></div>
                         <div class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-emerald-500"></div><span class="text-[7px] font-black text-slate-400 uppercase">Program</span></div>
                         <div class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-violet-500"></div><span class="text-[7px] font-black text-slate-400 uppercase">Music</span></div>
+                        <div class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-amber-500"></div><span class="text-[7px] font-black text-slate-400 uppercase">Today</span></div>
                     </div>
                 </div>
                 <div class="flex gap-2">
@@ -203,8 +195,10 @@
                     <button onclick="changeMonth(1)" class="w-8 h-8 flex items-center justify-center bg-white border rounded-lg hover:bg-slate-50 transition-colors">→</button>
                 </div>
             </div>
+            <div class="grid grid-cols-7 gap-2 mb-2">
+                <div class="day-label">Sun</div><div class="day-label">Mon</div><div class="day-label">Tue</div><div class="day-label">Wed</div><div class="day-label">Thu</div><div class="day-label">Fri</div><div class="day-label">Sat</div>
+            </div>
             <div id="calendarGrid" class="grid grid-cols-7 gap-2 relative z-10"></div>
-            
             <div id="dayEventsContainer" class="mt-6 p-4 bg-slate-50 rounded-2xl border border-slate-100 relative z-10">
                 <p class="text-[9px] font-black text-slate-400 uppercase mb-2">Selected Date Details:</p>
                 <div id="selectedDateDisplay" class="font-black text-xs text-slate-800 mb-3">Please select a date</div>
@@ -214,15 +208,13 @@
     </main>
 
     <footer class="footer-glass text-center relative overflow-hidden">
-        <div class="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
-            <span class="text-[15rem]">⛪</span>
-        </div>
+        <div class="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none"><span class="text-[15rem]">⛪</span></div>
         <div class="relative z-10 max-w-5xl mx-auto px-6">
             <h2 class="text-xl font-black uppercase tracking-[0.2em] mb-1">Mobilization Church Balilihan 2026</h2>
             <p class="text-[9px] font-bold text-emerald-400 uppercase tracking-[0.3em] mb-4 italic">Mobilizing hearts for Christ. A church family growing together in faith, love, and service.</p>
             <div class="flex justify-center gap-6 mb-6">
-                <a href="https://www.facebook.com/share/18NKHpknxa/" target="_blank" class="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center border border-white/10 transition-all hover:bg-white/20"><i class="fa-brands fa-facebook-f"></i></a>
-                <a href="mailto:mobilizationchuchb@gmail.com" class="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center border border-white/10 transition-all hover:bg-white/20"><i class="fa-solid fa-envelope"></i></a>
+                <a href="#" class="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center border border-white/10 transition-all hover:bg-white/20"><i class="fa-brands fa-facebook-f"></i></a>
+                <a href="#" class="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center border border-white/10 transition-all hover:bg-white/20"><i class="fa-solid fa-envelope"></i></a>
             </div>
             <div class="pt-6 border-t border-white/10">
                 <p class="text-[10px] font-black text-white uppercase tracking-widest mb-1">System Architect: Mark Brian Angco</p>
@@ -231,116 +223,140 @@
         </div>
     </footer>
 
-    <div id="pinModal" class="fixed inset-0 z-[1000] flex items-center justify-center hidden p-4">
-        <div class="absolute inset-0 bg-slate-900/90 backdrop-blur-md" onclick="closePinModal()"></div>
-        <div class="bg-white w-full max-w-xs rounded-[2.5rem] relative overflow-hidden shadow-2xl p-8 text-center">
-            <h3 class="text-xl font-black text-slate-800 uppercase italic">Admin Access</h3>
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-8">Enter Security PIN</p>
-            <div class="flex justify-center gap-3 mb-8">
-                <input type="password" inputmode="numeric" maxlength="1" class="pin-input" onkeyup="moveFocus(this, 'p2')" id="p1">
-                <input type="password" inputmode="numeric" maxlength="1" class="pin-input" onkeyup="moveFocus(this, 'p3')" id="p2">
-                <input type="password" inputmode="numeric" maxlength="1" class="pin-input" onkeyup="moveFocus(this, 'p4')" id="p3">
-                <input type="password" inputmode="numeric" maxlength="1" class="pin-input" onkeyup="validatePinFinal(this)" id="p4">
+    <div id="pinModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[2000] hidden flex items-center justify-center p-6">
+        <div class="bg-white rounded-[2.5rem] w-full max-w-md p-8 shadow-2xl relative overflow-hidden">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <h2 class="text-xl font-black text-slate-800 uppercase tracking-tighter">Admin Access</h2>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Enter Security PIN</p>
             </div>
-            <button onclick="closePinModal()" class="text-[9px] font-black text-slate-400 uppercase tracking-widest underline">Cancel</button>
-        </div>
-    </div>
-
-    <div id="generalModal" class="fixed inset-0 z-[1100] flex items-center justify-center hidden p-4">
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeModal()"></div>
-        <div class="bg-white w-full max-w-sm rounded-[2.5rem] relative overflow-hidden shadow-2xl">
-            <div id="modalHeader" class="px-8 py-6 text-white bg-slate-900">
-                <p id="modalDateLabel" class="text-xs font-black uppercase tracking-widest">Notification</p>
+            <div class="flex justify-center gap-3 mb-8" id="pinInputs">
+                <input type="password" maxlength="1" class="pin-input" autofocus>
+                <input type="password" maxlength="1" class="pin-input">
+                <input type="password" maxlength="1" class="pin-input">
+                <input type="password" maxlength="1" class="pin-input">
             </div>
-            <div id="modalContent" class="p-8 max-h-[40vh] overflow-y-auto text-sm text-slate-600 italic"></div>
-            <div class="p-6">
-                <button onclick="closeModal()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase text-[10px]">Close</button>
+            <div class="flex gap-3">
+                <button onclick="hidePinModal()" class="flex-1 py-4 rounded-2xl bg-slate-100 text-slate-500 font-black text-[10px] uppercase tracking-widest">Cancel</button>
+                <button onclick="verifyPin()" class="flex-1 py-4 rounded-2xl bg-emerald-500 text-white font-black text-[10px] uppercase tracking-widest shadow-lg shadow-emerald-200">Verify</button>
             </div>
         </div>
     </div>
 
     <nav class="bottom-menu">
-        <a href="user.html" class="flex flex-col items-center gap-1 text-slate-400">
-            <i class="fa-solid fa-user text-lg"></i>
-            <span class="text-[8px] font-black uppercase">User</span>
-        </a>
-        <a href="pwmusic.html" class="flex flex-col items-center gap-1 text-slate-400">
-            <i class="fa-solid fa-music text-lg"></i>
-            <span class="text-[8px] font-black uppercase">Music</span>
-        </a>
-        <a href="dashboard.html" class="flex flex-col items-center gap-1 text-emerald-500">
-            <div class="w-11 h-11 bg-emerald-50 rounded-full flex items-center justify-center border border-emerald-100">
-                <i class="fa-solid fa-chart-line text-lg"></i>
-            </div>
-            <span class="text-[8px] font-black uppercase">Report</span>
-        </a>
-        <button onclick="showPinModal()" class="flex flex-col items-center gap-1 text-amber-500">
-            <i class="fa-solid fa-lock text-lg"></i>
-            <span class="text-[8px] font-black uppercase">Admin</span>
-        </button>
+        <a href="user.html" class="flex flex-col items-center gap-1 text-slate-400"><i class="fa-solid fa-user text-lg"></i><span class="text-[8px] font-black uppercase">User</span></a>
+        <a href="pwmusic.html" class="flex flex-col items-center gap-1 text-slate-400"><i class="fa-solid fa-music text-lg"></i><span class="text-[8px] font-black uppercase">Music</span></a>
+        <a href="dashboard.html" class="flex flex-col items-center gap-1 text-emerald-500"><div class="w-11 h-11 bg-emerald-50 rounded-full flex items-center justify-center border border-emerald-100"><i class="fa-solid fa-chart-line text-lg"></i></div><span class="text-[8px] font-black uppercase">Report</span></a>
+        <button onclick="showPinModal()" class="flex flex-col items-center gap-1 text-amber-500"><i class="fa-solid fa-lock text-lg"></i><span class="text-[8px] font-black uppercase">Admin</span></button>
     </nav>
 
     <script>
-        // PWA SW Registration with path fix
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./service-worker.js').catch(err => console.log(err));
-            });
-        }
-
         const sb = supabase.createClient('https://eejovtuputrwneovhfpc.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlam92dHVwdXRyd25lb3ZoZnBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMjY5MzIsImV4cCI6MjA4NjgwMjkzMn0.JJz64gSTT9qSqOkiJvuL1PT_H_I4ZYJbchrmkoljwws');
         
+        const PHIL_HOLIDAYS_2026 = {
+            "01-01": "New Year's Day", "02-17": "Chinese New Year", "02-25": "EDSA Revolution",
+            "04-02": "Maundy Thursday", "04-03": "Good Friday", "04-04": "Black Saturday",
+            "04-09": "Araw ng Kagitingan", "05-01": "Labor Day", "06-12": "Independence Day",
+            "08-31": "National Heroes Day", "11-01": "All Saints' Day", "11-30": "Bonifacio Day",
+            "12-08": "Feast of the Immaculate Conception", "12-25": "Christmas Day", "12-30": "Rizal Day"
+        };
+
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
         let allPrograms = [];
 
-        // 2026 Philippine Holidays
-        const PHIL_HOLIDAYS_2026 = {
-            "01-01": "New Year's Day",
-            "02-17": "Chinese New Year",
-            "02-25": "EDSA Revolution",
-            "04-02": "Maundy Thursday",
-            "04-03": "Good Friday",
-            "04-04": "Black Saturday",
-            "04-09": "Araw ng Kagitingan",
-            "05-01": "Labor Day",
-            "06-12": "Independence Day",
-            "08-31": "National Heroes Day",
-            "11-01": "All Saints' Day",
-            "11-30": "Bonifacio Day",
-            "12-08": "Feast of the Immaculate Conception",
-            "12-25": "Christmas Day",
-            "12-30": "Rizal Day"
-        };
+        // Admin PIN Logic
+        function showPinModal() { document.getElementById('pinModal').classList.remove('hidden'); }
+        function hidePinModal() { document.getElementById('pinModal').classList.add('hidden'); }
 
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('liveClock').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " | " + now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            let hour = now.getHours();
-            document.getElementById('greetingText').innerText = hour < 12 ? "Maayong Buntag" : hour < 13 ? "Maayong Udto" : hour < 18 ? "Maayong Hapon" : "Maayong Gabii";
+        const pinInputs = document.querySelectorAll('.pin-input');
+        pinInputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                if (e.target.value.length === 1 && index < pinInputs.length - 1) pinInputs[index + 1].focus();
+            });
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value && index > 0) pinInputs[index - 1].focus();
+            });
+        });
+
+        async function verifyPin() {
+            const enteredPin = Array.from(pinInputs).map(i => i.value).join('');
+            if(enteredPin === '2026') { 
+                window.location.href = 'admin.html'; 
+            } else { 
+                alert('Invalid Security PIN'); 
+                pinInputs.forEach(i => i.value = ''); 
+                pinInputs[0].focus();
+            }
         }
-        setInterval(updateClock, 1000); updateClock();
 
         async function loadViewerData() {
             try {
                 const { data: annData } = await sb.from('music_announcements').select('*').order('created_at', { ascending: false });
-                if(annData) { updateAnnStatus('pastor', annData); updateAnnStatus('music', annData); }
+                if(annData) { updateAnnBoard('pastor', annData); updateAnnBoard('music', annData); }
                 const { data: programs } = await sb.from('programs').select('*').eq('status', 'approved').order('program_date', { ascending: true });
                 if(programs) { allPrograms = programs; buildCalendar(); populateTables(programs); }
             } catch (e) { console.error(e); }
         }
 
-        function updateAnnStatus(type, data) {
+        function updateAnnBoard(type, data) {
             const filtered = data.filter(ann => ann.type === type);
-            const btn = document.getElementById(type + 'Btn');
             const dot = document.getElementById(type + 'Dot');
+            const legend = document.getElementById(type + 'Legend');
             const msgBox = document.getElementById(type + 'Msg');
+            const btn = document.getElementById(type + 'Btn');
+
             if (filtered[0]) {
-                dot.className = `w-3 h-3 rounded-full bg-blue-500 animate-pulse`;
+                const postDate = new Date(filtered[0].created_at);
+                const diffHours = Math.abs(new Date() - postDate) / 36e5;
+                if (diffHours <= 24) {
+                    dot.className = "w-3 h-3 rounded-full bg-blue-500 animate-pulse";
+                    legend.innerText = "New Update";
+                    legend.className = "text-[7px] font-black uppercase text-blue-500";
+                } else {
+                    dot.className = "w-3 h-3 rounded-full bg-amber-500";
+                    legend.innerText = "Old Update";
+                    legend.className = "text-[7px] font-black uppercase text-amber-500";
+                }
                 msgBox.innerText = `"${filtered[0].content.substring(0, 50)}..."`;
                 btn.className = "w-full py-3 rounded-xl bg-slate-900 text-white font-black text-[10px] uppercase";
-                btn.onclick = () => openAnnModal(filtered[0].content, new Date(filtered[0].created_at).toLocaleString(), type);
+                btn.onclick = () => alert(filtered[0].content);
             }
+        }
+
+        function buildCalendar() {
+            const grid = document.getElementById('calendarGrid'); grid.innerHTML = '';
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const today = new Date();
+            document.getElementById('calendarMonth').innerText = new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long', year: 'numeric' });
+            for(let i=0; i<firstDay; i++) grid.appendChild(document.createElement('div'));
+            for(let i=1; i<=daysInMonth; i++) {
+                const dayKey = `${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                const fullDate = `${currentYear}-${dayKey}`;
+                const isHoliday = PHIL_HOLIDAYS_2026[dayKey];
+                const isToday = today.getDate() === i && today.getMonth() === currentMonth && today.getFullYear() === currentYear;
+                const hasP = allPrograms.some(p => p.program_date === fullDate && p.title.toLowerCase() !== 'music');
+                const hasM = allPrograms.some(p => p.program_date === fullDate && p.title.toLowerCase() === 'music');
+                const dayDiv = document.createElement('div');
+                dayDiv.className = `calendar-day ${isHoliday ? 'holiday-day' : ''} ${isToday ? 'today-day' : ''}`;
+                dayDiv.innerHTML = `<span>${i}</span><div class="flex gap-0.5 mt-1">${hasP ? '<div class="w-1 h-1 rounded-full bg-emerald-500"></div>' : ''}${hasM ? '<div class="w-1 h-1 rounded-full bg-violet-500"></div>' : ''}</div>`;
+                dayDiv.onclick = () => showDayDetails(fullDate, isHoliday);
+                grid.appendChild(dayDiv);
+            }
+        }
+
+        function showDayDetails(dateStr, holidayName) {
+            const display = document.getElementById('selectedDateDisplay');
+            const list = document.getElementById('eventListDisplay');
+            const dayEvents = allPrograms.filter(d => d.program_date === dateStr);
+            display.innerText = new Date(dateStr).toDateString();
+            let html = holidayName ? `<div class="p-3 bg-red-50 border border-red-100 rounded-xl mb-2"><p class="text-[8px] font-black text-red-500 uppercase">PHILIPPINE HOLIDAY</p><p class="font-bold text-red-700 text-[10px]">${holidayName}</p></div>` : '';
+            if(dayEvents.length) html += dayEvents.map(ev => `<div class="p-3 bg-white border rounded-xl"><p class="text-[8px] font-black text-emerald-500 uppercase">${ev.title}</p><p class="font-bold text-slate-700 text-[10px]">${ev.user_id}</p></div>`).join('');
+            else if (!holidayName) html = '<p class="text-[9px] text-slate-400 italic">No church events scheduled.</p>';
+            list.innerHTML = html;
         }
 
         function populateTables(data) {
@@ -354,99 +370,16 @@
             });
         }
 
-        function buildCalendar() {
-            const grid = document.getElementById('calendarGrid'); grid.innerHTML = '';
-            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-            
-            document.getElementById('calendarMonth').innerText = new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long', year: 'numeric' });
-            
-            for(let i=0; i<firstDay; i++) grid.appendChild(document.createElement('div'));
-            
-            for(let i=1; i<=daysInMonth; i++) {
-                const dayKey = `${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-                const fullDate = `${currentYear}-${dayKey}`;
-                
-                const isHoliday = PHIL_HOLIDAYS_2026[dayKey];
-                const hasP = allPrograms.some(p => p.program_date === fullDate && p.title.toLowerCase() !== 'music');
-                const hasM = allPrograms.some(p => p.program_date === fullDate && p.title.toLowerCase() === 'music');
-                
-                const dayDiv = document.createElement('div');
-                dayDiv.className = `calendar-day ${isHoliday ? 'holiday-day' : ''}`;
-                dayDiv.innerHTML = `
-                    <span>${i}</span>
-                    <div class="flex gap-0.5 mt-1">
-                        ${hasP ? '<div class="w-1 h-1 rounded-full bg-emerald-500"></div>' : ''}
-                        ${hasM ? '<div class="w-1 h-1 rounded-full bg-violet-500"></div>' : ''}
-                    </div>`;
-                dayDiv.onclick = () => showDayDetails(fullDate, isHoliday);
-                grid.appendChild(dayDiv);
-            }
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('liveClock').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " | " + now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            let hr = now.getHours();
+            document.getElementById('greetingText').innerText = hr < 12 ? "Maayong Buntag" : hr < 13 ? "Maayong Udto" : hr < 18 ? "Maayong Hapon" : "Maayong Gabii";
         }
-
-        function showDayDetails(dateStr, holidayName) {
-            const display = document.getElementById('selectedDateDisplay');
-            const list = document.getElementById('eventListDisplay');
-            const dayEvents = allPrograms.filter(d => d.program_date === dateStr);
-            
-            display.innerText = new Date(dateStr).toDateString();
-            
-            let html = holidayName ? `<div class="p-3 bg-red-50 border border-red-100 rounded-xl mb-2"><p class="text-[8px] font-black text-red-500 uppercase">PHILIPPINE HOLIDAY</p><p class="font-bold text-red-700 text-[10px]">${holidayName}</p></div>` : '';
-            
-            if(dayEvents.length) {
-                html += dayEvents.map(ev => `
-                    <div class="p-3 bg-white border rounded-xl">
-                        <p class="text-[8px] font-black text-emerald-500 uppercase">${ev.title}</p>
-                        <p class="font-bold text-slate-700 text-[10px]">${ev.user_id}</p>
-                    </div>`).join('');
-            } else if (!holidayName) {
-                html = '<p class="text-[9px] text-slate-400 italic">No events scheduled.</p>';
-            }
-            list.innerHTML = html;
-        }
-
-        function openAnnModal(msg, time, type) {
-            document.getElementById('modalDateLabel').innerText = type.toUpperCase() + " ADVISORY";
-            document.getElementById('modalContent').innerText = `"${msg}"\n\nPosted: ${time}`;
-            document.getElementById('generalModal').classList.remove('hidden');
-        }
-
-        function closeModal() { document.getElementById('generalModal').classList.add('hidden'); }
-        function showPinModal() { document.getElementById('pinModal').classList.remove('hidden'); }
-        function closePinModal() { 
-            document.getElementById('pinModal').classList.add('hidden');
-            document.querySelectorAll('.pin-input').forEach(i => i.value = '');
-        }
-
-        function moveFocus(c, n) { 
-            if(c.value && n) document.getElementById(n).focus(); 
-        }
-
-        function validatePinFinal(c) {
-            const p1 = document.getElementById('p1').value;
-            const p2 = document.getElementById('p2').value;
-            const p3 = document.getElementById('p3').value;
-            const p4 = c.value;
-            const pin = p1 + p2 + p3 + p4;
-            
-            if(pin.length === 4) {
-                if(pin === "0000") {
-                    window.location.href = 'admin.html';
-                } else {
-                    alert("Incorrect PIN. Access Denied.");
-                    document.querySelectorAll('.pin-input').forEach(i => i.value = '');
-                    document.getElementById('p1').focus();
-                }
-            }
-        }
-
-        function changeMonth(s) { 
-            currentMonth += s; 
-            if(currentMonth > 11) { currentMonth = 0; currentYear++; } 
-            if(currentMonth < 0) { currentMonth = 11; currentYear--; } 
-            buildCalendar(); 
-        }
-
+        
+        setInterval(updateClock, 1000); updateClock();
+        function changeMonth(s) { currentMonth += s; if(currentMonth>11){currentMonth=0;currentYear++} if(currentMonth<0){currentMonth=11;currentYear--} buildCalendar(); }
+        
         loadViewerData();
     </script>
 </body>
