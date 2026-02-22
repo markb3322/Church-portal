@@ -52,7 +52,9 @@
             position: relative;
         }
         .calendar-day:hover { background: var(--mc-emerald); color: white; transform: translateY(-3px); }
-        .holiday-day { border: 2px solid #ef4444 !important; color: #ef4444; }
+        
+        /* RESTORED HOLIDAY STYLE */
+        .holiday-day { border: 2px solid #ef4444 !important; color: #ef4444 !important; background: #fef2f2; }
         .today-day { border: 2px solid var(--mc-gold) !important; background: #fffbeb; }
         
         .day-label { font-size: 9px; font-weight: 900; color: #94a3b8; text-align: center; text-transform: uppercase; padding-bottom: 8px; }
@@ -71,14 +73,14 @@
             margin-top: 40px; border-radius: 3rem 3rem 0 0;
         }
 
-        @keyframes bounce-cake { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-10px) scale(1.1); } }
-        .animate-cake { animation: bounce-cake 2s infinite ease-in-out; }
-
         .pin-input {
             width: 45px; height: 55px; border: 2px solid #e2e8f0; border-radius: 12px;
-            text-align: center; font-size: 1.5rem; font-weight: 800; background: #f8fafc;
+            text-align: center; font-size: 1.5rem; font-weight: 800; background: #f8fafc; color: #0f172a;
         }
         .pin-input:focus { border-color: var(--mc-emerald); outline: none; background: white; }
+
+        @keyframes bounce-cake { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-10px) scale(1.1); } }
+        .animate-cake { animation: bounce-cake 2s infinite ease-in-out; }
 
         .table-container { width: 100%; overflow-x: auto; border-radius: 1rem; }
         table { width: 100%; border-collapse: collapse; font-size: 11px; }
@@ -212,10 +214,16 @@
         <div class="relative z-10 max-w-5xl mx-auto px-6">
             <h2 class="text-xl font-black uppercase tracking-[0.2em] mb-1">Mobilization Church Balilihan 2026</h2>
             <p class="text-[9px] font-bold text-emerald-400 uppercase tracking-[0.3em] mb-4 italic">Mobilizing hearts for Christ. A church family growing together in faith, love, and service.</p>
+            
             <div class="flex justify-center gap-6 mb-6">
-                <a href="#" class="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center border border-white/10 transition-all hover:bg-white/20"><i class="fa-brands fa-facebook-f"></i></a>
-                <a href="#" class="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center border border-white/10 transition-all hover:bg-white/20"><i class="fa-solid fa-envelope"></i></a>
+                <a href="https://www.facebook.com/MCBBalilihan" target="_blank" class="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center border border-white/10 transition-all hover:bg-white/20 hover:scale-110 active:scale-95">
+                    <i class="fa-brands fa-facebook-f"></i>
+                </a>
+                <a href="mailto:mcbbalilihan@gmail.com" class="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center border border-white/10 transition-all hover:bg-white/20 hover:scale-110 active:scale-95">
+                    <i class="fa-solid fa-envelope"></i>
+                </a>
             </div>
+
             <div class="pt-6 border-t border-white/10">
                 <p class="text-[10px] font-black text-white uppercase tracking-widest mb-1">System Architect: Mark Brian Angco</p>
                 <p class="text-[8px] font-medium text-white/30">@ 2026 MCB Viewer. All Rights Reserved</p>
@@ -233,7 +241,7 @@
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Enter Security PIN</p>
             </div>
             <div class="flex justify-center gap-3 mb-8" id="pinInputs">
-                <input type="password" maxlength="1" class="pin-input" autofocus>
+                <input type="password" maxlength="1" class="pin-input">
                 <input type="password" maxlength="1" class="pin-input">
                 <input type="password" maxlength="1" class="pin-input">
                 <input type="password" maxlength="1" class="pin-input">
@@ -255,21 +263,41 @@
     <script>
         const sb = supabase.createClient('https://eejovtuputrwneovhfpc.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlam92dHVwdXRyd25lb3ZoZnBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMjY5MzIsImV4cCI6MjA4NjgwMjkzMn0.JJz64gSTT9qSqOkiJvuL1PT_H_I4ZYJbchrmkoljwws');
         
+        // --- 2026 HOLIDAY DATABASE ---
         const PHIL_HOLIDAYS_2026 = {
-            "01-01": "New Year's Day", "02-17": "Chinese New Year", "02-25": "EDSA Revolution",
-            "04-02": "Maundy Thursday", "04-03": "Good Friday", "04-04": "Black Saturday",
-            "04-09": "Araw ng Kagitingan", "05-01": "Labor Day", "06-12": "Independence Day",
-            "08-31": "National Heroes Day", "11-01": "All Saints' Day", "11-30": "Bonifacio Day",
-            "12-08": "Feast of the Immaculate Conception", "12-25": "Christmas Day", "12-30": "Rizal Day"
+            "01-01": "New Year's Day",
+            "02-17": "Chinese New Year",
+            "02-25": "EDSA Revolution Anniversary",
+            "04-02": "Maundy Thursday",
+            "04-03": "Good Friday",
+            "04-04": "Black Saturday",
+            "04-09": "Araw ng Kagitingan",
+            "05-01": "Labor Day",
+            "06-12": "Independence Day",
+            "08-21": "Ninoy Aquino Day",
+            "08-31": "National Heroes Day",
+            "11-01": "All Saints' Day",
+            "11-02": "All Souls' Day",
+            "11-30": "Bonifacio Day",
+            "12-08": "Feast of the Immaculate Conception",
+            "12-25": "Christmas Day",
+            "12-30": "Rizal Day",
+            "12-31": "Last Day of the Year"
         };
 
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
         let allPrograms = [];
 
-        // Admin PIN Logic
-        function showPinModal() { document.getElementById('pinModal').classList.remove('hidden'); }
-        function hidePinModal() { document.getElementById('pinModal').classList.add('hidden'); }
+        function showPinModal() {
+            document.getElementById('pinModal').classList.remove('hidden');
+            document.querySelectorAll('.pin-input')[0].focus();
+        }
+        function hidePinModal() {
+            document.getElementById('pinModal').classList.add('hidden');
+            const inputs = document.querySelectorAll('.pin-input');
+            inputs.forEach(i => i.value = '');
+        }
 
         const pinInputs = document.querySelectorAll('.pin-input');
         pinInputs.forEach((input, index) => {
@@ -332,18 +360,24 @@
             const firstDay = new Date(currentYear, currentMonth, 1).getDay();
             const today = new Date();
             document.getElementById('calendarMonth').innerText = new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long', year: 'numeric' });
+            
             for(let i=0; i<firstDay; i++) grid.appendChild(document.createElement('div'));
+            
             for(let i=1; i<=daysInMonth; i++) {
                 const dayKey = `${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
                 const fullDate = `${currentYear}-${dayKey}`;
-                const isHoliday = PHIL_HOLIDAYS_2026[dayKey];
+                
+                // HOLIDAY CHECK
+                const holidayName = PHIL_HOLIDAYS_2026[dayKey];
+                
                 const isToday = today.getDate() === i && today.getMonth() === currentMonth && today.getFullYear() === currentYear;
                 const hasP = allPrograms.some(p => p.program_date === fullDate && p.title.toLowerCase() !== 'music');
                 const hasM = allPrograms.some(p => p.program_date === fullDate && p.title.toLowerCase() === 'music');
+                
                 const dayDiv = document.createElement('div');
-                dayDiv.className = `calendar-day ${isHoliday ? 'holiday-day' : ''} ${isToday ? 'today-day' : ''}`;
+                dayDiv.className = `calendar-day ${isToday ? 'today-day' : ''} ${holidayName ? 'holiday-day' : ''}`;
                 dayDiv.innerHTML = `<span>${i}</span><div class="flex gap-0.5 mt-1">${hasP ? '<div class="w-1 h-1 rounded-full bg-emerald-500"></div>' : ''}${hasM ? '<div class="w-1 h-1 rounded-full bg-violet-500"></div>' : ''}</div>`;
-                dayDiv.onclick = () => showDayDetails(fullDate, isHoliday);
+                dayDiv.onclick = () => showDayDetails(fullDate, holidayName);
                 grid.appendChild(dayDiv);
             }
         }
@@ -353,9 +387,25 @@
             const list = document.getElementById('eventListDisplay');
             const dayEvents = allPrograms.filter(d => d.program_date === dateStr);
             display.innerText = new Date(dateStr).toDateString();
-            let html = holidayName ? `<div class="p-3 bg-red-50 border border-red-100 rounded-xl mb-2"><p class="text-[8px] font-black text-red-500 uppercase">PHILIPPINE HOLIDAY</p><p class="font-bold text-red-700 text-[10px]">${holidayName}</p></div>` : '';
-            if(dayEvents.length) html += dayEvents.map(ev => `<div class="p-3 bg-white border rounded-xl"><p class="text-[8px] font-black text-emerald-500 uppercase">${ev.title}</p><p class="font-bold text-slate-700 text-[10px]">${ev.user_id}</p></div>`).join('');
-            else if (!holidayName) html = '<p class="text-[9px] text-slate-400 italic">No church events scheduled.</p>';
+            
+            let html = "";
+            if(holidayName) {
+                html += `<div class="p-3 bg-red-50 border border-red-100 rounded-xl mb-2">
+                            <p class="text-[8px] font-black text-red-500 uppercase">🚩 Public Holiday</p>
+                            <p class="font-bold text-red-700 text-[10px]">${holidayName}</p>
+                         </div>`;
+            }
+            
+            if(dayEvents.length) {
+                html += dayEvents.map(ev => `
+                    <div class="p-3 bg-white border rounded-xl shadow-sm">
+                        <p class="text-[8px] font-black text-emerald-500 uppercase">${ev.title}</p>
+                        <p class="font-bold text-slate-700 text-[10px]">${ev.user_id}</p>
+                    </div>
+                `).join('');
+            } else if (!holidayName) {
+                html = '<p class="text-[9px] text-slate-400 italic">No church events scheduled.</p>';
+            }
             list.innerHTML = html;
         }
 
