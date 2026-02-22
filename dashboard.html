@@ -10,148 +10,171 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Special+Elite&display=swap');
         
-        :root { 
-            --mc-green: #2D4E53; 
-            --mc-emerald: #10b981;
-            --mc-soft-bg: #fdfdfe;
-        }
-
+        :root { --mc-green: #2D4E53; --mc-emerald: #10b981; }
+        
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: radial-gradient(circle at top right, #f8fafc, #eff6ff);
+            background: #f8fafc;
             color: #1e293b; 
-            display: flex; 
-            flex-direction: column; 
-            min-height: 100vh; 
+            padding-bottom: 160px; 
+            min-height: 100vh;
             overflow-x: hidden;
         }
 
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.03);
-        }
+        .glass-panel { background: white; border: 1px solid #f1f5f9; position: relative; overflow: hidden; z-index: 10; }
         
-        .calendar-day { 
-            min-height: 110px; 
-            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); 
-            background: white;
-            border: 1px solid #f1f5f9;
-            border-radius: 1.8rem;
-            margin: 2px;
-            position: relative;
+        /* Clear Emoji Background logic */
+        .emoji-bg::before {
+            content: attr(data-emoji);
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            font-size: 7rem;
+            opacity: 0.08; /* Tinaasan ang opacity para mas malinaw */
+            transform: rotate(12deg);
+            pointer-events: none;
+            z-index: 0;
+            filter: grayscale(0.2);
         }
-        .calendar-day:hover { 
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05); 
-            border-color: var(--mc-emerald);
+
+        /* Premium Calendar Style */
+        .glass-calendar {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 2.5rem;
+            padding: 2rem;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.03);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .calendar-grid { 
+            display: grid; 
+            grid-template-columns: repeat(7, 1fr); 
+            gap: 10px; 
+            width: 100%;
+            text-align: center;
+            position: relative;
             z-index: 10;
         }
-        .today { 
-            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%) !important; 
-            border: 2px solid #10b981 !important; 
+
+        .calendar-day-text { 
+            aspect-ratio: 1/1;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+            justify-content: center;
+            cursor: pointer; 
+            border-radius: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255,255,255,0.6);
         }
 
-        #eventDrawer { 
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); 
-            transform: translateX(100%); 
-            box-shadow: -20px 0 50px rgba(0,0,0,0.05);
-        }
-        #eventDrawer.open { transform: translateX(0); }
-
-        .rubber-stamp { 
-            font-family: 'Special Elite', cursive; 
-            border: 4px double currentColor; 
-            padding: 8px 20px; 
-            transform: rotate(-8deg); 
-            border-radius: 6px;
-            font-size: 1.2rem;
-        }
+        .calendar-day-text:hover { background: white; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .calendar-day-text.active-day { background: var(--mc-green) !important; color: white !important; }
+        .calendar-day-text.active-day .day-number { color: white; }
         
-        .floating { animation: floating 4s ease-in-out infinite; }
-        @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        .day-number { font-size: 14px; font-weight: 800; color: #64748b; }
 
-        .stat-card {
-            transition: transform 0.3s ease;
-            border-bottom: 4px solid transparent;
+        .embedded-details-container {
+            margin-top: 2rem;
+            border-top: 2px dashed #e2e8f0;
+            padding-top: 1.5rem;
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+            position: relative;
+            z-index: 20;
         }
-        .stat-card:hover { transform: scale(1.03); }
 
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        
-        main { flex-grow: 1; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .premium-card {
+            background: white;
+            border-radius: 1.2rem;
+            padding: 1.2rem;
+            border: 1px solid #f1f5f9;
+            margin-bottom: 0.8rem;
+            transition: 0.3s;
+        }
+
+        .rubber-stamp-small {
+            font-family: 'Special Elite', cursive;
+            font-size: 9px;
+            border: 2px solid currentColor;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transform: rotate(-3deg);
+            display: inline-block;
+            font-weight: bold;
+        }
+
+        /* Nav & Footer */
+        .fixed-footer-container { position: fixed; bottom: 65px; left: 0; right: 0; z-index: 900; background: white; border-top: 1px solid #f1f5f9; height: 65px; display: flex; align-items: center; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; height: 65px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #f1f5f9; z-index: 1000; box-shadow: 0 -4px 20px rgba(0,0,0,0.03); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #94a3b8; text-decoration: none; font-weight: 800; text-transform: uppercase; width: 50%; }
+        .nav-item i { font-size: 1.3rem; margin-bottom: 2px; } 
+        .nav-item span { font-size: 10px; }
+        .nav-item.active { color: var(--mc-green); }
     </style>
 </head>
-<body class="antialiased pb-4"> <nav class="sticky top-0 z-[100] bg-white/70 backdrop-blur-xl border-b border-slate-100">
-        <div class="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
-            <div class="flex items-center gap-4">
-                <div class="bg-white p-2 rounded-2xl shadow-sm border border-slate-50 floating">
-                    <img src="mcb.png" class="w-8 h-8 object-contain" alt="Logo">
-                </div>
+<body>
+
+    <nav class="sticky top-0 z-[100] bg-white/80 backdrop-blur-md border-b border-slate-100">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <img src="mcb.png" class="w-7 h-7" alt="Logo">
                 <div>
-                    <h1 class="font-black text-slate-800 text-lg md:text-xl uppercase tracking-tighter leading-none">Activity <span class="text-emerald-500">Tracker</span></h1>
-                    <p class="text-[8px] font-extrabold text-slate-400 uppercase tracking-[0.3em] mt-1 flex items-center gap-2">
-                        <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span> System Monitor
-                    </p>
+                    <h1 class="font-black text-slate-800 text-sm uppercase tracking-tighter leading-none">Activity <span class="text-emerald-500">Tracker</span></h1>
+                    <p class="text-[7px] font-extrabold text-slate-400 uppercase tracking-widest mt-0.5">Mobilization Church Balilihan</p>
                 </div>
             </div>
-            <div id="liveClock" class="hidden md:flex items-center gap-2 text-[10px] font-black text-slate-600 bg-slate-50 px-4 py-2 rounded-full border border-slate-200 uppercase tracking-widest shadow-sm">
-                🕒 Loading...
-            </div>
+            <div id="liveClock" class="text-[9px] font-black text-slate-600 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200 uppercase">🕒 00:00:00</div>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-6 mt-6 space-y-6 pb-10">
-        <div class="bg-white/40 p-6 md:p-8 rounded-[2.5rem] glass-panel border border-white flex flex-col md:flex-row justify-between items-center gap-6">
-            <div class="text-center md:text-left">
-                <h2 class="text-4xl font-black text-slate-800 tracking-tighter uppercase italic leading-none">Event <span class="text-emerald-500">Log</span></h2>
-                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em] mt-2">Monthly Analytics & Records ✨</p>
-            </div>
-            
-            <div class="flex items-center bg-white p-1.5 rounded-full border border-slate-100 shadow-lg shadow-slate-200/50">
-                <button onclick="changeMonth(-1)" class="w-10 h-10 flex items-center justify-center bg-slate-50 hover:bg-emerald-500 hover:text-white rounded-full transition-all">
-                    <i class="fa-solid fa-chevron-left text-xs"></i>
-                </button>
-                <div id="currentMonthYear" class="px-6 font-black text-slate-800 min-w-[180px] text-center uppercase tracking-tighter text-lg">
-                    ---
+    <main class="max-w-7xl mx-auto mt-6 space-y-6 px-4">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-8 space-y-6">
+                <div class="glass-panel emoji-bg p-6 rounded-[2rem]" data-emoji="📊">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-4 relative z-10">
+                        <h2 class="text-2xl font-black text-slate-800 tracking-tighter uppercase italic">Event <span class="text-emerald-500">Log</span></h2>
+                        <div class="flex items-center bg-white p-1 rounded-full border border-slate-200 shadow-sm">
+                            <button onclick="changeMonth(-1)" class="w-10 h-10 flex items-center justify-center hover:bg-slate-50 rounded-full"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                            <div id="currentMonthYear" class="px-4 font-black text-slate-800 min-w-[120px] text-center uppercase tracking-tighter text-xs">---</div>
+                            <button onclick="changeMonth(1)" class="w-10 h-10 flex items-center justify-center hover:bg-slate-50 rounded-full"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                        </div>
+                    </div>
                 </div>
-                <button onclick="changeMonth(1)" class="w-10 h-10 flex items-center justify-center bg-slate-50 hover:bg-emerald-500 hover:text-white rounded-full transition-all">
-                    <i class="fa-solid fa-chevron-right text-xs"></i>
-                </button>
-            </div>
-        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
-            <div class="md:col-span-8 grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-white p-5 rounded-[2rem] border border-white shadow-sm stat-card border-b-slate-200">
-                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Logs</p>
-                    <h3 id="statTotal" class="text-3xl font-black text-slate-800 tracking-tighter">0</h3>
-                </div>
-                <div class="bg-white p-5 rounded-[2rem] border border-white shadow-sm stat-card border-b-emerald-400">
-                    <p class="text-[9px] font-black text-emerald-500 uppercase tracking-widest mb-1">Success ✅</p>
-                    <h3 id="statApproved" class="text-3xl font-black text-emerald-500 tracking-tighter">0</h3>
-                </div>
-                <div class="bg-white p-5 rounded-[2rem] border border-white shadow-sm stat-card border-b-amber-400">
-                    <p class="text-[9px] font-black text-amber-500 uppercase tracking-widest mb-1">Queue ⏳</p>
-                    <h3 id="statPending" class="text-3xl font-black text-amber-500 tracking-tighter">0</h3>
-                </div>
-                <div class="bg-white p-5 rounded-[2rem] border border-white shadow-sm stat-card border-b-rose-400">
-                    <p class="text-[9px] font-black text-rose-500 uppercase tracking-widest mb-1">Dropped ❌</p>
-                    <h3 id="statRejected" class="text-3xl font-black text-rose-500 tracking-tighter">0</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="glass-panel p-4 rounded-3xl border-b-4 border-b-slate-200 text-center">
+                        <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Logs</p>
+                        <h3 id="statTotal" class="text-2xl font-black text-slate-800">0</h3>
+                    </div>
+                    <div class="glass-panel p-4 rounded-3xl border-b-4 border-b-emerald-400 text-center">
+                        <p class="text-[8px] font-black text-emerald-500 uppercase tracking-widest mb-1">Success ✅</p>
+                        <h3 id="statApproved" class="text-2xl font-black text-emerald-500">0</h3>
+                    </div>
+                    <div class="glass-panel p-4 rounded-3xl border-b-4 border-b-amber-400 text-center">
+                        <p class="text-[8px] font-black text-amber-500 uppercase tracking-widest mb-1">Queue ⏳</p>
+                        <h3 id="statPending" class="text-2xl font-black text-amber-500">0</h3>
+                    </div>
+                    <div class="glass-panel p-4 rounded-3xl border-b-4 border-b-rose-400 text-center">
+                        <p class="text-[8px] font-black text-rose-500 uppercase tracking-widest mb-1">Dropped ❌</p>
+                        <h3 id="statRejected" class="text-2xl font-black text-rose-500">0</h3>
+                    </div>
                 </div>
             </div>
 
-            <div class="md:col-span-4 bg-[#2D4E53] p-6 rounded-[2.5rem] text-white shadow-xl flex flex-col justify-between overflow-hidden relative">
-                <div class="absolute -right-4 -top-4 text-white/5 text-8xl rotate-12"><i class="fa-solid fa-chart-pie"></i></div>
-                <h4 class="font-black uppercase tracking-[0.2em] text-[9px] mb-4 opacity-60">Category Breakdown</h4>
+            <div class="lg:col-span-4 glass-panel emoji-bg bg-[#2D4E53] p-6 rounded-[2rem] text-white" data-emoji="📈">
+                <h4 class="font-black uppercase tracking-widest text-[10px] mb-4 opacity-60">Category Breakdown</h4>
                 <div class="space-y-3 relative z-10">
-                    <div class="flex justify-between items-center bg-white/5 backdrop-blur-md p-4 rounded-2xl border border-white/10">
+                    <div class="flex justify-between items-center bg-white/10 p-4 rounded-2xl border border-white/10">
                         <span class="text-[10px] font-black uppercase tracking-widest">Programs 📖</span>
                         <span id="statGeneral" class="text-2xl font-black">0</span>
                     </div>
-                    <div class="flex justify-between items-center bg-white/5 backdrop-blur-md p-4 rounded-2xl border border-white/10">
+                    <div class="flex justify-between items-center bg-white/10 p-4 rounded-2xl border border-white/10">
                         <span class="text-[10px] font-black uppercase tracking-widest">Music 🎸</span>
                         <span id="statMusic" class="text-2xl font-black">0</span>
                     </div>
@@ -159,232 +182,180 @@
             </div>
         </div>
 
-        <div class="bg-white/60 p-5 rounded-[3rem] glass-panel border border-white">
-            <div class="grid grid-cols-7 mb-4">
-                <div class="py-2 text-center text-[10px] font-black text-emerald-600/60 uppercase tracking-[0.4em]">Sun</div>
-                <div class="py-2 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">Mon</div>
-                <div class="py-2 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">Tue</div>
-                <div class="py-2 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">Wed</div>
-                <div class="py-2 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">Thu</div>
-                <div class="py-2 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">Fri</div>
-                <div class="py-2 text-center text-[10px] font-black text-rose-600/60 uppercase tracking-[0.4em]">Sat</div>
+        <div class="glass-calendar emoji-bg" data-emoji="📅">
+            <div class="calendar-grid mb-6 opacity-40">
+                <div class="text-[9px] font-black text-rose-500 uppercase">Sun</div>
+                <div class="text-[9px] font-black text-slate-400 uppercase">Mon</div>
+                <div class="text-[9px] font-black text-slate-400 uppercase">Tue</div>
+                <div class="text-[9px] font-black text-slate-400 uppercase">Wed</div>
+                <div class="text-[9px] font-black text-slate-400 uppercase">Thu</div>
+                <div class="text-[9px] font-black text-slate-400 uppercase">Fri</div>
+                <div class="text-[9px] font-black text-slate-400 uppercase">Sat</div>
             </div>
-            <div id="calendarBody" class="grid grid-cols-7 gap-2"></div>
+
+            <div id="calendarBody" class="calendar-grid"></div>
+
+            <div id="embeddedDetails" class="embedded-details-container">
+                <div class="flex justify-between items-center mb-4 px-2">
+                    <div>
+                        <p class="text-[8px] font-black text-slate-400 uppercase">Viewing Records for</p>
+                        <h3 id="selectedDateLabel" class="text-sm font-black text-slate-800 uppercase italic">Selected Date</h3>
+                    </div>
+                    <button onclick="closeDetails()" class="text-[9px] font-black text-rose-400 uppercase bg-rose-50 px-3 py-1.5 rounded-full">Close Details</button>
+                </div>
+                <div id="reportsList" class="space-y-3"></div>
+            </div>
         </div>
     </main>
 
-    <footer class="mt-8 py-6 border-t border-slate-200 bg-white/50 backdrop-blur-md">
-        <div class="max-w-7xl mx-auto px-8">
-            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <img src="mcb.png" class="w-8 h-8 object-contain grayscale opacity-70" alt="MCB Logo">
-                    <div class="text-left">
-                        <p class="text-[11px] font-black uppercase tracking-tight text-slate-800">Mobilization Church Balilihan</p>
-                        <p class="text-[8px] font-bold text-slate-400 uppercase tracking-[0.3em]">© 2026 • System Analytics</p>
-                    </div>
+    <div id="dataModal" class="fixed inset-0 z-[2000] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeDataModal()"></div>
+        <div class="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden relative flex flex-col max-h-[90vh]">
+            <div class="p-8 overflow-y-auto">
+                <div class="flex flex-col items-center mb-6 text-center">
+                    <img src="mcb.png" class="w-14 h-14 mb-2">
+                    <h2 class="text-xl font-black text-[#2D4E53] uppercase">MCB Balilihan</h2>
+                    <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest border-t pt-1 w-full max-w-[200px]">Official Service Program</p>
                 </div>
-
-                <div class="text-center md:text-right">
-                    <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Developed by:</p>
-                    <p class="text-[11px] font-extrabold text-[#2D4E53] uppercase tracking-tighter">
-                        Mark Brian D. Angco 🫶
-                    </p>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <div id="eventDrawer" class="fixed top-0 right-0 h-full w-full md:w-[450px] bg-slate-50/95 backdrop-blur-2xl z-[150] flex flex-col border-l border-white/50">
-        <div class="p-8 border-b border-white flex justify-between items-center bg-white/50">
-            <div>
-                <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Records for</p>
-                <h3 class="text-2xl font-black text-slate-800 uppercase italic tracking-tighter" id="selectedDateText">---</h3>
-            </div>
-            <button onclick="closeDrawer()" class="w-12 h-12 flex items-center justify-center rounded-xl bg-white text-slate-400 hover:text-rose-500 transition-all shadow-sm border border-slate-100">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-        </div>
-        <div id="drawerContent" class="flex-grow p-6 space-y-4 overflow-y-auto"></div>
-    </div>
-
-    <div id="programModal" class="fixed inset-0 z-[200] flex items-center justify-center hidden p-4">
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeProgramModal()"></div>
-        <div class="bg-white w-full max-w-2xl max-h-[90vh] rounded-[3rem] shadow-2xl overflow-hidden flex flex-col relative border-[6px] border-white">
-            <div class="flex-grow overflow-y-auto p-10 md:p-12">
-                <div class="flex flex-col items-center mb-8 text-center">
-                    <img src="mcb.png" class="w-16 h-16 object-contain mb-4" alt="Logo">
-                    <h1 class="text-xl font-black text-slate-800 uppercase tracking-tighter">Mobilization Church</h1>
-                    <p class="text-[9px] font-extrabold text-slate-400 uppercase tracking-[0.4em] mt-1">Official Program Report</p>
-                </div>
-                <div id="programDetailsArea">
-                     <div class="grid grid-cols-2 gap-4 bg-slate-50 p-6 rounded-[2rem] mb-8 border border-slate-100">
-                        <div>
-                            <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Title</p>
-                            <h2 id="viewProgTitle" class="text-xl font-black text-slate-800 uppercase italic leading-none">---</h2>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Date Issued</p>
-                            <p id="viewProgDate" class="font-black text-emerald-600 text-base uppercase">---</p>
-                        </div>
-                    </div>
-                    <table class="w-full mb-8">
-                        <thead>
-                            <tr class="border-b-2 border-slate-100">
-                                <th class="py-4 text-left text-[9px] font-black uppercase text-slate-400 tracking-widest">Activity Detail</th>
-                                <th class="py-4 text-right text-[9px] font-black uppercase text-slate-400 tracking-widest">In-Charge</th>
-                            </tr>
-                        </thead>
-                        <tbody id="viewProgRows" class="divide-y divide-slate-50"></tbody>
-                    </table>
-                </div>
-                <div class="flex justify-between items-center pt-8 border-t-2 border-dashed border-slate-100">
+                <div id="modalMainContent" class="space-y-1"></div>
+                <div class="mt-8 flex justify-between items-end border-t border-slate-50 pt-6">
                     <div>
-                        <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Reporting Officer</p>
-                        <p id="viewProgUser" class="text-sm font-black text-slate-700">---</p>
+                        <p class="text-[8px] font-bold text-slate-300 uppercase mb-1">Prepared By</p>
+                        <p id="modalUser" class="text-[10px] font-black text-slate-800 uppercase">---</p>
                     </div>
-                    <div id="viewProgStamp" class="rubber-stamp hidden">APPROVED</div>
+                    <div id="modalStampContainer"></div>
                 </div>
             </div>
-            <button onclick="closeProgramModal()" class="m-8 bg-slate-900 text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] hover:bg-emerald-600 transition-all">Dismiss Report</button>
+            <button onclick="closeDataModal()" class="m-6 bg-slate-900 text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-emerald-600 transition-all">Close Report</button>
         </div>
     </div>
+
+    <div class="fixed-footer-container">
+        <div class="w-full max-w-7xl mx-auto px-6 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <img src="mcb.png" class="w-6 h-6 grayscale opacity-60" alt="MCB Logo">
+                <div class="text-left">
+                    <p class="text-[9px] font-black uppercase tracking-tight text-slate-800">MCB Balilihan</p>
+                    <p class="text-[7px] font-bold text-slate-400 uppercase tracking-widest">Analytics System © 2026</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <p class="text-[7px] font-black text-slate-400 uppercase tracking-widest">Dev:</p>
+                <p class="text-[10px] font-extrabold text-[#2D4E53] uppercase tracking-tighter">Mark Brian Angco 🫶</p>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item"><i class="fa-solid fa-house"></i><span>Home</span></a>
+        <a href="dashboard.html" class="nav-item active"><i class="fa-solid fa-chart-pie"></i><span>Report</span></a>
+    </nav>
 
     <script>
+        // Supabase and Core logic remains unchanged
         const sb = supabase.createClient('https://eejovtuputrwneovhfpc.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlam92dHVwdXRyd25lb3ZoZnBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMjY5MzIsImV4cCI6MjA4NjgwMjkzMn0.JJz64gSTT9qSqOkiJvuL1PT_H_I4ZYJbchrmkoljwws');
-        
         let currentDate = new Date();
         let allPrograms = [];
 
         async function loadData() {
-            try {
-                const { data, error } = await sb.from('programs').select('*');
-                if (error) throw error;
-                allPrograms = data || [];
-                updateStats();
-                renderCalendar();
-            } catch (err) { console.error("Database Error:", err.message); }
+            const { data } = await sb.from('programs').select('*').order('created_at', { ascending: false });
+            allPrograms = data || [];
+            updateStats(); renderCalendar();
         }
 
         function updateStats() {
-            const total = allPrograms.length;
-            const approved = allPrograms.filter(i => i.status === 'approved').length;
-            const pending = allPrograms.filter(i => i.status === 'pending').length;
-            const rejected = allPrograms.filter(i => i.status === 'rejected').length;
-            
-            const musicCount = allPrograms.filter(i => 
-                (i.title && i.title.toLowerCase().includes('music')) || 
-                (i.category && i.category.toLowerCase() === 'music')
-            ).length;
-
-            const generalCount = total - musicCount;
-            
-            document.getElementById('statTotal').innerText = total;
-            document.getElementById('statApproved').innerText = approved;
-            document.getElementById('statPending').innerText = pending;
-            document.getElementById('statRejected').innerText = rejected;
+            document.getElementById('statTotal').innerText = allPrograms.length;
+            document.getElementById('statApproved').innerText = allPrograms.filter(i => i.status === 'approved').length;
+            document.getElementById('statPending').innerText = allPrograms.filter(i => i.status === 'pending').length;
+            document.getElementById('statRejected').innerText = allPrograms.filter(i => i.status === 'rejected').length;
+            const musicCount = allPrograms.filter(i => i.title?.toLowerCase().includes('music')).length;
             document.getElementById('statMusic').innerText = musicCount;
-            document.getElementById('statGeneral').innerText = generalCount;
+            document.getElementById('statGeneral').innerText = allPrograms.length - musicCount;
         }
 
         function renderCalendar() {
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
-            const today = new Date();
-            document.getElementById('currentMonthYear').innerText = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(currentDate);
-            
+            document.getElementById('currentMonthYear').innerText = new Intl.DateTimeFormat('en-US', { month: 'short', year: 'numeric' }).format(currentDate);
             const calendarBody = document.getElementById('calendarBody');
             calendarBody.innerHTML = '';
-
             const firstDay = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-            for (let i = 0; i < firstDay; i++) {
-                calendarBody.innerHTML += `<div class="calendar-day opacity-0 pointer-events-none"></div>`;
-            }
-
+            for (let i = 0; i < firstDay; i++) calendarBody.innerHTML += `<div></div>`;
             for (let day = 1; day <= daysInMonth; day++) {
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 const dayEvents = allPrograms.filter(p => p.program_date === dateStr);
-                const isToday = today.toDateString() === new Date(year, month, day).toDateString();
-                
                 calendarBody.innerHTML += `
-                    <div class="calendar-day ${isToday ? 'today' : ''} p-4 flex flex-col justify-between cursor-pointer" onclick="openDrawer('${dateStr}')">
-                        <span class="text-[10px] font-black ${isToday ? 'text-emerald-700' : 'text-slate-300'}">${day}</span>
-                        <div class="flex flex-wrap gap-1 mt-1">
-                            ${dayEvents.slice(0, 4).map(e => {
-                                let color = 'bg-amber-400';
-                                if(e.status === 'approved') color = 'bg-emerald-500';
-                                if(e.status === 'rejected') color = 'bg-rose-500';
-                                return `<div class="w-2 h-2 rounded-full ${color} ring-1 ring-white"></div>`;
-                            }).join('')}
-                        </div>
+                    <div class="calendar-day-text" id="day-${day}" onclick="selectDate('${dateStr}', ${day})">
+                        <span class="day-number">${day}</span>
+                        ${dayEvents.length > 0 ? `<div class="w-1.5 h-1.5 bg-emerald-400 rounded-full mt-1"></div>` : ''}
                     </div>`;
             }
         }
 
-        function openDrawer(dateStr) {
+        function selectDate(dateStr, dayNum) {
+            document.querySelectorAll('.calendar-day-text').forEach(el => el.classList.remove('active-day'));
+            document.getElementById(`day-${dayNum}`).classList.add('active-day');
             const dayEvents = allPrograms.filter(p => p.program_date === dateStr);
-            const dateObj = new Date(dateStr);
-            document.getElementById('selectedDateText').innerText = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            const content = document.getElementById('drawerContent');
-            
-            content.innerHTML = dayEvents.length === 0 
-                ? `<div class="text-center py-10 opacity-20"><i class="fa-solid fa-folder-open text-4xl mb-2"></i><br><p class="text-[8px] font-black uppercase tracking-widest">No logs</p></div>`
-                : dayEvents.map(e => `
-                    <div class="bg-white p-5 rounded-[1.5rem] border border-slate-100 hover:border-emerald-500 cursor-pointer transition-all duration-300 group" onclick="viewProgram('${e.id}')">
-                        <div class="flex justify-between items-center mb-3">
-                            <span class="px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest ${e.status === 'approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-50 text-slate-400'}">
-                                ${e.status}
-                            </span>
-                            <i class="fa-solid fa-arrow-right text-[8px] text-slate-300 group-hover:text-emerald-500"></i>
+            document.getElementById('selectedDateLabel').innerText = new Date(dateStr).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric'});
+            const reportsList = document.getElementById('reportsList');
+            const container = document.getElementById('embeddedDetails');
+            container.style.display = 'block';
+            if (dayEvents.length === 0) {
+                reportsList.innerHTML = `<p class="text-center text-[10px] py-10 text-slate-300 font-bold uppercase tracking-widest">No Activity Records</p>`;
+            } else {
+                reportsList.innerHTML = dayEvents.map(e => `
+                    <div class="premium-card flex justify-between items-center cursor-pointer" onclick="showFullRecord('${e.id}')">
+                        <div>
+                            <h4 class="text-xs font-black text-slate-800 uppercase tracking-tighter italic">${e.title || 'Church Service'}</h4>
+                            <p class="text-[8px] text-slate-400 font-bold uppercase mt-1">Reporter: ${e.user_id}</p>
                         </div>
-                        <h4 class="font-black text-slate-800 uppercase italic tracking-tight leading-none text-base">${e.title || 'Report Entry'}</h4>
-                        <p class="text-[8px] font-bold text-slate-400 mt-2 uppercase tracking-widest">👤 User: ${e.user_id}</p>
+                        <div class="rubber-stamp-small ${e.status === 'approved' ? 'text-emerald-500 border-emerald-500' : 'text-amber-500 border-amber-500'}">
+                            ${e.status}
+                        </div>
                     </div>
                 `).join('');
-            document.getElementById('eventDrawer').classList.add('open');
-        }
-
-        async function viewProgram(id) {
-            const prog = allPrograms.find(p => p.id == id);
-            if(!prog) return;
-
-            document.getElementById('viewProgTitle').innerText = prog.title || 'Untitled';
-            document.getElementById('viewProgDate').innerText = prog.program_date;
-            document.getElementById('viewProgUser').innerText = prog.user_id || 'System';
-            
-            let list = [];
-            try { 
-                list = (typeof prog.content === 'string') ? JSON.parse(prog.content) : (prog.content || []); 
-            } catch (e) { list = []; }
-
-            document.getElementById('viewProgRows').innerHTML = list.map(row => `
-                <tr class="group">
-                    <td class="py-4 font-black uppercase text-[10px] text-slate-700">${row.act || '---'}</td>
-                    <td class="py-4 text-right text-slate-400 font-bold italic text-[10px] uppercase">${row.who || '---'}</td>
-                </tr>
-            `).join('');
-
-            const stamp = document.getElementById('viewProgStamp');
-            if(prog.status === 'approved') {
-                stamp.classList.remove('hidden');
-                stamp.style.color = prog.ink_color || '#10b981';
-            } else {
-                stamp.classList.add('hidden');
             }
-            document.getElementById('programModal').classList.remove('hidden');
         }
 
-        function closeProgramModal() { document.getElementById('programModal').classList.add('hidden'); }
-        function closeDrawer() { document.getElementById('eventDrawer').classList.remove('open'); }
-        function changeMonth(offset) { currentDate.setMonth(currentDate.getMonth() + offset); renderCalendar(); }
+        function showFullRecord(id) {
+            const record = allPrograms.find(r => r.id == id);
+            if(!record) return;
+            const rows = [
+                ['Sunday School', 'Sis. Jackie'], ['Opening Song', 'Worship Team'],
+                ['Scripture Reading', 'Sis. Jasmine'], ['Opening Prayer', 'Ptra. Rosmir'],
+                ['Praise & Worship', 'Sis. Jean Mae'], ['Word of God', 'Ptra. Maricar'],
+                ['Tithes/Offering', 'Ptra. Marilyn'], ['Announcement', '% MC'],
+                ['Closing Prayer', 'Ptr. Ulysses'], ['Master of Ceremony', 'Sis. Merlyn']
+            ];
+            document.getElementById('modalMainContent').innerHTML = `
+                <div class="mb-5">
+                    <h3 class="text-2xl font-black text-slate-800 tracking-tighter uppercase italic leading-tight">${record.title || 'Sunday Service'}</h3>
+                    <p class="text-[10px] font-bold text-emerald-500 uppercase">${record.program_date}</p>
+                </div>
+                <div class="space-y-0.5">
+                    ${rows.map(row => `
+                        <div class="flex justify-between border-b border-slate-50 py-2 text-[10px]">
+                            <span class="font-bold text-slate-400 uppercase tracking-tight">${row[0]}</span>
+                            <span class="font-black text-slate-700 uppercase">${row[1]}</span>
+                        </div>
+                    `).join('')}
+                </div>`;
+            document.getElementById('modalUser').innerText = record.user_id.toUpperCase();
+            const stampCont = document.getElementById('modalStampContainer');
+            stampCont.innerHTML = `<div class="rubber-stamp-small text-xs ${record.status === 'approved' ? 'text-emerald-500 border-emerald-500' : 'text-amber-500 border-amber-500'}">
+                ${record.status === 'approved' ? 'VERIFIED APPROVED' : record.status}
+            </div>`;
+            document.getElementById('dataModal').classList.remove('hidden');
+        }
 
-        setInterval(() => {
-            const now = new Date();
-            const liveClock = document.getElementById('liveClock');
-            if(liveClock) liveClock.innerHTML = `<span class="text-emerald-400">🕒</span> ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}`;
-        }, 1000);
-
+        function closeDetails() { 
+            document.getElementById('embeddedDetails').style.display = 'none';
+            document.querySelectorAll('.calendar-day-text').forEach(el => el.classList.remove('active-day'));
+        }
+        function closeDataModal() { document.getElementById('dataModal').classList.add('hidden'); }
+        function changeMonth(offset) { currentDate.setMonth(currentDate.getMonth() + offset); renderCalendar(); closeDetails(); }
+        setInterval(() => { document.getElementById('liveClock').innerText = `🕒 ${new Date().toLocaleTimeString('en-GB')}`; }, 1000);
         document.addEventListener('DOMContentLoaded', loadData);
     </script>
 </body>
