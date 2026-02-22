@@ -6,7 +6,7 @@
     <title>User Portal | MCB Balilihan</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
@@ -17,7 +17,6 @@
             font-family: 'Plus Jakarta Sans', sans-serif; 
             background: #f1f5f9; 
             color: #1e293b; 
-            /* Increased padding to ensure footer doesn't overlap content */
             padding-bottom: 180px; 
         }
         
@@ -26,7 +25,6 @@
         
         .emoji-bg { position: absolute; font-size: 8rem; opacity: 0.07; z-index: 0; pointer-events: none; }
 
-        /* Animations */
         @keyframes wave {
             0%, 100% { transform: rotate(0deg); }
             25% { transform: rotate(20deg); }
@@ -40,13 +38,11 @@
         }
         .blink-text { animation: blink 1.5s infinite ease-in-out; }
 
-        /* Footers */
         .steady-footer { position: fixed; bottom: 75px; left: 0; right: 0; background: white; border-top: 1px solid #e2e8f0; z-index: 999; padding: 15px 0; width: 100%; }
         .bottom-menu { position: fixed; bottom: 0; left: 0; right: 0; height: 75px; background: white; border-top: 1px solid rgba(0,0,0,0.05); display: flex; justify-content: space-around; align-items: center; z-index: 1000; width: 100%; }
         
         #viewModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
         
-        /* Registry Styling */
         .filter-btn { padding: 8px 16px; border-radius: 12px; font-size: 10px; font-weight: 800; text-transform: uppercase; border: 1.5px solid #f1f5f9; transition: all 0.2s; background: white; color: #94a3b8; }
         .filter-btn.active { background: #2D4E53; color: white; border-color: #2D4E53; }
 
@@ -57,25 +53,34 @@
 
         .act-row { position: relative; background: #f8fafc; padding: 1rem; border-radius: 1rem; margin-bottom: 0.5rem; }
 
-        #downloadCanvas { width: 700px; padding: 60px; background: white; position: absolute; left: -9999px; text-align: center; }
+        /* Hidden Download Template */
+        #downloadCanvas { 
+            width: 600px; 
+            padding: 40px; 
+            background: white; 
+            position: fixed; 
+            top: 0; 
+            left: -2000px; /* Stay hidden but rendered */
+            text-align: center;
+            z-index: -1;
+        }
     </style>
 </head>
 <body>
 
     <div id="downloadCanvas">
         <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 20px;">
-            <img src="mcb.png" style="width: 120px; height: auto;">
-            <h1 style="font-family: 'Arial Black', sans-serif; font-size: 24pt; color: #2D4E53;">MOBILIZATION CHURCH BALILIHAN</h1>
-            <p style="font-family: Arial, sans-serif; font-size: 12pt; color: #64748b;">Sali-ng, Balilihan, Bohol</p>
+            <img src="mcb.png" style="width: 100px; height: auto;">
+            <h1 style="font-family: sans-serif; font-weight: 900; font-size: 20pt; color: #2D4E53; margin-top: 10px;">MCB BALILIHAN</h1>
+            <p style="font-family: sans-serif; font-size: 10pt; color: #64748b; text-transform: uppercase; letter-spacing: 2px;">Official Service Record</p>
         </div>
-        <div style="border-bottom: 4px solid #2D4E53; margin: 25px 0;"></div>
-        <h2 id="canvasTitle" style="font-family: 'Arial Black', sans-serif; font-size: 18pt; text-decoration: underline;">OFFICIAL PROGRAM</h2>
-        <div id="canvasBody"></div>
-        <div style="margin-top: 60px; display: flex; justify-content: space-between; align-items: flex-end;">
-            <div style="text-align: left; border: 3px solid #10b981; padding: 15px; border-radius: 10px; background: #f0fdf4;">
-                <p style="margin: 0; font-family: 'Arial Black', sans-serif; font-size: 14pt; color: #065f46;">STATUS: APPROVED ✅</p>
-                <p id="stampDetails" style="margin: 0; font-family: Arial, sans-serif; font-size: 10pt; color: #64748b;"></p>
-            </div>
+        <div style="border-bottom: 2px solid #2D4E53; margin: 20px 0;"></div>
+        <h2 id="canvasTitle" style="font-family: sans-serif; font-weight: 800; font-size: 16pt; color: #1e293b; text-transform: uppercase;">---</h2>
+        <p id="canvasDate" style="font-size: 10pt; font-weight: bold; color: #10b981; margin-bottom: 20px;">---</p>
+        <div id="canvasBody" style="text-align: left; background: #f8fafc; padding: 20px; border-radius: 15px;"></div>
+        <div style="margin-top: 40px; text-align: right;">
+            <p style="font-size: 8pt; color: #94a3b8; text-transform: uppercase;">Verified By</p>
+            <p id="canvasUser" style="font-weight: 900; font-size: 11pt; color: #2D4E53;">---</p>
         </div>
     </div>
 
@@ -89,7 +94,9 @@
                 <button onclick="closeModal()"><i class="fa-solid fa-circle-xmark text-2xl text-slate-300"></i></button>
             </div>
             <div id="modalContent" class="space-y-3 max-h-[40vh] overflow-y-auto mb-6 pr-2"></div>
-            <button id="dlBtn" class="w-full py-4 bg-emerald-600 text-white rounded-2xl font-black text-xs uppercase shadow-lg">Download Official Image</button>
+            <button id="dlBtn" onclick="downloadImage()" class="w-full py-4 bg-emerald-600 text-white rounded-2xl font-black text-xs uppercase shadow-lg hover:bg-emerald-700 transition-all">
+                <i class="fa-solid fa-download mr-2"></i> Download Official Image
+            </button>
         </div>
     </div>
 
@@ -111,7 +118,6 @@
     </nav>
 
     <main class="max-w-6xl mx-auto px-4 py-6 space-y-6">
-        
         <section class="glass-card p-8 border-l-8 border-emerald-500">
             <div class="emoji-bg -right-10 -top-10">⛪</div>
             <div class="relative z-10 flex items-center gap-5">
@@ -146,7 +152,6 @@
                     <div class="pt-4">
                         <h3 class="text-[11px] font-black text-slate-800 uppercase tracking-widest mb-4">Program Flow</h3>
                         <div id="rowContainer" class="max-h-[300px] overflow-y-auto space-y-4 pr-2"></div>
-                        
                         <button type="button" onclick="addRow()" class="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 font-black text-[10px] uppercase tracking-widest hover:bg-emerald-50 hover:text-emerald-500 mt-4 transition-all">
                             <i class="fa-solid fa-plus-circle mr-2"></i> Add Activity Flow
                         </button>
@@ -177,8 +182,7 @@
                     <input id="searchName" type="text" oninput="loadHistory()" placeholder="Quick Search Name..." class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl font-bold text-xs outline-none focus:border-emerald-500 transition-all">
                 </div>
                 
-                <div id="historyList" class="space-y-3">
-                    </div>
+                <div id="historyList" class="space-y-3"></div>
             </div>
         </section>
     </main>
@@ -189,10 +193,7 @@
                 <img src="mcb.png" class="w-10 h-10 opacity-40 grayscale">
                 <div>
                     <p class="text-[10px] font-black uppercase text-slate-800 leading-tight">MCB Balilihan</p>
-                    <p class="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">© 2026 Mobilizing hearts for Christ. A church family growing together in faith, love, and service.
-
-
-</p>
+                    <p class="text-[8px] font-bold text-slate-400 uppercase tracking-tighter max-w-[200px] md:max-w-none">© 2026 Mobilizing hearts for Christ. A church family growing together.</p>
                 </div>
             </div>
             <div class="text-right">
@@ -238,11 +239,9 @@
         async function loadHistory() {
             const val = document.getElementById('searchName').value;
             const list = document.getElementById('historyList');
-            
             let query = sb.from('programs').select('*');
             if(val) query = query.or(`user_id.ilike.%${val}%,title.ilike.%${val}%`);
             if(currentFilter !== 'all') query = query.eq('status', currentFilter);
-            
             const { data } = await query.order('created_at', {ascending: false}).limit(20);
             
             if(data?.length) {
@@ -292,18 +291,65 @@
         };
 
         function closeModal() { document.getElementById('viewModal').style.display = 'none'; }
+
+        // THE DOWNLOAD FUNCTION FIX
+        async function downloadImage() {
+            if(!activeItem) return;
+            const dlBtn = document.getElementById('dlBtn');
+            dlBtn.innerText = "GENERATING IMAGE...";
+            dlBtn.disabled = true;
+
+            // 1. Fill the Hidden Template
+            document.getElementById('canvasTitle').innerText = activeItem.title;
+            document.getElementById('canvasDate').innerText = activeItem.program_date;
+            document.getElementById('canvasUser').innerText = activeItem.user_id;
+            document.getElementById('canvasBody').innerHTML = activeItem.content.map(c => `
+                <div style="margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;">
+                    <p style="margin: 0; font-weight: 800; font-size: 11pt; color: #1e293b; text-transform: uppercase;">${c.act}</p>
+                    <p style="margin: 0; color: #10b981; font-weight: bold; font-size: 10pt;">➔ ${c.who}</p>
+                </div>
+            `).join('');
+
+            // 2. Trigger html2canvas
+            const element = document.getElementById('downloadCanvas');
+            
+            // Temporary bring into view for accurate capture
+            element.style.left = "0px";
+            element.style.top = "0px";
+            element.style.zIndex = "5000";
+
+            try {
+                const canvas = await html2canvas(element, {
+                    scale: 2, // High quality
+                    useCORS: true,
+                    backgroundColor: "#ffffff"
+                });
+                
+                const imgData = canvas.toDataURL("image/png");
+                const link = document.createElement('a');
+                link.download = `MCB-Program-${activeItem.program_date}.png`;
+                link.href = imgData;
+                link.click();
+            } catch (err) {
+                alert("Error generating image. Please try again.");
+                console.error(err);
+            } finally {
+                // 3. Hide it again
+                element.style.left = "-2000px";
+                dlBtn.innerText = "DOWNLOAD OFFICIAL IMAGE";
+                dlBtn.disabled = false;
+            }
+        }
         
         function updateUI() {
             const now = new Date();
             const hrs = now.getHours();
             const day = now.getDay();
-
             let greet = "Maayong Buntag";
             if (hrs >= 12 && hrs < 13) greet = "Maayong Udto";
             else if (hrs >= 13 && hrs < 18) greet = "Maayong Hapon";
             else if (hrs >= 18 || hrs < 5) greet = "Maayong Gabii";
             document.getElementById('greetingText').innerText = greet;
-
             if (day === 0) document.getElementById('sabbathLabel').classList.remove('hidden');
             document.getElementById('liveClock').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             document.getElementById('liveDate').innerText = now.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
