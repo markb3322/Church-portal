@@ -52,27 +52,10 @@
         .status-badge { font-size: 8px; font-weight: 900; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.05em; }
         .act-row { position: relative; background: #f8fafc; padding: 1rem; border-radius: 1rem; margin-bottom: 0.5rem; }
 
-        /* OFFICIAL DOWNLOAD TEMPLATE STYLING (MATCHING THE UPLOADED PICTURES) */
-        #downloadCanvas { 
-            width: 700px; 
-            padding: 50px; 
-            background: white; 
-            position: fixed; 
-            top: 0; 
-            left: -3000px; /* Fully hidden */
-            z-index: -10;
-        }
+        /* DOWNLOAD CANVAS HIDDEN STYLES */
+        #downloadCanvas { width: 700px; padding: 50px; background: white; position: fixed; top: 0; left: -3000px; z-index: -10; }
         .canvas-header { text-align: center; border-bottom: 3px solid #2D4E53; padding-bottom: 20px; margin-bottom: 30px; }
-        .canvas-title { font-size: 24pt; font-weight: 800; color: #1e293b; margin-top: 15px; text-transform: uppercase; }
         .canvas-subtitle { font-size: 11pt; color: #64748b; letter-spacing: 3px; font-weight: 600; margin-top: 5px; }
-        .official-stamp { 
-            border: 3px solid #10b981; 
-            padding: 15px 25px; 
-            border-radius: 10px; 
-            display: inline-block; 
-            transform: rotate(-3deg); 
-            margin-top: 30px;
-        }
     </style>
 </head>
 <body>
@@ -83,23 +66,18 @@
             <h1 style="font-family: sans-serif; font-weight: 900; font-size: 22pt; color: #2D4E53; margin-top: 10px; letter-spacing: -1px;">MOBILIZATION CHURCH BALILIHAN</h1>
             <p class="canvas-subtitle">OFFICIAL SERVICE PROGRAM</p>
         </div>
-        
         <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px;">
             <div style="text-align: left;">
                 <h2 id="canvasTitle" style="font-size: 26pt; font-weight: 800; color: #1e293b; margin: 0;">---</h2>
                 <p id="canvasDateDisplay" style="font-size: 14pt; font-weight: 700; color: #64748b; margin-top: 5px;">---</p>
             </div>
         </div>
-
-        <div id="canvasBody" style="border-top: 1px solid #f1f5f9;">
-            </div>
-
+        <div id="canvasBody" style="border-top: 1px solid #f1f5f9;"></div>
         <div style="margin-top: 50px; display: flex; justify-content: space-between; align-items: center;">
             <div style="text-align: left;">
                 <p style="font-size: 9pt; color: #94a3b8; font-weight: 800; text-transform: uppercase;">Prepared By:</p>
                 <p id="canvasUser" style="font-size: 12pt; font-weight: 900; color: #1e293b; text-transform: uppercase;">---</p>
             </div>
-            
             <div id="stampArea" style="text-align: center; border: 4px solid #10b981; padding: 10px 20px; border-radius: 12px; transform: rotate(-2deg); background: rgba(16, 185, 129, 0.05);">
                 <p style="color: #10b981; font-weight: 900; font-size: 8pt; margin: 0; text-decoration: underline;">MOBILIZATION CHURCH BALILIHAN</p>
                 <h1 style="color: #10b981; font-weight: 950; font-size: 28pt; margin: 0; line-height: 1;">APPROVED</h1>
@@ -176,7 +154,6 @@
                         <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Program Title</label>
                         <input id="progTitle" type="text" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-sm outline-none focus:border-emerald-500" placeholder="e.g. Sunday Celebration" required>
                     </div>
-
                     <div class="pt-4">
                         <h3 class="text-[11px] font-black text-slate-800 uppercase tracking-widest mb-4">Program Flow</h3>
                         <div id="rowContainer" class="max-h-[300px] overflow-y-auto space-y-4 pr-2"></div>
@@ -184,7 +161,6 @@
                             <i class="fa-solid fa-plus-circle mr-2"></i> Add Activity Flow
                         </button>
                     </div>
-
                     <button type="submit" id="submitBtn" class="w-full py-5 bg-[#2D4E53] text-white rounded-[2rem] font-black uppercase text-[12px] shadow-xl mt-8 tracking-widest">PUBLISH TO REGISTRY</button>
                 </form>
             </div>
@@ -197,19 +173,16 @@
                     <h2 class="text-2xl font-black text-slate-800 uppercase italic">Registry Tracking</h2>
                     <div class="bg-emerald-100 px-3 py-1 rounded-full text-[10px] font-black text-emerald-700 uppercase tracking-wider">Live Database</div>
                 </div>
-                
                 <div class="flex flex-wrap gap-2 mb-6">
                     <button onclick="setFilter('all')" class="filter-btn active" id="f-all">All</button>
                     <button onclick="setFilter('approved')" class="filter-btn" id="f-approved">Approved</button>
                     <button onclick="setFilter('pending')" class="filter-btn" id="f-pending">Pending</button>
                     <button onclick="setFilter('rejected')" class="filter-btn" id="f-rejected">Rejected</button>
                 </div>
-
                 <div class="relative mb-6">
                     <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
                     <input id="searchName" type="text" oninput="loadHistory()" placeholder="Quick Search Name..." class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl font-bold text-xs outline-none focus:border-emerald-500 transition-all">
                 </div>
-                
                 <div id="historyList" class="space-y-3"></div>
             </div>
         </section>
@@ -280,8 +253,7 @@
                         rejected: 'bg-red-100 text-red-700'
                     }[i.status] || 'bg-slate-100 text-slate-700';
 
-                    return `
-                    <div onclick='openModal(${JSON.stringify(i)})' class="registry-item">
+                    return `<div onclick='openModal(${JSON.stringify(i)})' class="registry-item">
                         <div class="flex justify-between items-start">
                             <div>
                                 <h4 class="text-[12px] font-black text-slate-800 uppercase leading-tight mb-1">${i.title}</h4>
@@ -320,23 +292,19 @@
 
         function closeModal() { document.getElementById('viewModal').style.display = 'none'; }
 
-        // THE DOWNLOAD FUNCTION FIX & STAMP LOGIC
         async function downloadImage() {
             if(!activeItem) return;
             const dlBtn = document.getElementById('dlBtn');
-            dlBtn.innerText = "GENERATING OFFICIAL PROGRAM...";
+            dlBtn.innerText = "GENERATING...";
             dlBtn.disabled = true;
 
             const now = new Date();
-            const stampDate = now.toLocaleDateString('en-GB'); // DD/MM/YYYY
+            const stampDate = now.toLocaleDateString('en-GB');
             const stampTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }).toUpperCase();
 
-            // 1. Fill the Hidden Template
             document.getElementById('canvasTitle').innerText = activeItem.title;
             document.getElementById('canvasDateDisplay').innerText = activeItem.program_date;
             document.getElementById('canvasUser').innerText = activeItem.user_id;
-            
-            // Stamp details
             document.getElementById('stampDate').innerText = `DATE: ${stampDate}`;
             document.getElementById('stampTime').innerText = `TIME: ${stampTime}`;
             document.getElementById('stampArea').style.display = (activeItem.status === 'approved') ? 'block' : 'none';
@@ -348,42 +316,49 @@
                 </div>
             `).join('');
 
-            // 2. Trigger html2canvas
             const element = document.getElementById('downloadCanvas');
-            element.style.left = "0px"; // Temporarily bring to screen for capture
+            element.style.left = "0px";
 
             try {
-                const canvas = await html2canvas(element, {
-                    scale: 3, // Very High quality
-                    useCORS: true,
-                    backgroundColor: "#ffffff",
-                    logging: false
-                });
-                
-                const imgData = canvas.toDataURL("image/png");
+                const canvas = await html2canvas(element, { scale: 3, useCORS: true, backgroundColor: "#ffffff" });
                 const link = document.createElement('a');
-                link.download = `MCB-OFFICIAL-${activeItem.title}-${activeItem.program_date}.png`;
-                link.href = imgData;
+                link.download = `MCB-OFFICIAL-${activeItem.title}.png`;
+                link.href = canvas.toDataURL("image/png");
                 link.click();
-            } catch (err) {
-                alert("Error generating official image.");
-            } finally {
+            } catch (err) { alert("Error generating image."); }
+            finally {
                 element.style.left = "-3000px";
-                dlBtn.innerText = "DOWNLOAD OFFICIAL IMAGE";
+                dlBtn.innerText = "Download Official Image";
                 dlBtn.disabled = false;
             }
         }
         
+        // REFINED UPDATE UI LOGIC (GREETING & SABBATH)
         function updateUI() {
             const now = new Date();
             const hrs = now.getHours();
-            const day = now.getDay();
-            let greet = "Maayong Buntag";
-            if (hrs >= 12 && hrs < 13) greet = "Maayong Udto";
-            else if (hrs >= 13 && hrs < 18) greet = "Maayong Hapon";
-            else if (hrs >= 18 || hrs < 5) greet = "Maayong Gabii";
+            const day = now.getDay(); // 0 = Sunday, 6 = Saturday
+            
+            // Logic for Greeting
+            let greet = "Maayong Buntag"; // Default Morning (5am - 11:59am)
+            if (hrs >= 12 && hrs < 13) {
+                greet = "Maayong Udto"; // Lunch (12pm - 12:59pm)
+            } else if (hrs >= 13 && hrs < 18) {
+                greet = "Maayong Hapon"; // Afternoon (1pm - 5:59pm)
+            } else if (hrs >= 18 || hrs < 5) {
+                greet = "Maayong Gabii"; // Evening (6pm - 4:59am)
+            }
+            
             document.getElementById('greetingText').innerText = greet;
-            if (day === 0) document.getElementById('sabbathLabel').classList.remove('hidden');
+
+            // Sabbath Day Logic: 6 is Saturday (Sabbath). If you mean Sunday, use 0.
+            const sabbathElement = document.getElementById('sabbathLabel');
+            if (day === 6 || day === 0) { 
+                sabbathElement.classList.remove('hidden');
+            } else {
+                sabbathElement.classList.add('hidden');
+            }
+
             document.getElementById('liveClock').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             document.getElementById('liveDate').innerText = now.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
         }
