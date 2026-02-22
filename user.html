@@ -50,37 +50,65 @@
         .registry-item:hover { transform: translateX(5px); border-left-color: #10b981; background: #f8fafc; }
         
         .status-badge { font-size: 8px; font-weight: 900; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.05em; }
-
         .act-row { position: relative; background: #f8fafc; padding: 1rem; border-radius: 1rem; margin-bottom: 0.5rem; }
 
-        /* Hidden Download Template */
+        /* OFFICIAL DOWNLOAD TEMPLATE STYLING (MATCHING THE UPLOADED PICTURES) */
         #downloadCanvas { 
-            width: 600px; 
-            padding: 40px; 
+            width: 700px; 
+            padding: 50px; 
             background: white; 
             position: fixed; 
             top: 0; 
-            left: -2000px; /* Stay hidden but rendered */
-            text-align: center;
-            z-index: -1;
+            left: -3000px; /* Fully hidden */
+            z-index: -10;
+        }
+        .canvas-header { text-align: center; border-bottom: 3px solid #2D4E53; padding-bottom: 20px; margin-bottom: 30px; }
+        .canvas-title { font-size: 24pt; font-weight: 800; color: #1e293b; margin-top: 15px; text-transform: uppercase; }
+        .canvas-subtitle { font-size: 11pt; color: #64748b; letter-spacing: 3px; font-weight: 600; margin-top: 5px; }
+        .official-stamp { 
+            border: 3px solid #10b981; 
+            padding: 15px 25px; 
+            border-radius: 10px; 
+            display: inline-block; 
+            transform: rotate(-3deg); 
+            margin-top: 30px;
         }
     </style>
 </head>
 <body>
 
     <div id="downloadCanvas">
-        <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 20px;">
-            <img src="mcb.png" style="width: 100px; height: auto;">
-            <h1 style="font-family: sans-serif; font-weight: 900; font-size: 20pt; color: #2D4E53; margin-top: 10px;">MCB BALILIHAN</h1>
-            <p style="font-family: sans-serif; font-size: 10pt; color: #64748b; text-transform: uppercase; letter-spacing: 2px;">Official Service Record</p>
+        <div class="canvas-header">
+            <img src="mcb.png" style="width: 110px; margin: 0 auto;">
+            <h1 style="font-family: sans-serif; font-weight: 900; font-size: 22pt; color: #2D4E53; margin-top: 10px; letter-spacing: -1px;">MOBILIZATION CHURCH BALILIHAN</h1>
+            <p class="canvas-subtitle">OFFICIAL SERVICE PROGRAM</p>
         </div>
-        <div style="border-bottom: 2px solid #2D4E53; margin: 20px 0;"></div>
-        <h2 id="canvasTitle" style="font-family: sans-serif; font-weight: 800; font-size: 16pt; color: #1e293b; text-transform: uppercase;">---</h2>
-        <p id="canvasDate" style="font-size: 10pt; font-weight: bold; color: #10b981; margin-bottom: 20px;">---</p>
-        <div id="canvasBody" style="text-align: left; background: #f8fafc; padding: 20px; border-radius: 15px;"></div>
-        <div style="margin-top: 40px; text-align: right;">
-            <p style="font-size: 8pt; color: #94a3b8; text-transform: uppercase;">Verified By</p>
-            <p id="canvasUser" style="font-weight: 900; font-size: 11pt; color: #2D4E53;">---</p>
+        
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px;">
+            <div style="text-align: left;">
+                <h2 id="canvasTitle" style="font-size: 26pt; font-weight: 800; color: #1e293b; margin: 0;">---</h2>
+                <p id="canvasDateDisplay" style="font-size: 14pt; font-weight: 700; color: #64748b; margin-top: 5px;">---</p>
+            </div>
+        </div>
+
+        <div id="canvasBody" style="border-top: 1px solid #f1f5f9;">
+            </div>
+
+        <div style="margin-top: 50px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="text-align: left;">
+                <p style="font-size: 9pt; color: #94a3b8; font-weight: 800; text-transform: uppercase;">Prepared By:</p>
+                <p id="canvasUser" style="font-size: 12pt; font-weight: 900; color: #1e293b; text-transform: uppercase;">---</p>
+            </div>
+            
+            <div id="stampArea" style="text-align: center; border: 4px solid #10b981; padding: 10px 20px; border-radius: 12px; transform: rotate(-2deg); background: rgba(16, 185, 129, 0.05);">
+                <p style="color: #10b981; font-weight: 900; font-size: 8pt; margin: 0; text-decoration: underline;">MOBILIZATION CHURCH BALILIHAN</p>
+                <h1 style="color: #10b981; font-weight: 950; font-size: 28pt; margin: 0; line-height: 1;">APPROVED</h1>
+                <p style="color: #10b981; font-weight: 800; font-size: 7pt; margin: 0;">APPROVED BY ADMIN</p>
+                <div style="display: flex; justify-content: space-between; gap: 20px; border-top: 1px solid #10b981; margin-top: 5px; padding-top: 2px;">
+                    <span id="stampDate" style="color: #10b981; font-weight: 800; font-size: 7pt;">DATE: --/--/--</span>
+                    <span id="stampTime" style="color: #10b981; font-weight: 800; font-size: 7pt;">TIME: --:-- --</span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -193,7 +221,7 @@
                 <img src="mcb.png" class="w-10 h-10 opacity-40 grayscale">
                 <div>
                     <p class="text-[10px] font-black uppercase text-slate-800 leading-tight">MCB Balilihan</p>
-                    <p class="text-[8px] font-bold text-slate-400 uppercase tracking-tighter max-w-[200px] md:max-w-none">© 2026 Mobilizing hearts for Christ. A church family growing together.</p>
+                    <p class="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">© 2026 Mobilizing hearts for Christ. A church family growing together.</p>
                 </div>
             </div>
             <div class="text-right">
@@ -292,50 +320,55 @@
 
         function closeModal() { document.getElementById('viewModal').style.display = 'none'; }
 
-        // THE DOWNLOAD FUNCTION FIX
+        // THE DOWNLOAD FUNCTION FIX & STAMP LOGIC
         async function downloadImage() {
             if(!activeItem) return;
             const dlBtn = document.getElementById('dlBtn');
-            dlBtn.innerText = "GENERATING IMAGE...";
+            dlBtn.innerText = "GENERATING OFFICIAL PROGRAM...";
             dlBtn.disabled = true;
+
+            const now = new Date();
+            const stampDate = now.toLocaleDateString('en-GB'); // DD/MM/YYYY
+            const stampTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }).toUpperCase();
 
             // 1. Fill the Hidden Template
             document.getElementById('canvasTitle').innerText = activeItem.title;
-            document.getElementById('canvasDate').innerText = activeItem.program_date;
+            document.getElementById('canvasDateDisplay').innerText = activeItem.program_date;
             document.getElementById('canvasUser').innerText = activeItem.user_id;
+            
+            // Stamp details
+            document.getElementById('stampDate').innerText = `DATE: ${stampDate}`;
+            document.getElementById('stampTime').innerText = `TIME: ${stampTime}`;
+            document.getElementById('stampArea').style.display = (activeItem.status === 'approved') ? 'block' : 'none';
+
             document.getElementById('canvasBody').innerHTML = activeItem.content.map(c => `
-                <div style="margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;">
-                    <p style="margin: 0; font-weight: 800; font-size: 11pt; color: #1e293b; text-transform: uppercase;">${c.act}</p>
-                    <p style="margin: 0; color: #10b981; font-weight: bold; font-size: 10pt;">➔ ${c.who}</p>
+                <div style="display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #f1f5f9; align-items: center;">
+                    <p style="margin: 0; font-weight: 800; font-size: 13pt; color: #1e293b; text-transform: uppercase;">${c.act}</p>
+                    <p style="margin: 0; color: #64748b; font-weight: 600; font-size: 11pt;">${c.who}</p>
                 </div>
             `).join('');
 
             // 2. Trigger html2canvas
             const element = document.getElementById('downloadCanvas');
-            
-            // Temporary bring into view for accurate capture
-            element.style.left = "0px";
-            element.style.top = "0px";
-            element.style.zIndex = "5000";
+            element.style.left = "0px"; // Temporarily bring to screen for capture
 
             try {
                 const canvas = await html2canvas(element, {
-                    scale: 2, // High quality
+                    scale: 3, // Very High quality
                     useCORS: true,
-                    backgroundColor: "#ffffff"
+                    backgroundColor: "#ffffff",
+                    logging: false
                 });
                 
                 const imgData = canvas.toDataURL("image/png");
                 const link = document.createElement('a');
-                link.download = `MCB-Program-${activeItem.program_date}.png`;
+                link.download = `MCB-OFFICIAL-${activeItem.title}-${activeItem.program_date}.png`;
                 link.href = imgData;
                 link.click();
             } catch (err) {
-                alert("Error generating image. Please try again.");
-                console.error(err);
+                alert("Error generating official image.");
             } finally {
-                // 3. Hide it again
-                element.style.left = "-2000px";
+                element.style.left = "-3000px";
                 dlBtn.innerText = "DOWNLOAD OFFICIAL IMAGE";
                 dlBtn.disabled = false;
             }
