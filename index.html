@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technical Update | MCB Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            padding: 3rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gear-icon {
+            animation: spin 4s linear infinite;
+            color: #2D4E53;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .pulse-emerald {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+
+        .programmer-badge {
+            background: #2D4E53;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 99px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            display: inline-block;
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glass-card">
+        <div class="flex justify-center mb-6">
+            <div class="relative">
+                <i class="fa-solid fa-screwdriver-wrench text-5xl text-emerald-500 mb-4"></i>
+                <i class="fa-solid fa-gear gear-icon text-2xl absolute -top-2 -right-2"></i>
+            </div>
+        </div>
+
+        <h1 class="text-2xl font-extrabold text-slate-900 uppercase tracking-tight mb-2">
+            Technical <span class="text-emerald-600">Maintenance</span>
+        </h1>
+        
+        <div class="w-16 h-1 bg-emerald-500 mx-auto mb-6 rounded-full"></div>
+
+        <p class="text-slate-600 text-sm leading-relaxed mb-6 font-medium">
+            We are currently resolving some technical errors to provide you with a more seamless experience. The portal is undergoing a system optimization.
+        </p>
+
+        <div class="bg-white/50 rounded-2xl p-4 border border-slate-200 mb-6">
+            <div class="flex items-center justify-center gap-2 mb-1">
+                <span class="w-2 h-2 bg-emerald-500 rounded-full pulse-emerald"></span>
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Status Update</span>
+            </div>
+            <p class="text-slate-800 font-bold text-xs uppercase italic">
+                "Fixing all technical glitches and improving database connectivity."
+            </p>
+        </div>
+
+        <p class="text-[11px] text-slate-400 font-bold uppercase tracking-tighter">
+            System Programmer
+        </p>
+        <div class="programmer-badge shadow-lg">
+            Mark Brian D. Angco
+        </div>
+
+        <div class="mt-10 border-t border-slate-200 pt-6">
+            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                Mobilization Church Balilihan
+            </p>
+            <p class="text-[8px] font-bold text-slate-400 italic">
+                © 2026 • Enhancing our digital service for God's glory.
+            </p>
+        </div>
+    </div>
+
+</body>
+</html>
