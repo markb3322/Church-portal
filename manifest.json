@@ -1,6 +1,6 @@
 {
   "name": "MCB Viewer Portal",
-  "short_name": "Mobilization Church Balilihan",
+  "short_name": "MCB Viewer",
   "description": "Premium Viewer Portal for Mobilization Church Balilihan",
   "start_url": "index.html",
   "display": "standalone",
