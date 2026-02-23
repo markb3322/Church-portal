@@ -26,12 +26,12 @@
         }
 
         .splash-logo {
-            width: 80px; /* Paliitin ang image gaya ng request mo */
+            width: 80px; 
             height: auto;
             margin-bottom: 20px;
         }
 
-        .church-name {
+        .church-name-loading {
             font-weight: 800;
             color: #2D4E53;
             text-transform: uppercase;
@@ -79,8 +79,36 @@
             text-align: center;
             padding: 3rem 2rem;
             position: relative;
+            overflow: hidden;
         }
 
+        .gear-icon {
+            animation: spin 4s linear infinite;
+            color: #2D4E53;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .pulse-emerald {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+
+        .programmer-container {
+            display: inline-block;
+            margin-top: 1.5rem;
+            position: relative;
+            padding: 10px 20px;
+        }
+
+        /* Doctor's Short Signature Style */
         .signature-overlay {
             font-family: 'Mrs Saint Delafield', cursive;
             position: absolute;
@@ -92,6 +120,8 @@
             white-space: nowrap;
             pointer-events: none;
             z-index: 20;
+            opacity: 0.85;
+            letter-spacing: -2px;
         }
 
         .printed-name {
@@ -111,7 +141,7 @@
 
     <div id="splash-screen">
         <img src="mcb.png" alt="Logo" class="splash-logo">
-        <div class="church-name">Mobilization Church</div>
+        <div class="church-name-loading">Mobilization Church</div>
         <div class="loading-dots">
             <div class="dot"></div>
             <div class="dot"></div>
@@ -121,33 +151,53 @@
 
     <div class="glass-card">
         <div class="flex justify-center mb-6">
-            <i class="fa-solid fa-screwdriver-wrench text-5xl text-emerald-500 mb-4"></i>
+            <div class="relative">
+                <i class="fa-solid fa-screwdriver-wrench text-5xl text-emerald-500 mb-4"></i>
+                <i class="fa-solid fa-gear gear-icon text-2xl absolute -top-2 -right-2"></i>
+            </div>
         </div>
 
         <h1 class="text-2xl font-extrabold text-slate-900 uppercase tracking-tight mb-2">
             Technical <span class="text-emerald-600">Maintenance</span>
         </h1>
+        
+        <div class="w-16 h-1 bg-emerald-500 mx-auto mb-6 rounded-full"></div>
 
-        <p class="text-slate-600 text-sm mb-6">
-            System is undergoing optimization.
+        <p class="text-slate-600 text-sm leading-relaxed mb-6 font-medium">
+            We are currently resolving some technical errors to provide you with a more seamless experience. The portal is undergoing a system optimization.
+        </p>
+
+        <div class="bg-white/50 rounded-2xl p-4 border border-slate-200 mb-6">
+            <div class="flex items-center justify-center gap-2 mb-1">
+                <span class="w-2 h-2 bg-emerald-500 rounded-full pulse-emerald"></span>
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Status Update</span>
+            </div>
+            <p class="text-slate-800 font-bold text-xs uppercase italic">
+                "Fixing all technical glitches and improving database connectivity."
+            </p>
+        </div>
+
+        <p class="text-[11px] text-slate-400 font-bold uppercase tracking-tighter">
+            System Programmer
         </p>
         
-        <p class="text-[11px] text-slate-400 font-bold uppercase tracking-tighter">System Programmer</p>
-        
-        <div class="relative inline-block mt-6 px-4 py-2">
+        <div class="programmer-container">
             <span class="signature-overlay">M. Angco</span>
             <div class="printed-name">Mark Brian D. Angco</div>
         </div>
 
         <div class="mt-10 border-t border-slate-200 pt-6">
-            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">
+            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
                 Mobilization Church Balilihan
+            </p>
+            <p class="text-[8px] font-bold text-slate-400 italic">
+                © 2026 • Enhancing our digital service for God's glory.
             </p>
         </div>
     </div>
 
     <script>
-        // HIDE SPLASH SCREEN AFTER 2.5 SECONDS
+        // HIDE SPLASH SCREEN AFTER LOADING
         window.addEventListener('load', () => {
             setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
@@ -155,7 +205,7 @@
                 setTimeout(() => {
                     splash.style.display = 'none';
                 }, 500);
-            }, 2500);
+            }, 2500); // 2.5 seconds loading
         });
     </script>
 </body>
