@@ -2,13 +2,62 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Technical Update | MCB Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mobilization Church Balilihan</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2D4E53">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Mrs+Saint+Delafield&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        /* SPLASH SCREEN STYLE (FB LITE STYLE) */
+        #splash-screen {
+            position: fixed;
+            inset: 0;
+            background: #f8fafc;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease-out;
+        }
 
+        .splash-logo {
+            width: 80px; /* Paliitin ang image gaya ng request mo */
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        .church-name {
+            font-weight: 800;
+            color: #2D4E53;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+
+        /* 3-DOT LOADING ANIMATION */
+        .loading-dots { display: flex; gap: 6px; }
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1.0); }
+        }
+
+        /* ORIGINAL PAGE STYLES */
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 100%);
@@ -30,88 +79,84 @@
             text-align: center;
             padding: 3rem 2rem;
             position: relative;
-            overflow: hidden;
         }
 
-        .gear-icon {
-            animation: spin 4s linear infinite;
-            color: #2D4E53;
+        .signature-overlay {
+            font-family: 'Mrs Saint Delafield', cursive;
+            position: absolute;
+            top: -25px; 
+            left: 50%;
+            transform: translateX(-50%) rotate(-5deg);
+            font-size: 3rem; 
+            color: #10b981; 
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 20;
         }
 
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .pulse-emerald {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: .5; }
-        }
-
-        .programmer-badge {
-            background: #2D4E53;
-            color: white;
-            padding: 6px 16px;
-            border-radius: 99px;
-            font-size: 10px;
+        .printed-name {
+            font-size: 11px;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
-            display: inline-block;
-            margin-top: 1.5rem;
+            letter-spacing: 0.2em;
+            color: #1e293b;
+            position: relative;
+            z-index: 10;
+            border-top: 1px solid rgba(0,0,0,0.1);
+            padding-top: 4px;
         }
     </style>
 </head>
 <body>
 
+    <div id="splash-screen">
+        <img src="mcb.png" alt="Logo" class="splash-logo">
+        <div class="church-name">Mobilization Church</div>
+        <div class="loading-dots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+    </div>
+
     <div class="glass-card">
         <div class="flex justify-center mb-6">
-            <div class="relative">
-                <i class="fa-solid fa-screwdriver-wrench text-5xl text-emerald-500 mb-4"></i>
-                <i class="fa-solid fa-gear gear-icon text-2xl absolute -top-2 -right-2"></i>
-            </div>
+            <i class="fa-solid fa-screwdriver-wrench text-5xl text-emerald-500 mb-4"></i>
         </div>
 
         <h1 class="text-2xl font-extrabold text-slate-900 uppercase tracking-tight mb-2">
             Technical <span class="text-emerald-600">Maintenance</span>
         </h1>
+
+        <p class="text-slate-600 text-sm mb-6">
+            System is undergoing optimization.
+        </p>
         
-        <div class="w-16 h-1 bg-emerald-500 mx-auto mb-6 rounded-full"></div>
-
-        <p class="text-slate-600 text-sm leading-relaxed mb-6 font-medium">
-            We are currently resolving some technical errors to provide you with a more seamless experience. The portal is undergoing a system optimization.
-        </p>
-
-        <div class="bg-white/50 rounded-2xl p-4 border border-slate-200 mb-6">
-            <div class="flex items-center justify-center gap-2 mb-1">
-                <span class="w-2 h-2 bg-emerald-500 rounded-full pulse-emerald"></span>
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Status Update</span>
-            </div>
-            <p class="text-slate-800 font-bold text-xs uppercase italic">
-                "Fixing all technical glitches and improving database connectivity."
-            </p>
-        </div>
-
-        <p class="text-[11px] text-slate-400 font-bold uppercase tracking-tighter">
-            System Programmer
-        </p>
-        <div class="programmer-badge shadow-lg">
-            Mark Brian D. Angco
+        <p class="text-[11px] text-slate-400 font-bold uppercase tracking-tighter">System Programmer</p>
+        
+        <div class="relative inline-block mt-6 px-4 py-2">
+            <span class="signature-overlay">M. Angco</span>
+            <div class="printed-name">Mark Brian D. Angco</div>
         </div>
 
         <div class="mt-10 border-t border-slate-200 pt-6">
-            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
+            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">
                 Mobilization Church Balilihan
-            </p>
-            <p class="text-[8px] font-bold text-slate-400 italic">
-                © 2026 • Enhancing our digital service for God's glory.
             </p>
         </div>
     </div>
 
+    <script>
+        // HIDE SPLASH SCREEN AFTER 2.5 SECONDS
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                splash.style.opacity = '0';
+                setTimeout(() => {
+                    splash.style.display = 'none';
+                }, 500);
+            }, 2500);
+        });
+    </script>
 </body>
 </html>
