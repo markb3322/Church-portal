@@ -1,11 +1,7 @@
 {
-  "name": "MCB Viewer Portal",
-  "short_name": "MCB Viewer",
-  "description": "Premium Viewer Portal for Mobilization Church Balilihan",
-  "start_url": "index.html",
-  "display": "standalone",
-  "background_color": "#f1f5f9",
-  "theme_color": "#10b981",
+  "short_name": "MCB Portal",
+  "name": "Mobilization Church Balilihan",
+  "description": "Official Portal for Mobilization Church Balilihan",
   "icons": [
     {
       "src": "mcb.png",
@@ -18,5 +14,10 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ]
+  ],
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#2D4E53",
+  "orientation": "portrait"
 }
